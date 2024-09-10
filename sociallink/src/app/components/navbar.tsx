@@ -6,7 +6,7 @@ import logo from '/static/logo.png';
 import SpotlightEffect from './spotlight';
 
 export default function Navbar() {
-  const pathname = usePathname(); // Get the current path
+  const pathname = usePathname();
   const isActive = (path: string): boolean => pathname === path;
 
   return (
@@ -26,7 +26,8 @@ export default function Navbar() {
             <a href="#/">
                 <div className="flex items-center bg-white py-1 px-2 rounded-xl transition duration-300">
                   <i className="fas fa-right-to-bracket mr-2 text-black fa-lg"></i>
-                  <p className="text-black font-extrabold text-base">Dashboard</p>
+                  <p className="text-black font-extrabold text-base">Log in</p>
+                  {/* <p className="text-black font-extrabold text-base">Dashboard</p> */}
                 </div>
             </a>
           </SpotlightEffect>
