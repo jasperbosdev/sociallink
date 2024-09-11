@@ -13,13 +13,12 @@ export default function Navbar() {
     <nav className="border-b-2 border-zinc-800 sticky top-0 backdrop-blur-lg bg-opacity-70 z-50 animate-fade-down animate-once animate-duration-1000 animate-delay-0">
       <div className="flex mx-auto justify-between max-w-[1000px] py-4 items-center">
         <div className="">
-            <img src="/static/logo.png" className='w-32 h-auto'></img>
+            <a href="/"><img src="/static/logo.png" className='w-32 h-auto'></img></a>
         </div>
         <div className="flex font-bold space-x-8 text-l text-zinc-300 items-center">
           <div className={isActive("/") ? "text-white/60" : "hover:text-white transition duration-300"}>
             <a className="hover:text-white transition duration-300" href="/#">Home</a>
           </div>
-          <div className=""><a className="hover:text-white transition duration-300" href="/#">Products</a></div>
           <div className=""><a className="hover:text-white transition duration-300" href="/#">Store</a></div>
           <div className=""><a className="hover:text-white transition duration-300" href="/#">Discord</a></div>
           <SpotlightEffect>
