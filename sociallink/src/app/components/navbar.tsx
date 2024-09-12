@@ -5,9 +5,13 @@ import Image from 'next/image';
 import logo from '/static/logo.png';
 import SpotlightEffect from './utils/spotlight';
 
+//auth
+import { signIn, useSession } from 'next-auth/react';
+
 export default function Navbar() {
   const pathname = usePathname();
   const isActive = (path: string): boolean => pathname === path;
+  const { data: session } = useSession();
 
   return (
     <nav className="border-b-2 border-zinc-800 sticky top-0 backdrop-blur-lg bg-opacity-70 z-50 animate-fade-down animate-once animate-duration-1000 animate-delay-0">
@@ -22,13 +26,25 @@ export default function Navbar() {
           <div className=""><a className="hover:text-white transition duration-300" href="/#">Store</a></div>
           <div className=""><a className="hover:text-white transition duration-300" href="/#">Discord</a></div>
           <SpotlightEffect>
-            <a href="#/">
+            {session ? (
+              // User is signed in, show Dashboard link and Logout button
+              <>
+                <a href="/dashboard">
+                  <div className="flex items-center bg-white py-1 px-2 rounded-xl transition duration-300">
+                    <i className="fas fa-address-card mr-2 text-black fa-lg"></i>
+                    <p className="text-black font-extrabold text-base">Dashboard</p>
+                  </div>
+                </a>
+              </>
+            ) : (
+              // User is not signed in, show Login button
+              <a href="/login">
                 <div className="flex items-center bg-white py-1 px-2 rounded-xl transition duration-300">
                   <i className="fas fa-right-to-bracket mr-2 text-black fa-lg"></i>
                   <p className="text-black font-extrabold text-base">Log in</p>
-                  {/* <p className="text-black font-extrabold text-base">Dashboard</p> */}
                 </div>
-            </a>
+              </a>
+            )}
           </SpotlightEffect>
         </div>
       </div>
