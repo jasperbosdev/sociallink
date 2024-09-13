@@ -1,15 +1,36 @@
+// pages/signin.js
 'use client';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { supabase } from '../supabase';
 
 export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    
+    // Sign in using Supabase Auth
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      return;
+    }
+
+    // Redirect on successful sign-in
+    router.push('/');
+  };
+
   return (
     <>
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-20 w-auto"
@@ -33,6 +54,7 @@ export default function Signin() {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
@@ -57,6 +79,7 @@ export default function Signin() {
                   name="password"
                   type="password"
                   autoComplete="current-password"
+                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
@@ -66,7 +89,7 @@ export default function Signin() {
 
             <div>
               <button
-                onClick={() => signIn('credentials', {email, password, redirect: true, callbackUrl: '/'})}
+                onClick={handleSignIn}
                 disabled={!email || !password}
                 className="disabled:opacity-40 flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               >
@@ -75,14 +98,16 @@ export default function Signin() {
             </div>
           </div>
 
+          {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+
           <p className="mt-10 text-center text-sm text-gray-400">
             Not a member?{' '}
-            <button onClick={() => router.push('register')} className="font-semibold leading-6 text-indigo-400 hover:text-indigo-300">
+            <button onClick={() => router.push('/register')} className="font-semibold leading-6 text-indigo-400 hover:text-indigo-300">
               Sign Up
             </button>
           </p>
         </div>
       </div>
     </>
-  )
+  );
 }
