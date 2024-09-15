@@ -1,7 +1,7 @@
 'use client';
 
-import { Tilt } from 'react-next-tilt';
 import ParticleEffectComponent from './components/utils/particles';
+import { Tilt } from 'react-next-tilt';
 
 export default function Home() {
   return (
@@ -41,7 +41,7 @@ export default function Home() {
             Bla bla bla, blu blu blu, bleh bleh bleh...
           </p>
           <div className="flex justify-center space-x-10 mt-5">
-            <a href="/#">
+            <a href="#/">
             <div className="relative bg-neutral-950 rounded-xl p-0.5 transition-all duration-[300ms] ease-in-out hover:bg-white/60">
               <div className="flex items-center bg-neutral-950 py-1 px-4 rounded-xl transition duration-300">
                 <i className="fas fa-tags mr-2 text-white fa-lg"></i>

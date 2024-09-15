@@ -25,7 +25,7 @@ export default function Signin() {
     }
 
     // Redirect on successful sign-in
-    router.push('/');
+    router.push('/dashboard');
   };
 
   return (

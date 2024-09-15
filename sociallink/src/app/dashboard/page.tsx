@@ -36,17 +36,19 @@ export default function Dashboard() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="p-8">
-      <div className='text-white'>
-        {userEmail ? `Welcome, ${userEmail}` : 'No user found'}
+    <>
+      <div className="p-8">
+        <div className='text-white'>
+          {userEmail ? `Welcome, ${userEmail}` : 'No user found'}
+        </div>
+        <button
+          className='text-white mt-4 px-4 py-2 bg-indigo-500 rounded'
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+        {error && <div className="text-red-500">{error}</div>}
       </div>
-      <button
-        className='text-white mt-4 px-4 py-2 bg-indigo-500 rounded'
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
-      {error && <div className="text-red-500">{error}</div>}
-    </div>
+    </>
   );
 }
