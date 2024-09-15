@@ -1,11 +1,13 @@
 // pages/login.js
 import { useState } from 'react';
 import { supabase } from '../src/app/supabase';
+import { useRouter } from 'next/router';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,7 +21,7 @@ export default function Login() {
       setError(error.message);
     } else {
       alert('Login successful!');
-      // Redirect to dashboard or homepage
+      router.push('/dashboard');
     }
   };
 
