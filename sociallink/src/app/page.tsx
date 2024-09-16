@@ -36,7 +36,7 @@ export default function Home() {
           </Tilt>
         </div>
 
-        <div className="flex flex-col animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[2100ms]">
+        <div className="flex flex-col animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[1500ms]">
           <p className="font-bold text-white/60">
             Bla bla bla, blu blu blu, bleh bleh bleh...
           </p>
@@ -58,12 +58,25 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="flex flex-col text-center space-y-6 animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[2900ms]">
+        <div className="flex flex-col text-center space-y-6 animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[1700ms]">
           <p className="font-bold text-white/60">
             Learn More
           </p>
           <div className="animate-bounce animate-infinite">
             <i className='fas fa-arrow-down fa-2xl text-white/60'></i>
+          </div>
+        </div>
+
+        {/* What do we do */}
+        <div className="w-3/4">
+          <div className="flex flex-row justify-between">
+            <div className="text-start">
+              <p className='text-4xl font-extrabold'>What do we do?</p>
+              <p className='text-white/60 font-bold mt-1'>Bla bla bla bla bla.</p>
+            </div>
+            <div className="border border-white/60 border-4 rounded-lg">
+              <img src='https://via.placeholder.com/500x281'></img>
+            </div>
           </div>
         </div>
 
