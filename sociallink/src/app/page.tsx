@@ -3,6 +3,7 @@
 import ParticleEffectComponent from './components/utils/particles';
 import { Tilt } from 'react-next-tilt';
 import SpotlightEffect from './components/utils/spotlightHome';
+import { users } from './components/utils/usersData'; // Import the users array
 
 export default function Home() {
   return (
@@ -148,8 +149,36 @@ export default function Home() {
 
         <div className="mt-20 w-3/4 relative flex flex-col items-center">
           <p className='text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent'>
-            Level up your profile
+            Wondering what we got in store?
           </p>
+          <p className='text-white/60 font-bold mt-2 text-center'>
+            Take a look at a few of the featured profiles below to get an idea of what is possible.
+          </p>
+          {/* featured slider */}
+          <div className="flex flex-col mt-4 w-full justify-center overflow-hidden space-y-4">
+            {/* Left to right slider */}
+            <div className="flex flex-row space-x-4 w-fit">
+              {users.map((user, index) => (
+                <div key={index} className="bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
+                  <div className="flex items-center space-x-2">
+                    <img src={user.imgSrc} className='rounded-full max-w-[50px] max-h-[50px] object-cover' alt={user.username} />
+                    <p className='font-bold truncate'>{user.username}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Right to left slider */}
+            <div className="flex flex-row space-x-4 w-fit">
+              {users.map((user, index) => (
+                <div key={index} className="bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
+                  <div className="flex items-center space-x-2">
+                    <img src={user.imgSrc} className='rounded-full max-w-[50px] max-h-[50px] object-cover' alt={user.username} />
+                    <p className='font-bold truncate'>{user.username}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>
