@@ -81,13 +81,15 @@ export default function Home() {
           <div className="flex md:flex-row flex-col justify-between space-x-20">
             <div className="text-start">
               <p className="text-4xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
-                What do we do?
+                What do we do and why?
               </p>
-              <p className="text-white/60 font-bold mt-2">
+              <p className="text-white/60 font-bold mt-2 w-3/4">
                 We offer a wide range of features to help you connect with others, and share your online presence.
+                Using our endless customizability you can really tweak everything the way you like it.
+                This projected started as an idea abandoned months ago, but revived to be used as school project.
               </p>
             </div>
-            <div className="relative">
+            <div className="relative w-full">
               <img src="/static/assets/square.png" className="absolute top-[-30%] z-0" />
               <Tilt className="" lineGlareEnable={false} tiltReverse={false} spotGlareEnable={false}>
                 <img src="/static/assets/whatdowedo.png" className="rounded relative z-10 border border-white/60 border-4 rounded-lg" />
