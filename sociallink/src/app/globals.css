@@ -118,3 +118,9 @@ button:hover {
   z-index: 1;
   color: rgb(203 213 225);
 }
+
+@layer utilities {
+  .animation-pause {
+    animation-play-state: paused;
+  }
+}
