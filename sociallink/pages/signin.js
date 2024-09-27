@@ -1,10 +1,9 @@
-// pages/login.js
 import { useState } from 'react';
 import { supabase } from '../src/app/supabase';
 import { useRouter } from 'next/router';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState(''); // Update to use username
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -12,17 +11,31 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { user, session, error } = await supabase.auth.signIn({
-      email,
+    // Fetch the user's email using the username from the users table
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('email')
+      .eq('username', username)
+      .single();
+
+    if (userError || !user) {
+      setError('Invalid username');
+      return;
+    }
+
+    // Sign in using Supabase Auth with the retrieved email
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email, // Use the email for authentication
       password,
     });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      alert('Login successful!');
-      router.push('/dashboard');
+    if (signInError) {
+      setError(signInError.message);
+      return;
     }
+
+    alert('Login successful!');
+    router.push('/dashboard');
   };
 
   return (
@@ -30,16 +43,18 @@ export default function Login() {
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
+          type="text" // Change type to text for username input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+          required
         />
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          required
         />
         <button type="submit">Login</button>
         {error && <p>{error}</p>}
