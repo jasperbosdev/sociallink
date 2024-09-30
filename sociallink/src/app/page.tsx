@@ -177,29 +177,29 @@ export default function Home() {
             {/* Left to right slider */}
             <div className="container flex relative overflow-hidden whitespace-nowrap [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)]">
               <div className="flex animate-slide-left-infinite space-x-4 mr-4 inline-block w-max py-1">
-                {users.map((user, index) => (
-                  <a href={user.profileLink}>
-                    <div key={index} className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
-                      <div className="flex items-center space-x-2">
-                        <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
-                        <p className="font-bold truncate">{user.username}</p>
-                      </div>
-                   </div>
-                  </a>
-                ))}
+              {users.map((user) => (
+                <a href={user.profileLink} key={user.profileLink}>
+                  <div className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
+                    <div className="flex items-center space-x-2">
+                      <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
+                      <p className="font-bold truncate">{user.username}</p>
+                    </div>
+                  </div>
+                </a>
+              ))}
               </div>
               {/* Duplicate for infinite effect */}
               <div className="flex animate-slide-left-infinite space-x-4 inline-block w-max py-1">
-                {users.map((user, index) => (
-                  <a href={user.profileLink}>
-                    <div key={`duplicate-left-${index}`} className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
-                      <div className="flex items-center space-x-2">
-                        <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
-                        <p className="font-bold truncate">{user.username}</p>
-                      </div>
+              {users.map((user) => (
+                <a href={user.profileLink} key={user.profileLink}>
+                  <div className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
+                    <div className="flex items-center space-x-2">
+                      <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
+                      <p className="font-bold truncate">{user.username}</p>
                     </div>
-                  </a>
-                ))}
+                  </div>
+                </a>
+              ))}
               </div>
             </div>
 
