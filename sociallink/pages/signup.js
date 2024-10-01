@@ -5,7 +5,7 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordAgain, setPasswordAgain] = useState('');
-  const [username, setUsername] = useState(''); // New username state
+  const [username, setUsername] = useState('');
   const [inviteToken, setInviteToken] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -45,9 +45,10 @@ export default function SignUp() {
 
     // Ensure user ID is available before inserting into users
     if (signUpData.user?.id) {
+      // Insert the user into the users table with username and automatically assign UID
       const { error: profileError } = await supabase
         .from('users')
-        .insert([{ id: signUpData.user.id, username }]); // Insert the username with user ID
+        .insert([{ id: signUpData.user.id, username }]); // UID will be automatically assigned due to SERIAL
 
       if (profileError) {
         setError(profileError.message);
