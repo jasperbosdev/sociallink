@@ -98,7 +98,7 @@ export default function SetMOTDPage() {
           <textarea
             value={motd}
             onChange={(e) => setMOTD(e.target.value)}
-            className="w-full p-2 mb-4 border rounded text-white bg-black"
+            className="w-full p-2 mb-4 border-4 border-white/20 rounded-lg text-white bg-black"
             rows={5}
             placeholder="Enter the Message of the Day..."
           />
