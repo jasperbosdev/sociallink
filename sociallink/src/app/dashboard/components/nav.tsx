@@ -6,36 +6,52 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../supabase';
 
 export default function Nav() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const router = useRouter();
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [userEmail, setUserEmail] = useState<string | null>(null);
-    const router = useRouter();
-  
-    useEffect(() => {
-      const checkSession = async () => {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error || !session) {
-          router.push('/login');
-          return;
-        }
-        setUserEmail(session.user?.email || 'No user found');
-        setLoading(false);
-      };
-  
-      checkSession();
-    }, [router]);
-  
-    const handleLogout = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        setError('Failed to log out');
-      } else {
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
         router.push('/login');
+        return;
       }
+      
+      setUserEmail(session.user?.email || 'No user found');
+      
+      // Fetch the user role from the public.users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')  // Make sure the table name is correct
+        .select('role')
+        .eq('id', session.user?.id)
+        .single();
+      
+      if (userError || !userData) {
+        setError('Failed to fetch user role');
+        setLoading(false);
+        return;
+      }
+
+      setUserRole(userData.role);
+      setLoading(false);
     };
-  
-    if (loading) return <div>Loading...</div>;
+
+    checkSession();
+  }, [router]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setError('Failed to log out');
+    } else {
+      router.push('/login');
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
 
     return (
         <>
@@ -56,6 +72,12 @@ export default function Nav() {
                         <i className="fas fa-user-cog text-white fa-2xl"></i>
                     </div>
                     <div className="border border-2 border-white/20"></div> {/* divider */}
+                    {/* Conditionally render the admin settings button */}
+                    {userRole === 'admin' && (
+                      <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer">
+                        <i className="fas fa-user-tie text-white fa-2xl"></i>
+                      </div>
+                    )}
                     {/* dashboard logout */}
                     <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={handleLogout}>
                         <i className="fas fa-arrow-right-from-bracket text-white fa-2xl"></i>
