@@ -1,49 +1,86 @@
-// pages/admin/invite.js
-import { useState } from 'react';
+import { supabase } from '../../src/app/supabase';
 
-export default function InvitePage() {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    console.error('Method not allowed');
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-  const handleInviteCreation = async (e) => {
-    e.preventDefault();
+  // Extract token from the Authorization header
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    console.error('Unauthorized: No token provided');
+    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+  }
 
-    try {
-      const response = await fetch('/api/create-invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+  // Validate the token and get the user
+  const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+  if (userError || !user) {
+    console.error('Unauthorized: Invalid token', userError);
+    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
 
-      const data = await response.json();
+  try {
+    // Fetch the user's role and username from the 'users' table
+    const { data: userData, error: roleError } = await supabase
+      .from('users')
+      .select('role, username')  // Assuming you have a 'username' column in your 'users' table
+      .eq('id', user.id)
+      .single();
 
-      if (response.ok) {
-        setMessage(`Invite created: ${data.token}`);
-        // Optionally, you might want to clear the input field or show a success message
-        setEmail('');
-      } else {
-        setMessage(`Error creating invite: ${data.message}`);
-      }
-    } catch (error) {
-      setMessage('An error occurred while creating the invite.');
-      console.error('An error occurred:', error);
+    if (roleError || !userData) {
+      console.error('Failed to fetch user role or name', roleError);
+      return res.status(500).json({ error: 'Failed to fetch user role or name' });
     }
-  };
 
-  return (
-    <div>
-      <h1>Create Invite</h1>
-      <form onSubmit={handleInviteCreation}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter email"
-          required
-        />
-        <button type="submit">Create Invite</button>
-      </form>
-      {message && <p>{message}</p>}
-    </div>
-  );
+    const isAdmin = userData.role === 'admin';
+    const userName = userData.username;  // Username of the user creating the invite
+
+    // Regular users: check how many invites they have already created
+    let inviteCount = 0;
+
+    if (!isAdmin) {
+      const { data: invites, error: inviteError } = await supabase
+        .from('invites')
+        .select('id')  // Select only the id of the invite
+        .eq('created_by', user.id);  // Now comparing based on user.id (UUID)
+
+      if (inviteError) {
+        console.error('Error fetching invites', inviteError);
+        return res.status(500).json({ error: 'Error fetching invites' });
+      }
+
+      inviteCount = invites.length;  // Count the number of invites created by the user
+
+      if (inviteCount >= 1) {
+        return res.status(403).json({ error: 'You have already created an invite' });
+      }
+    }
+
+    // Generate a random token (invite key)
+    const inviteToken = Math.random().toString(36).substr(2, 10).toUpperCase();
+
+    // Insert invite into the database, using the username in 'created_by'
+    const { error: insertError } = await supabase.from('invites').insert([
+      {
+        email: req.body.email,  // Assuming email is passed in the request body
+        token: inviteToken,
+        used: false,
+        created_at: new Date(),
+        invite_limit: isAdmin ? null : 1,  // Admin can create unlimited invites, regular users get 1
+        created_by: userName,  // Use the username instead of the user id
+        invite_id: inviteCount + 1,  // Set invite_id based on how many invites the user has already created
+      },
+    ]);
+
+    if (insertError) {
+      console.error('Error creating invite', insertError);
+      return res.status(500).json({ error: 'Error creating invite' });
+    }
+
+    return res.status(200).json({ inviteToken });
+  } catch (err) {
+    console.error('Error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 }
