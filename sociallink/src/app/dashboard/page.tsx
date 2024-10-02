@@ -147,7 +147,7 @@ export default function Dashboard() {
                 {/* <p className="text-white text-base">Invited Users</p> */}
                 <div className="flex flex-col">
                   <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/60 font-bold rounded-lg text-start pl-2">No users invited yet</div>
-                  <div className="bg-blue-700 py-[7px] text-white rounded-md my-1 border-blue-400 border-[3px] font-bold rounded-lg text-center">Manage Invites</div>
+                  <div className="bg-blue-700 py-[7px] text-white rounded-md my-1 border-blue-400 border-[3px] font-bold rounded-lg text-center cursor-pointer hover:scale-[1.02] transition">Manage Invites</div>
                 </div>
               </div>
             </div>
