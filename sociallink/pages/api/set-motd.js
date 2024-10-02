@@ -12,8 +12,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized: No token provided' });
   }
 
-  console.log('Token:', token);
-
   const { data: { user }, error: userError } = await supabase.auth.getUser(token);
   if (userError || !user) {
     console.error('Unauthorized: Invalid token', userError);
