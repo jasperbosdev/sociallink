@@ -60,7 +60,7 @@ export default async function handler(req, res) {
     // Update the existing MOTD
     const { error: updateError } = await supabase
       .from('motd')
-      .update({ message: req.body.motd })
+      .update({ message: req.body.motd, created_at: new Date() })
       .eq('id', 1);
 
     if (updateError) {
