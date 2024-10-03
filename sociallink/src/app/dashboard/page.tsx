@@ -13,9 +13,10 @@ export default function Dashboard() {
   const [created_at, setCreatedAt] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const [totalUsers, setTotalUsers] = useState<any>(null);
-
+  const [totalInvited, setTotalInvited] = useState<any>(null);
   const [motd, setMOTD] = useState<string | null>(null);
   const [MOTDCreatedAt, setMOTDCreatedAt] = useState<string | null>(null);
+  const [invitedUsers, setInvitedUsers] = useState<any[]>([]); // New state for invited users
 
   const router = useRouter();
 
@@ -24,76 +25,117 @@ export default function Dashboard() {
     if (footer) {
       footer.style.display = 'none';
     }
-  }
+  };
+
+  const fetchInvitedUsers = async (sessionUsername: string) => {
+    console.log("Fetching invited users for:", sessionUsername);  // Added log
+  
+    // Fetch only invites that have been used (i.e., used_by is not null)
+    const { data, error } = await supabase
+      .from('invites')
+      .select('used_by')
+      .eq('created_by', sessionUsername)
+      .not('used_by', 'is', null); // Exclude NULL 'used_by' values
+  
+    if (error) {
+      console.error('Error fetching invited users:', error);
+    } else {
+      console.log('Fetched invited users:', data);  // Log the data
+      setInvitedUsers(data || []);
+    }
+  };
+
+  const fetchTotalInvited = async (sessionUsername: string) => {
+    try {
+      // Query to count invites where the 'created_by' is the session user and 'used_by' is not NULL
+      const { count, error } = await supabase
+        .from('invites')
+        .select('used_by', { count: 'exact' }) // Count invites where 'used_by' is not NULL
+        .eq('created_by', sessionUsername)
+        .not('used_by', 'is', null); // Exclude NULL 'used_by' values
+  
+      if (error) {
+        console.error('Error fetching total invited users:', error);
+        setError('Error fetching total invited users');
+      } else {
+        setTotalInvited(count); // Set the count in the state
+      }
+    } catch (err) {
+      console.error('Error during fetch:', err);
+      setError('Error fetching total invited users');
+    }
+  };
 
   useEffect(() => {
     hideFooter();
+
     const checkSessionAndFetchUserData = async () => {
-      // Start the loading state
       setLoading(true);
-  
-      // Get the session data
+    
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) {
         console.error('Session Error:', sessionError);
         router.push('/login');
         return;
       }
-  
+    
       const userId = session.user.id;
-  
-      // Fetch the current user's data and total users simultaneously
+    
       try {
         const [publicUserResponse, totalUsersResponse] = await Promise.all([
           supabase.from('users').select('*').eq('id', userId).single(),
-          supabase.from('users').select('uid')  // Fetch total users by counting 'uid'
+          supabase.from('users').select('uid'),
         ]);
-  
-        // Handle public user data
+    
         if (publicUserResponse.error) {
           console.error('Error fetching public user:', publicUserResponse.error);
           setError('Error fetching user from public.users');
           setLoading(false);
           return;
         }
-  
+    
         const publicUserData = publicUserResponse.data;
         setUsername(publicUserData?.username || 'No username found');
         setUID(publicUserData?.uid || 'No uid found');
         setCreatedAt(publicUserData?.created_at || 'No date found');
         setUserData(publicUserData);
-  
-        // Handle total users count
+    
         if (totalUsersResponse.error) {
           console.error('Error fetching total users:', totalUsersResponse.error);
           setError('Error fetching total users');
           setLoading(false);
           return;
         }
-  
-        setTotalUsers(totalUsersResponse.data.length);  // Count total users by length
+    
+        setTotalUsers(totalUsersResponse.data.length);
+    
+        // Fetch invited users
+        if (publicUserData?.username) {
+          fetchInvitedUsers(publicUserData.username);
+          fetchTotalInvited(publicUserData.username); // Fetch total invited users
+        }
       } catch (err) {
         console.error('Error during data fetching:', err);
         setError('Error fetching data');
       } finally {
-        setLoading(false);  // Turn off loading state
+        setLoading(false);
       }
     };
 
     const fetchMOTD = async () => {
       const { data: motdData, error } = await supabase.from('motd').select('message, created_at').single();
       if (motdData) {
-      setMOTD(motdData.message);
-      setMOTDCreatedAt(motdData.created_at);
+        setMOTD(motdData.message);
+        setMOTDCreatedAt(motdData.created_at);
       } else {
-      console.error('Error fetching MOTD:', error);
-      setError('Error fetching MOTD');
+        console.error('Error fetching MOTD:', error);
+        setError('Error fetching MOTD');
       }
     };
-    
+
     fetchMOTD();
     checkSessionAndFetchUserData();
-  }, [router]);  
+  }, [router]);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -125,7 +167,7 @@ export default function Dashboard() {
                 </li>
                 <li className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 items-center justify-center w-full rounded-lg flex flex-col">
                   <h1 className="text-white font-bold text-center min-[1450px]:text-xl text-lg">Invited Users</h1>
-                  <p className="text-white text-center min-[1450px]:text-xl text-lg">1337</p>
+                  <p className="text-white text-center min-[1450px]:text-xl text-lg">{totalInvited !== null ? `${totalInvited}` : 'Total not found'}</p>
                 </li>
                 <li className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 items-center justify-center w-full rounded-lg flex flex-col">
                   <h1 className="text-white font-bold text-center min-[1450px]:text-xl text-lg">Total Users</h1>
@@ -144,10 +186,24 @@ export default function Dashboard() {
               </div>
               <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 md:w-1/3 w-full rounded-md p-4">
                 <h1 className="text-white font-bold text-xl pb-2">Manage Invites</h1>
-                {/* <p className="text-white text-base">Invited Users</p> */}
                 <div className="flex flex-col">
-                  <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/60 font-bold rounded-lg text-start pl-2">No users invited yet</div>
-                  <div className="bg-blue-700 py-[7px] text-white rounded-md my-1 border-blue-400 border-[3px] font-bold rounded-lg text-center cursor-pointer hover:scale-[1.02] transition" onClick={() => router.push('/dashboard/invite')}>Manage Invites</div>
+                  {invitedUsers.length > 0 ? (
+                    <select className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start pl-2">
+                      {invitedUsers.map((user) => (
+                        <option key={user.used_by} value={user.used_by}>
+                          {user.used_by}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start pl-2">
+                      No users invited yet
+                    </div>
+                  )}
+                  <div className="bg-blue-700 py-[7px] text-white rounded-md my-1 border-blue-400 border-[3px] font-bold rounded-lg text-center cursor-pointer hover:scale-[1.02] transition"
+                    onClick={() => router.push('/dashboard/invite')}>
+                    Manage Invites
+                  </div>
                 </div>
               </div>
             </div>
