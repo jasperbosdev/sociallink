@@ -61,11 +61,16 @@ export default function SignUp() {
       return;
     }
 
-    // Mark the invite token as used
-    await supabase
+    // Mark the invite token as used and update the 'used_by' field with the username
+    const { error: updateInviteError } = await supabase
       .from('invites')
-      .update({ used: true })
+      .update({ used: true, used_by: username }) // Insert username into 'used_by'
       .eq('token', inviteToken);
+
+    if (updateInviteError) {
+      setError('Failed to update invite: ' + updateInviteError.message);
+      return;
+    }
 
     // Set success message
     setSuccess('Signup successful! Please check your email for confirmation.');
