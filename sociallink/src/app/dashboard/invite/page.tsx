@@ -176,6 +176,7 @@ export default function InvitePage() {
                   <thead>
                     <tr className="border-b border-white/20">
                       <th className="text-left p-2 border-r border-white/20 text-center">ID</th>
+                      <th className="text-left p-2 border-r border-white/20 text-center">Invite</th>
                       <th className="text-left p-2 border-r border-white/20 text-center">Created By</th>
                       <th className="text-left p-2 border-r border-white/20 text-center">Used By</th>
                       <th className="text-left p-2 border-r border-white/20 text-center">Created At</th>
@@ -189,6 +190,11 @@ export default function InvitePage() {
                           <td className="p-2 border-r border-white/20">
                             <p className="text-white">
                               <span className="font-bold">{invite.invite_id}</span>
+                            </p>
+                          </td>
+                          <td className="p-2 border-r border-white/20">
+                            <p className="text-white">
+                              <span className="font-bold">{invite.token}</span>
                             </p>
                           </td>
                           <td className="p-2 border-r border-white/20">
