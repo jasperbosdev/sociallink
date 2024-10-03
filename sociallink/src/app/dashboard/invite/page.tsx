@@ -9,10 +9,15 @@ export default function InvitePage() {
   const [loading, setLoading] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [canGenerateInvite, setCanGenerateInvite] = useState(false); // Updated logic for invite generation
-  const [invites, setInvites] = useState<any[]>([]); // State to hold the invites created by the user
-  const [username, setUsername] = useState<string | null>(null); // To store the session user's username
-  const [userRole, setUserRole] = useState<string | null>(null); // To store the session user's role
+  const [canGenerateInvite, setCanGenerateInvite] = useState(false);
+  const [invites, setInvites] = useState<any[]>([]); // State to hold the invites
+  const [username, setUsername] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1); // Track the current page
+  const [totalPages, setTotalPages] = useState(1); // Track the total number of pages
+
+  const invitesPerPage = 5; // Number of invites to display per page
 
   const router = useRouter();
 
@@ -23,7 +28,7 @@ export default function InvitePage() {
     }
   };
 
-  const fetchInvites = async () => {
+  const fetchInvites = async (page: number = 1) => {
     setLoading(true);
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -52,20 +57,36 @@ export default function InvitePage() {
       setUsername(userData.username);
       setUserRole(userData.role);
 
-      // Fetch invites based on the username
+      // Fetch total count of invites for pagination
+      const { count: totalInvites, error: countError } = await supabase
+        .from('invites')
+        .select('*', { count: 'exact', head: true })
+        .eq('created_by', userData.username);
+
+      if (countError) {
+        console.error('Error fetching invite count:', countError);
+        setError('Error fetching invite count');
+        setLoading(false);
+        return;
+      }
+
+      // Calculate total number of pages
+      setTotalPages(Math.ceil(totalInvites! / invitesPerPage));
+
+      // Fetch invites sorted by ID in descending order, limited to 10 invites per page
       const { data: userInvites, error: inviteError } = await supabase
         .from('invites')
         .select('*')
-        .eq('created_by', userData.username); // Use the username to get invites
+        .eq('created_by', userData.username)
+        .order('id', { ascending: false })
+        .range((page - 1) * invitesPerPage, page * invitesPerPage - 1); // Pagination logic
 
       if (inviteError) {
         console.error('Error fetching invites:', inviteError);
         setError('Error fetching invites');
       } else {
         setInvites(userInvites); // Update invites state
-
-        // Set canGenerateInvite based on the user's role (only admin can generate invites)
-        setCanGenerateInvite(userData.role === 'admin');
+        setCanGenerateInvite(userData.role === 'admin'); // Set canGenerateInvite based on the user's role
       }
     } catch (error) {
       console.error('Error fetching invites:', error);
@@ -77,8 +98,8 @@ export default function InvitePage() {
 
   useEffect(() => {
     hideFooter();
-    fetchInvites(); // Fetch the invites when the component mounts
-  }, []); // Empty dependency array to run only once when component mounts
+    fetchInvites(currentPage); // Fetch the invites for the current page when the component mounts
+  }, [currentPage]); // Fetch invites when currentPage changes
 
   const generateInvite = async () => {
     setLoading(true);
@@ -114,9 +135,7 @@ export default function InvitePage() {
       if (response.ok) {
         console.log('Invite Token:', result.inviteToken);
         setInviteToken(result.inviteToken); // Set the invite token state here
-
-        // After generating the invite, re-fetch the invites to update the UI
-        fetchInvites();
+        fetchInvites(currentPage); // After generating the invite, re-fetch the invites to update the UI
       } else {
         console.error('Error creating invite:', result.error);
         setError(result.error); // Display the error message if any
@@ -154,7 +173,7 @@ export default function InvitePage() {
               <div className="flex space-x-2">
                 <button
                   onClick={generateInvite}
-                  disabled={loading || !canGenerateInvite} // Disable if loading or the user is not an admin
+                  disabled={loading || !canGenerateInvite}
                   className={`bg-blue-600 text-white py-2 px-4 rounded ${loading || !canGenerateInvite ? 'cursor-not-allowed' : ''}`}
                 >
                   {loading ? 'Generating...' : 'Generate Invite'}
@@ -168,7 +187,8 @@ export default function InvitePage() {
                 </button>
               </div>
             </div>
-            {/* table */}
+
+            {/* Invite Table */}
             <div className="bg-zinc-900 p-4 rounded-lg mt-4">
               <h2 className="text-2xl font-bold mb-2">Created Invites</h2>
               <div className="border border-4 border-white/20 rounded-lg">
@@ -221,11 +241,32 @@ export default function InvitePage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="p-2 text-center text-white">No invites found.</td>
+                        <td colSpan={6} className="p-2 text-center text-white">No invites found.</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="mt-4 flex justify-between">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  className="bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-white">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  className="bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>
