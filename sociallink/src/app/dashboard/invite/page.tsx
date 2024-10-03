@@ -153,7 +153,7 @@ export default function InvitePage() {
       <div className="flex">
         <Nav />
         <div className="flex flex-col justify-center items-center w-full px-4 mt-8">
-          <div className="container mx-auto w-2/3 p-6 border border-4 border-white/20 rounded-lg bg-[#101013]">
+          <div className="container mx-auto max-w-6xl p-6 border border-4 border-white/20 rounded-lg bg-[#101013]">
             <div className="bg-zinc-900 p-4 rounded-lg">
               <h1 className="text-2xl font-bold mb-2">Generate Invite</h1>
               <p className='mb-2'>
@@ -199,7 +199,7 @@ export default function InvitePage() {
                       <th className="text-left p-2 border-r border-white/20 text-center">Invite</th>
                       <th className="text-left p-2 border-r border-white/20 text-center">Created By</th>
                       <th className="text-left p-2 border-r border-white/20 text-center">Used By</th>
-                      <th className="text-left p-2 border-r border-white/20 text-center">Created At</th>
+                      <th className="text-left p-2 border-r border-white/20 text-center">Created On</th>
                       <th className="text-left p-2 text-center">Used</th>
                     </tr>
                   </thead>
@@ -224,7 +224,7 @@ export default function InvitePage() {
                           </td>
                           <td className="p-2 border-r border-white/20">
                             <p className="text-white">
-                              <span className="font-bold">{invite.used_by}</span>
+                              <a href={`/u/${invite.used_by}`} target='_blank' className="font-bold hover:text-[#BF2E12] text-[#14B90B] transition">{invite.used_by}</a>
                             </p>
                           </td>
                           <td className="p-2 border-r border-white/20">
