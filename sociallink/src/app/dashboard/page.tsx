@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../supabase';
 import Nav from './components/nav';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
+import DailyLoginsChart from './components/DailyLoginsChart';
+
+// Register necessary chart.js components
+ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -17,6 +22,7 @@ export default function Dashboard() {
   const [motd, setMOTD] = useState<string | null>(null);
   const [MOTDCreatedAt, setMOTDCreatedAt] = useState<string | null>(null);
   const [invitedUsers, setInvitedUsers] = useState<any[]>([]); // New state for invited users
+  const [dailyLogins, setDailyLogins] = useState<{ date: string; count: number }[]>([]);
 
   const router = useRouter();
 
@@ -27,38 +33,78 @@ export default function Dashboard() {
     }
   };
 
-  const fetchInvitedUsers = async (sessionUsername: string) => {
-    console.log("Fetching invited users for:", sessionUsername);  // Added log
+  const fetchDailyUniqueLogins = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('logins')  // Make sure this is the correct table name
+        .select('user_id, login_time')
+        .order('login_time', { ascending: false });
   
-    // Fetch only invites that have been used (i.e., used_by is not null)
+      // Log the raw data from Supabase
+      console.log('Fetched data from logins:', data);
+      
+      if (error) {
+        console.error('Error fetching daily unique logins:', error);
+        setError('Error fetching daily logins');
+        return;
+      }
+  
+      // Group logins by date
+      const groupedLogins: { [key: string]: number } = {};
+  
+      data.forEach((row) => {
+        const date = row.login_time.split('T')[0];  // Extract the date part
+        if (!groupedLogins[date]) {
+          groupedLogins[date] = 0;
+        }
+        groupedLogins[date] += 1;  // Count the logins for each date
+      });
+  
+      // Convert groupedLogins to an array
+      const dailyLogins = Object.keys(groupedLogins).map((date) => ({
+        date,
+        count: groupedLogins[date],
+      }));
+  
+      console.log('Grouped Daily Logins:', dailyLogins); // Log the grouped data
+  
+      // Update state with the daily logins data
+      setDailyLogins(dailyLogins);
+    } catch (err) {
+      console.error('Error during fetch:', err);
+      setError('Error fetching daily logins');
+    }
+  };  
+
+  // Fetch invited users
+  const fetchInvitedUsers = async (sessionUsername: string) => {
     const { data, error } = await supabase
       .from('invites')
       .select('used_by')
       .eq('created_by', sessionUsername)
-      .not('used_by', 'is', null); // Exclude NULL 'used_by' values
+      .not('used_by', 'is', null);
   
     if (error) {
       console.error('Error fetching invited users:', error);
     } else {
-      console.log('Fetched invited users:', data);  // Log the data
       setInvitedUsers(data || []);
     }
   };
 
+  // Fetch total invited users
   const fetchTotalInvited = async (sessionUsername: string) => {
     try {
-      // Query to count invites where the 'created_by' is the session user and 'used_by' is not NULL
       const { count, error } = await supabase
         .from('invites')
-        .select('used_by', { count: 'exact' }) // Count invites where 'used_by' is not NULL
+        .select('used_by', { count: 'exact' })
         .eq('created_by', sessionUsername)
-        .not('used_by', 'is', null); // Exclude NULL 'used_by' values
-  
+        .not('used_by', 'is', null);
+
       if (error) {
         console.error('Error fetching total invited users:', error);
         setError('Error fetching total invited users');
       } else {
-        setTotalInvited(count); // Set the count in the state
+        setTotalInvited(count);
       }
     } catch (err) {
       console.error('Error during fetch:', err);
@@ -66,9 +112,8 @@ export default function Dashboard() {
     }
   };
 
+  // Fetch user data on session load
   useEffect(() => {
-    hideFooter();
-
     const checkSessionAndFetchUserData = async () => {
       setLoading(true);
     
@@ -78,41 +123,41 @@ export default function Dashboard() {
         router.push('/login');
         return;
       }
-    
+
       const userId = session.user.id;
-    
+
       try {
         const [publicUserResponse, totalUsersResponse] = await Promise.all([
           supabase.from('users').select('*').eq('id', userId).single(),
           supabase.from('users').select('uid'),
         ]);
-    
+
         if (publicUserResponse.error) {
           console.error('Error fetching public user:', publicUserResponse.error);
           setError('Error fetching user from public.users');
           setLoading(false);
           return;
         }
-    
+
         const publicUserData = publicUserResponse.data;
         setUsername(publicUserData?.username || 'No username found');
         setUID(publicUserData?.uid || 'No uid found');
         setCreatedAt(publicUserData?.created_at || 'No date found');
         setUserData(publicUserData);
-    
+
         if (totalUsersResponse.error) {
           console.error('Error fetching total users:', totalUsersResponse.error);
           setError('Error fetching total users');
           setLoading(false);
           return;
         }
-    
+
         setTotalUsers(totalUsersResponse.data.length);
-    
-        // Fetch invited users
+
+        // Fetch invited users and total invited count
         if (publicUserData?.username) {
           fetchInvitedUsers(publicUserData.username);
-          fetchTotalInvited(publicUserData.username); // Fetch total invited users
+          fetchTotalInvited(publicUserData.username);
         }
       } catch (err) {
         console.error('Error during data fetching:', err);
@@ -122,6 +167,7 @@ export default function Dashboard() {
       }
     };
 
+    // Fetch MOTD
     const fetchMOTD = async () => {
       const { data: motdData, error } = await supabase.from('motd').select('message, created_at').single();
       if (motdData) {
@@ -133,9 +179,32 @@ export default function Dashboard() {
       }
     };
 
+    // Fetch daily logins
     fetchMOTD();
     checkSessionAndFetchUserData();
+    fetchDailyUniqueLogins();  // Fetch logins on page load
+    hideFooter();
   }, [router]);
+
+  // Chart component for Daily Login Graph
+  const DailyLoginGraph = () => {
+    const dates = dailyLogins.map((item) => item.date);
+    const loginCounts = dailyLogins.map((item) => item.count);
+
+    const data = {
+      labels: dates,
+      datasets: [
+        {
+          label: 'Daily Unique Logins',
+          data: loginCounts,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          tension: 0.4,
+        },
+      ],
+    };
+
+    return <canvas id="dailyLoginGraph" width="400" height="200"></canvas>;
+  };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -213,8 +282,8 @@ export default function Dashboard() {
                 <div className="py-20 text-center">example</div>
               </div>
               <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-300 lg:w-1/2 w-full rounded-md p-4">
-                <h1 className="text-white font-bold text-xl pb-2 text-center">System Graph</h1>
-                <div className="py-20 text-center">example</div>
+                <h2 className="font-bold text-center md:text-2xl text-xl pt-2 pb-4">Daily Logins</h2>
+                <DailyLoginsChart dailyLogins={dailyLogins} />
               </div>
             </div>
           </div>
