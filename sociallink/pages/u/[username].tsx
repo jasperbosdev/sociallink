@@ -44,12 +44,14 @@ export default function UserProfile() {
   if (!userData) return <div>User data not available</div>;
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">{userData.username}'s Profile</h1>
-      <p>Joined on: {new Date(userData.created_at).toLocaleDateString()}</p>
-      {userData.profile_picture && (
-        <img src={userData.profile_picture} alt={`${userData.username}'s profile`} />
-      )}
-    </div>
+    <>
+      <div className="container mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">{userData.username}'s Profile</h1>
+        <p>Joined on: {new Date(userData.created_at).toLocaleDateString()}</p>
+        {userData.profile_picture && (
+          <img src={userData.profile_picture} alt={`${userData.username}'s profile`} />
+        )}
+      </div>
+    </>
   );
 }
