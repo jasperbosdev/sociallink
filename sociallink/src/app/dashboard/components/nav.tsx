@@ -68,7 +68,8 @@ export default function Nav() {
                         <i className="fas fa-user-edit text-white fa-2xl"></i>
                     </div>
                     {/* dashboard account settings */}
-                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer">
+                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+                    onClick={() => router.push('/dashboard/account')}>
                         <i className="fas fa-user-cog text-white fa-2xl"></i>
                     </div>
                     <div className="border border-2 border-white/20"></div> {/* divider */}
