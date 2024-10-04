@@ -278,13 +278,18 @@ export default function Dashboard() {
             </div>
             <div className="flex lg:flex-row flex-col gap-4 mx-4 my-4">
               <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-300 lg:w-1/2 w-full rounded-md p-4">
-                <h1 className="text-white font-bold text-xl pb-2 text-center">System Graph</h1>
-                <div className="py-20 text-center">example</div>
+                <h2 className="font-bold text-center md:text-2xl text-xl pt-2 pb-4">Daily Logins</h2>
+                <DailyLoginsChart dailyLogins={dailyLogins} />
               </div>
+              {/* dupe of above, to fill empty space */}
               <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-300 lg:w-1/2 w-full rounded-md p-4">
                 <h2 className="font-bold text-center md:text-2xl text-xl pt-2 pb-4">Daily Logins</h2>
                 <DailyLoginsChart dailyLogins={dailyLogins} />
               </div>
+              {/* <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-300 lg:w-1/2 w-full rounded-md p-4">
+                <h1 className="text-white font-bold text-xl pb-2 text-center">System Graph</h1>
+                <div className="py-20 text-center">example</div>
+              </div> */}
             </div>
           </div>
         </div>
