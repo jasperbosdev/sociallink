@@ -16,6 +16,8 @@ const DailyLoginsChart = ({ dailyLogins }) => {
         borderColor: 'rgba(75, 192, 192, 1)', // Line color
         backgroundColor: 'rgba(75, 192, 192, 0.2)', // Area under the line color
         fill: true, // Fill the area under the line
+        borderWidth: 4, // Increase line thickness (change this value as needed)
+        tension: 0.5, // Adjust the curve of the line (0 = straight line, 1 = very smooth)
       },
     ],
   };
