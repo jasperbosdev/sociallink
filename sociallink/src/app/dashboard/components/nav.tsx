@@ -64,7 +64,8 @@ export default function Nav() {
                     </div>
                     <div className="border border-2 border-white/20"></div> {/* divider */}
                     {/* dashboard user edit */}
-                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer">
+                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+                    onClick={() => router.push('/dashboard/profile')}>
                         <i className="fas fa-user-edit text-white fa-2xl"></i>
                     </div>
                     {/* dashboard account settings */}
