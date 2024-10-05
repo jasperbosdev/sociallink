@@ -10,6 +10,41 @@ export default function Dashboard() {
   const router = useRouter();
   const { loading, error, userData } = useUserData();
 
+  // New state to hold the avatar URL fetched from Supabase
+  const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState<string | null>(null);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(true); // Loading state for avatar
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // Moved the fetchAvatar function here
+  const fetchAvatar = async () => {
+    if (userData && userData.username) {
+      const fileName = `${userData.username}-pfp`; // Assuming the filename format
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(fileName, 60); // The URL will be valid for 60 seconds
+
+      if (error) {
+        console.error("Error fetching avatar:", error);
+        setIsAvatarLoading(false); // Stop loading on error
+        return;
+      }
+
+      // console.log("Fetched avatar signed URL:", data.signedUrl); // Log the signed URL
+      setFetchedAvatarUrl(data.signedUrl); // Set the signed URL
+      setIsAvatarLoading(false); // Stop loading after fetching
+    }
+  };
+
+  useEffect(() => {
+    fetchAvatar(); // Fetch avatar when component mounts
+
+    return () => {
+      if (fetchedAvatarUrl) {
+        URL.revokeObjectURL(fetchedAvatarUrl);
+      }
+    };
+  }, [userData]); // Dependency on userData to refetch if it changes
+
   const hideFooter = () => {
     const footer = document.getElementById("footer");
     if (footer) {
@@ -57,7 +92,16 @@ export default function Dashboard() {
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setAvatar(event.target.files[0]);
+      const newAvatar = event.target.files[0];
+      // console.log("Selected file:", newAvatar); // Log the selected file
+      setAvatar(newAvatar); // Set the avatar state
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // console.log("Avatar preview data URL:", reader.result); // Log the preview URL
+        setAvatarPreview(reader.result as string); // Set the avatar preview state
+      };
+      reader.readAsDataURL(newAvatar); // Read the selected file as data URL
     }
   };
 
@@ -65,23 +109,27 @@ export default function Dashboard() {
     if (!avatar || !userData) return;
 
     setUploading(true);
-    const { username } = userData; // Assuming username is available in userData
+    const { username } = userData;
     const fileName = `${username}-pfp`;
 
     const { data, error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(fileName, avatar, {
         cacheControl: "3600",
-        upsert: true, // Replace if file exists
+        upsert: true,
       });
 
     if (uploadError) {
       console.error("Error uploading avatar:", uploadError);
+      setUploadSuccess(false); // Reset success message on error
     } else {
-      console.log("Avatar uploaded successfully:", data);
+      // console.log("Avatar uploaded successfully:", data);
+      await fetchAvatar();
+      setUploadSuccess(true); // Set success message
     }
+
     setUploading(false);
-    setAvatar(null); // Clear the selected file
+    setAvatar(null);
   };
 
   return (
@@ -166,23 +214,27 @@ export default function Dashboard() {
                           Avatar
                         </h3>
                         <div
-                          className="flex flex-col items-center justify-center px-10 rounded-lg py-5 space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer"
+                          className={`flex flex-col items-center justify-center rounded-lg ${
+                            avatarPreview || fetchedAvatarUrl
+                              ? ""
+                              : "px-10 py-5"
+                          } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
                           onClick={() =>
                             document
                               .getElementById("avatarUploadInput")
                               ?.click()
                           } // The whole box is now clickable
                         >
-                          {/* Check if avatarPreview (newly selected file) or previously uploaded avatar exists */}
-                          {avatarPreview || userData?.avatarUrl ? (
+                          {/* Check if avatarPreview (newly selected file) or fetchedAvatarUrl exists */}
+                          {avatarPreview || fetchedAvatarUrl ? (
                             <img
-                              src={avatarPreview || userData?.avatarUrl} // Display preview or current uploaded avatar
-                              alt="Avatar Preview"
-                              className="w-full object-cover rounded-lg" // Ensure avatar covers the entire box
+                              src={avatarPreview || fetchedAvatarUrl || ""}
+                              alt="Loading avatar..."
+                              className="w-full h-28 object-cover"
                             />
                           ) : (
                             <>
-                              <i className="fas fa-circle-user text-white/60 text-4xl"></i>
+                              <i className="fas fa-user-circle text-4xl text-white/50"></i>
                               <p className="text-base text-white/60 font-semibold">
                                 Click to upload a file
                               </p>
@@ -200,21 +252,21 @@ export default function Dashboard() {
 
                         {/* Display file name if avatar is selected, outside the box */}
                         {avatar && (
-                          <p className="text-sm text-white/60 mt-2">
-                            {avatar.name.length > 10
-                              ? avatar.name.substring(0, 10) + "..."
-                              : avatar.name}
-                          </p>
+                          <button
+                            className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                            onClick={uploadAvatar}
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload Avatar"}
+                          </button>
                         )}
 
-                        {/* Button to upload the selected avatar */}
-                        <button
-                          className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
-                          onClick={uploadAvatar} // Start upload when button is clicked
-                          disabled={uploading} // Disable the button while uploading
-                        >
-                          {uploading ? "Uploading..." : "Upload Avatar"}
-                        </button>
+                        {/* Conditionally render success message */}
+                        {uploadSuccess && (
+                          <div className="mt-4 text-green-600">
+                            Avatar uploaded successfully!
+                          </div>
+                        )}
 
                         <label className="mt-2 flex items-center cursor-pointer">
                           <span className="mr-2 text-white/60 font-semibold">
