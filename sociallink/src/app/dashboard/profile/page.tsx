@@ -105,6 +105,34 @@ export default function Dashboard() {
     }
   };
 
+  const incrementPfpVersion = async () => {
+    // Step 1: Fetch the current pfp_vers value
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("pfp_vers")
+      .eq("id", userData.id)
+      .single();
+  
+    if (fetchError || !user) {
+      console.error("Error fetching pfp_vers:", fetchError);
+      return;
+    }
+  
+    const currentPfpVers = user.pfp_vers;
+  
+    // Step 2: Increment the pfp_vers value
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ pfp_vers: currentPfpVers + 1 })
+      .eq("id", userData.id);
+  
+    if (updateError) {
+      console.error("Error updating pfp_vers:", updateError);
+    } else {
+      // console.log("pfp_vers successfully incremented.");
+    }
+  };  
+
   const uploadAvatar = async () => {
     if (!avatar || !userData) return;
 
@@ -121,11 +149,12 @@ export default function Dashboard() {
 
     if (uploadError) {
       console.error("Error uploading avatar:", uploadError);
-      setUploadSuccess(false); // Reset success message on error
+      setUploadSuccess(false);
     } else {
-      // console.log("Avatar uploaded successfully:", data);
-      await fetchAvatar();
-      setUploadSuccess(true); // Set success message
+      // Increment pfp_vers after successful upload
+      await incrementPfpVersion();
+      await fetchAvatar(); // Refetch the avatar to update the UI
+      setUploadSuccess(true);
     }
 
     setUploading(false);
