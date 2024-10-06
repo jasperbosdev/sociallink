@@ -22,11 +22,13 @@ const DailyLoginsChart = ({ dailyLogins }) => {
     ],
   };
 
-  // Get the current date and calculate the start of the week (Sunday)
+  // Get the current date and calculate the start of the week (Monday)
   const today = new Date();
-  const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())); // Set to Sunday
+  const day = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const distanceToMonday = day === 0 ? 6 : day - 1; // Calculate distance to Monday
+  const startOfWeek = new Date(today.setDate(today.getDate() - distanceToMonday));
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6); // End of the week (Saturday)
+  endOfWeek.setDate(endOfWeek.getDate() + 6); // End of the week (Sunday)
 
   // Initialize an array for the weekly logins data
   const weeklyLogins = Array(7).fill(0); // 7 days in a week
@@ -35,7 +37,7 @@ const DailyLoginsChart = ({ dailyLogins }) => {
   dailyLogins.forEach(login => {
     const loginDate = new Date(login.date);
     if (loginDate >= startOfWeek && loginDate <= endOfWeek) {
-      const dayIndex = loginDate.getDay(); // Get day index (0-6)
+      const dayIndex = (loginDate.getDay() + 6) % 7; // Shift Sunday to the end of the week (6)
       weeklyLogins[dayIndex] += login.count; // Aggregate count for each day
     }
   });
