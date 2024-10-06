@@ -12,8 +12,11 @@ export default function Dashboard() {
 
   // New state to hold the avatar URL fetched from Supabase
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState<string | null>(null);
+  const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
   const [isAvatarLoading, setIsAvatarLoading] = useState(true); // Loading state for avatar
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
+  const [uploadAvaSuccess, setUploadAvaSuccess] = useState(false);
+  const [uploadBgSuccess, setUploadBgSuccess] = useState(false);
 
   // Moved the fetchAvatar function here
   const fetchAvatar = async () => {
@@ -35,12 +38,35 @@ export default function Dashboard() {
     }
   };
 
+  const fetchBackground = async () => {
+    if (userData && userData.username) {
+      const fileName = `${userData.username}-bg`; // Assuming the filename format
+      const { data, error } = await supabase.storage
+        .from("backgrounds")
+        .createSignedUrl(fileName, 60); // The URL will be valid for 60 seconds
+
+      if (error) {
+        console.error("Error fetching background:", error);
+        setIsBackgroundLoading(false); // Stop loading on error
+        return;
+      }
+
+      // console.log("Fetched background signed URL:", data.signedUrl); // Log the signed URL
+      setFetchedBackgroundUrl(data.signedUrl); // Set the signed URL
+      setIsBackgroundLoading(false); // Stop loading after fetching
+    }
+  };
+
   useEffect(() => {
     fetchAvatar(); // Fetch avatar when component mounts
+    fetchBackground(); // Fetch background when component mounts
 
     return () => {
       if (fetchedAvatarUrl) {
         URL.revokeObjectURL(fetchedAvatarUrl);
+      }
+      if (fetchedBackgroundUrl) {
+        URL.revokeObjectURL(fetchedBackgroundUrl);
       }
     };
   }, [userData]); // Dependency on userData to refetch if it changes
@@ -57,12 +83,10 @@ export default function Dashboard() {
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
   const [isBannerEnabled, setIsBannerEnabled] = useState(false);
   const [isCursorEnabled, setIsCursorEnabled] = useState(false);
-
   // State for form inputs
   const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
   // State for collapsible sections
   const [isAccountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const [isFileSettingsOpen, setFileSettingsOpen] = useState(false);
@@ -70,10 +94,11 @@ export default function Dashboard() {
   const [isSocialSettingsOpen, setSocialSettingsOpen] = useState(false);
   const [isCustomLinkSettingsOpen, setCustomLinkSettingsOpen] = useState(false);
   const [isMediaEmbedSettingsOpen, setMediaEmbedSettingsOpen] = useState(false);
-
   // State for avatar upload
   const [avatar, setAvatar] = useState<File | null>(null);
+  const [background, setBackground] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -87,6 +112,16 @@ export default function Dashboard() {
       reader.readAsDataURL(avatar);
     } else {
       setAvatarPreview(null);
+    }
+
+    if (background) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBackgroundPreview(reader.result as string);
+      };
+      reader.readAsDataURL(background);
+    } else {
+      setBackgroundPreview(null);
     }
   }, [avatar]);
 
@@ -102,6 +137,21 @@ export default function Dashboard() {
         setAvatarPreview(reader.result as string); // Set the avatar preview state
       };
       reader.readAsDataURL(newAvatar); // Read the selected file as data URL
+    }
+  };
+
+  const handleBackgroundChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newBackground = event.target.files[0];
+      // console.log("Selected file:", newBackground); // Log the selected file
+      setBackground(newBackground); // Set the Background state
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // console.log("Background preview data URL:", reader.result); // Log the preview URL
+        setBackgroundPreview(reader.result as string); // Set the Background preview state
+      };
+      reader.readAsDataURL(newBackground); // Read the selected file as data URL
     }
   };
 
@@ -131,7 +181,35 @@ export default function Dashboard() {
     } else {
       // console.log("pfp_vers successfully incremented.");
     }
-  };  
+  };
+
+  const incrementBgVersion = async () => {
+    // Step 1: Fetch the current pfp_vers value
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("bg_vers")
+      .eq("id", userData.id)
+      .single();
+  
+    if (fetchError || !user) {
+      console.error("Error fetching bg_vers:", fetchError);
+      return;
+    }
+  
+    const currentBgVers = user.bg_vers;
+  
+    // Step 2: Increment the pfp_vers value
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ pfp_vers: currentBgVers + 1 })
+      .eq("id", userData.id);
+  
+    if (updateError) {
+      console.error("Error updating Bg_vers:", updateError);
+    } else {
+      // console.log("Bg_vers successfully incremented.");
+    }
+  };
 
   const uploadAvatar = async () => {
     if (!avatar || !userData) return;
@@ -149,16 +227,44 @@ export default function Dashboard() {
 
     if (uploadError) {
       console.error("Error uploading avatar:", uploadError);
-      setUploadSuccess(false);
+      setUploadAvaSuccess(false);
     } else {
       // Increment pfp_vers after successful upload
       await incrementPfpVersion();
       await fetchAvatar(); // Refetch the avatar to update the UI
-      setUploadSuccess(true);
+      setUploadAvaSuccess(true);
     }
 
     setUploading(false);
     setAvatar(null);
+  };
+
+  const uploadBackground = async () => {
+    if (!background || !userData) return;
+
+    setUploading(true);
+    const { username } = userData;
+    const fileName = `${username}-bg`;
+
+    const { data, error: uploadError } = await supabase.storage
+      .from("backgrounds")
+      .upload(fileName, background, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Error uploading Background:", uploadError);
+      setUploadBgSuccess(false);
+    } else {
+      // Increment pfp_vers after successful upload
+      await incrementBgVersion();
+      await fetchBackground(); // Refetch the Background to update the UI
+      setUploadBgSuccess(true);
+    }
+
+    setUploading(false);
+    setBackground(null);
   };
 
   return (
@@ -291,7 +397,7 @@ export default function Dashboard() {
                         )}
 
                         {/* Conditionally render success message */}
-                        {uploadSuccess && (
+                        {uploadAvaSuccess && (
                           <div className="mt-4 text-green-600">
                             Avatar uploaded successfully!
                           </div>
@@ -328,13 +434,60 @@ export default function Dashboard() {
                         <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
                           Background
                         </h3>
-                        <div className="flex flex-col items-center justify-center px-10 rounded-lg py-5 space-y-2 border border-2 border-white/20 bg-white/10">
-                          <i className="fas fa-photo-film text-white/60 text-4xl"></i>
-                          <p className="text-base text-white/60 font-semibold">
-                            Click to upload a file
-                          </p>
+                        <div
+                          className={`flex flex-col items-center justify-center rounded-lg ${
+                            backgroundPreview || fetchedBackgroundUrl
+                              ? ""
+                              : "px-10 py-5"
+                          } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
+                          onClick={() =>
+                            document
+                              .getElementById("backgroundUploadInput")
+                              ?.click()
+                          } // The whole box is now clickable
+                        >
+                          {/* Check if backgroundPreview (newly selected file) or fetchedBackgroundUrl exists */}
+                          {backgroundPreview || fetchedBackgroundUrl ? (
+                            <img
+                              src={backgroundPreview || fetchedBackgroundUrl || ""}
+                              alt="Loading background..."
+                              className="w-full h-28 object-cover"
+                            />
+                          ) : (
+                            <>
+                              <i className="fas fa-photo-film text-4xl text-white/50"></i>
+                              <p className="text-base text-white/60 font-semibold">
+                                Click to upload a file
+                              </p>
+                            </>
+                          )}
+
+                          {/* File input for selecting new background */}
+                          <input
+                            id="backgroundUploadInput"
+                            type="file"
+                            className="hidden"
+                            onChange={handleBackgroundChange} // Handle background file change
+                          />
                         </div>
-                        <label className="mt-2 flex items-center cursor-pointer"></label>
+
+                        {/* Display file name if background is selected, outside the box */}
+                        {background && (
+                          <button
+                            className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                            onClick={uploadBackground}
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload Background"}
+                          </button>
+                        )}
+
+                        {/* Conditionally render success message */}
+                        {uploadBgSuccess && (
+                          <div className="mt-4 text-green-600">
+                            Background uploaded successfully!
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col">
                         <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
@@ -346,31 +499,6 @@ export default function Dashboard() {
                             Click to upload a file
                           </p>
                         </div>
-                        <label className="mt-2 flex items-center cursor-pointer">
-                          <span className="mr-2 text-white/60 font-semibold">
-                            Banner
-                          </span>
-                          <div className="relative">
-                            <input
-                              type="checkbox"
-                              className="hidden"
-                              checked={isBannerEnabled}
-                              onChange={() =>
-                                setIsBannerEnabled(!isBannerEnabled)
-                              }
-                            />
-                            <div
-                              className={`block w-12 h-6 rounded-full ${
-                                isBannerEnabled ? "bg-green-500" : "bg-gray-300"
-                              }`}
-                            ></div>
-                            <div
-                              className={`dot absolute left-0 top-0 w-6 h-6 rounded-full bg-white transition ${
-                                isBannerEnabled ? "translate-x-6" : ""
-                              }`}
-                            ></div>
-                          </div>
-                        </label>
                       </div>
                       <div className="flex flex-col">
                         <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
