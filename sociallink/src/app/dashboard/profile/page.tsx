@@ -13,10 +13,31 @@ export default function Dashboard() {
   // New state to hold the avatar URL fetched from Supabase
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState<string | null>(null);
   const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
-  const [isAvatarLoading, setIsAvatarLoading] = useState(true); // Loading state for avatar
+  const [isAvatarLoading, setIsAvatarLoading] = useState(true);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
   const [uploadAvaSuccess, setUploadAvaSuccess] = useState(false);
   const [uploadBgSuccess, setUploadBgSuccess] = useState(false);
+  const [isAvatarEnabled, setIsAvatarEnabled] = useState(false);
+  const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
+  const [isBannerEnabled, setIsBannerEnabled] = useState(false);
+  const [isCursorEnabled, setIsCursorEnabled] = useState(false);
+  // State for form inputs
+  const [username, setUsername] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  // State for collapsible sections
+  const [isAccountSettingsOpen, setAccountSettingsOpen] = useState(false);
+  const [isFileSettingsOpen, setFileSettingsOpen] = useState(false);
+  const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
+  const [isSocialSettingsOpen, setSocialSettingsOpen] = useState(false);
+  const [isCustomLinkSettingsOpen, setCustomLinkSettingsOpen] = useState(false);
+  const [isMediaEmbedSettingsOpen, setMediaEmbedSettingsOpen] = useState(false);
+  // State for avatar upload
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [background, setBackground] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Moved the fetchAvatar function here
   const fetchAvatar = async () => {
@@ -24,7 +45,7 @@ export default function Dashboard() {
       const fileName = `${userData.username}-pfp`; // Assuming the filename format
       const { data, error } = await supabase.storage
         .from("avatars")
-        .createSignedUrl(fileName, 60); // The URL will be valid for 60 seconds
+        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours (86400 seconds)
 
       if (error) {
         console.error("Error fetching avatar:", error);
@@ -43,7 +64,7 @@ export default function Dashboard() {
       const fileName = `${userData.username}-bg`; // Assuming the filename format
       const { data, error } = await supabase.storage
         .from("backgrounds")
-        .createSignedUrl(fileName, 60); // The URL will be valid for 60 seconds
+        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
 
       if (error) {
         console.error("Error fetching background:", error);
@@ -77,29 +98,6 @@ export default function Dashboard() {
       footer.style.display = "none";
     }
   };
-
-  // State variables for toggles
-  const [isAvatarEnabled, setIsAvatarEnabled] = useState(false);
-  const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
-  const [isBannerEnabled, setIsBannerEnabled] = useState(false);
-  const [isCursorEnabled, setIsCursorEnabled] = useState(false);
-  // State for form inputs
-  const [username, setUsername] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  // State for collapsible sections
-  const [isAccountSettingsOpen, setAccountSettingsOpen] = useState(false);
-  const [isFileSettingsOpen, setFileSettingsOpen] = useState(false);
-  const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
-  const [isSocialSettingsOpen, setSocialSettingsOpen] = useState(false);
-  const [isCustomLinkSettingsOpen, setCustomLinkSettingsOpen] = useState(false);
-  const [isMediaEmbedSettingsOpen, setMediaEmbedSettingsOpen] = useState(false);
-  // State for avatar upload
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [background, setBackground] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     hideFooter();
