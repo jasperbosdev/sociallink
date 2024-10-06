@@ -201,7 +201,7 @@ export default function Dashboard() {
     // Step 2: Increment the pfp_vers value
     const { error: updateError } = await supabase
       .from("users")
-      .update({ pfp_vers: currentBgVers + 1 })
+      .update({ bg_vers: currentBgVers + 1 })
       .eq("id", userData.id);
   
     if (updateError) {
