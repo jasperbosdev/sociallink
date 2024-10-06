@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../supabase";
 import { useUserData } from "./util/useUserData";
 import Nav from "../components/nav";
+import CosmeticSettings from "./util/useCosmeticSettings";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -281,9 +282,6 @@ export default function Dashboard() {
                     </span>
                   </h2>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
-                      Save Changes
-                    </div>
                     <div
                       className="bg-blue-700 py-[7px] text-white rounded-md my-1 border-[3px] border-blue-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
                       onClick={() =>
@@ -559,9 +557,7 @@ export default function Dashboard() {
                     ></i>
                   </h2>
                   {isCosmeticSettingsOpen && (
-                    <div className="mt-2">
-                      <p>Cosmetic settings options go here.</p>
-                    </div>
+                    <CosmeticSettings />
                   )}
                 </div>
 
