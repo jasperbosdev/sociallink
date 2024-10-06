@@ -63,6 +63,7 @@ export default function UserProfile() {
             src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
             className='rounded-full max-w-32'
             alt={`${userData?.username}'s profile`}
+            draggable='false'
           />
           {/* User Username */}
           <h1 className="text-3xl font-bold text-center"> 
