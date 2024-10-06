@@ -57,11 +57,11 @@ export default function UserProfile() {
         />
       </aside>
       <div className={`transition flex items-center justify-center min-h-screen ${geistSans.variable} ${geistMono.variable}`}>
-        <div className="flex flex-col items-center space-y-4 p-6 bg-[#101013] border-white/20 border border-4 rounded-lg shadow-lg">
+        <div className="flex flex-col items-center space-y-4 p-6 bg-transparant border-red-500 border border-[3px] rounded-lg shadow-lg"> {/* bg-[#101013] */}
           {/* User Profile Picture */}
           <img
             src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-            className='rounded-full max-w-32'
+            className='rounded-full max-w-32 max-h-32 w-32 h-32 object-cover border-[3px] border-red-500'
             alt={`${userData?.username}'s profile`}
             draggable='false'
           />
