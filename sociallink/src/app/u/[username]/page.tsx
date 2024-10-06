@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useUserData } from './util/userDataLogic'; // Import userData logic
 import { useFetchAvatar } from './util/fetchAvatar'; // Import fetchAvatar logic
+import { useFetchBackground } from './util/fetchBackground'; // Import fetchAvatar logic
 import localFont from "next/font/local"; // Import localFont from next/font/local
 
 const geistSans = localFont({
@@ -19,18 +20,21 @@ const geistMono = localFont({
 export default function UserProfile() {
   const { userData, loading: userLoading, error } = useUserData();
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
+  const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
 
   // Combine loading states
   const isLoading = userLoading || avatarLoading;
 
   if (isLoading) {
     return (
-      <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
-        <div className="border border-4 border-white/20 bg-[#101013] py-2 px-10 rounded-lg text-center">
-          <img className='max-w-64 rounded-lg mt-4 mb-4' src='https://c.tenor.com/4Ob0zR2MXm0AAAAC/tenor.gif' />
-          <h2 className="text-2xl font-bold">Loading... 🐈🐈</h2>
+      <>
+        <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
+          <div className="border border-4 border-white/20 bg-[#101013] py-2 px-10 rounded-lg text-center">
+            <img className='max-w-64 rounded-lg mt-4 mb-4' src='https://c.tenor.com/4Ob0zR2MXm0AAAAC/tenor.gif' />
+            <h2 className="text-2xl font-bold">Loading... 🐈🐈</h2>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -43,21 +47,31 @@ export default function UserProfile() {
   }
 
   return (
-    <div className={`transition flex items-center justify-center min-h-screen bg-black ${geistSans.variable} ${geistMono.variable}`}>
-      <div className="flex flex-col items-center space-y-4 p-6 bg-[#101013] border-white/20 border border-4 rounded-lg shadow-lg">
-        {/* User Profile Picture */}
+    <>
+      <aside className='fixed w-screen h-screen z-[-5] duration-500'> {/* Change z-index */}
         <img
-          src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-          className='rounded-full max-w-32'
-          alt={`${userData?.username}'s profile`}
+          src={fetchedBackgroundUrl}
+          className='object-cover w-full h-full'
+          alt=''
+          draggable='false'
         />
-        {/* User Username */}
-        <h1 className="text-3xl font-bold text-center"> 
-          {userData?.username}
-        </h1>
-        {/* Additional User Information */}
-        <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
+      </aside>
+      <div className={`transition flex items-center justify-center min-h-screen ${geistSans.variable} ${geistMono.variable}`}>
+        <div className="flex flex-col items-center space-y-4 p-6 bg-[#101013] border-white/20 border border-4 rounded-lg shadow-lg">
+          {/* User Profile Picture */}
+          <img
+            src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+            className='rounded-full max-w-32'
+            alt={`${userData?.username}'s profile`}
+          />
+          {/* User Username */}
+          <h1 className="text-3xl font-bold text-center"> 
+            {userData?.username}
+          </h1>
+          {/* Additional User Information */}
+          <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
