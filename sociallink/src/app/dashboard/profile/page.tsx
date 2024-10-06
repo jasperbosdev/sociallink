@@ -355,9 +355,7 @@ export default function Dashboard() {
                               : "px-10 py-5"
                           } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
                           onClick={() =>
-                            document
-                              .getElementById("avatarUploadInput")
-                              ?.click()
+                            document.getElementById("avatarUploadInput")?.click()
                           } // The whole box is now clickable
                         >
                           {/* Check if avatarPreview (newly selected file) or fetchedAvatarUrl exists */}
@@ -381,7 +379,8 @@ export default function Dashboard() {
                             id="avatarUploadInput"
                             type="file"
                             className="hidden"
-                            onChange={handleAvatarChange} // Handle avatar file change
+                            onChange={handleAvatarChange}
+                            accept=".png, .jpg, .jpeg, .gif" // Handle avatar file change
                           />
                         </div>
 
@@ -467,7 +466,8 @@ export default function Dashboard() {
                             id="backgroundUploadInput"
                             type="file"
                             className="hidden"
-                            onChange={handleBackgroundChange} // Handle background file change
+                            onChange={handleBackgroundChange}
+                            accept=".png, .jpg, .jpeg, .gif, .mp4" // Handle avatar file change
                           />
                         </div>
 
