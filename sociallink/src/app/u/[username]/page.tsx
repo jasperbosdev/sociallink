@@ -78,9 +78,9 @@ export default function UserProfile() {
           draggable='false'
         />
       </aside>
-      <div className={`transition flex items-center justify-center min-h-screen ${geistSans.variable} ${geistMono.variable}`}>
+      <div className={`transition flex items-center justify-center min-h-screen mx-4 ${geistSans.variable} ${geistMono.variable}`}>
         <div 
-          className={`flex flex-col items-center space-y-4 p-[10em] border-red-500 shadow-lg ${cardBlur}`}
+          className={`flex w-full max-w-[45em] flex-col items-center space-y-4 p-6 border-red-500 shadow-lg ${cardBlur}`}
           style={{ borderWidth: borderWidth, borderRadius: borderRadius, backgroundColor: `rgba(0, 0, 0, ${cardOpacity})` }}>
           {/* User Profile Picture */}
           <img
