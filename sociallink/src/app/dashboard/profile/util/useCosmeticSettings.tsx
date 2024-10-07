@@ -162,17 +162,17 @@ export default function CosmeticSettings() {
     <div className="mt-2 grid grid-cols-2 gap-4">
       {/* Sliders */}
       <div>
-        <label className="text-white">Card Opacity</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="10"
-          value={cardOpacity}
-          onChange={(e) => setCardOpacity(parseFloat(e.target.value))}
-          className="w-full"
-        />
-        <div className="text-white">{cardOpacity.toFixed(1)}</div>
+      <label className="text-white">Card Opacity</label>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="10"
+        value={cardOpacity}
+        onChange={(e) => setCardOpacity(parseFloat(e.target.value))}
+        className="w-full"
+      />
+      <div className="text-white">{cardOpacity}</div>
       </div>
 
       <div>
