@@ -32,14 +32,22 @@ export default function UserProfile() {
     console.log("Fetched config data:", config);
   }
 
-  // Determine border width, falling back to 3 if not found
+  // config variable definitions
   const borderWidth = (config?.border_width !== undefined && config.border_width !== null) 
   ? `${config.border_width}px` 
   : '3px';
 
-const borderRadius = (config?.border_radius !== undefined && config.border_radius !== null) 
+  const borderRadius = (config?.border_radius !== undefined && config.border_radius !== null) 
   ? `${config.border_radius}rem` 
   : '0.5rem';
+
+  const cardOpacity = (config?.card_opacity !== undefined && config.card_opacity !== null)
+    ? config.card_opacity / 100 
+    : 0.9;
+
+  const cardBlur = (config?.card_blur !== undefined && config.card_blur !== null)
+  ? `backdrop-blur-[${config.card_blur}px]`
+  : 'backdrop-blur-[0px]';
 
   if (isLoading) {
     return (
@@ -72,8 +80,8 @@ const borderRadius = (config?.border_radius !== undefined && config.border_radiu
       </aside>
       <div className={`transition flex items-center justify-center min-h-screen ${geistSans.variable} ${geistMono.variable}`}>
         <div 
-          className="flex flex-col items-center space-y-4 p-6 bg-transparent border-red-500 shadow-lg"
-          style={{ borderWidth: borderWidth, borderRadius: borderRadius }}>
+          className={`flex flex-col items-center space-y-4 p-[10em] border-red-500 shadow-lg ${cardBlur}`}
+          style={{ borderWidth: borderWidth, borderRadius: borderRadius, backgroundColor: `rgba(0, 0, 0, ${cardOpacity})` }}>
           {/* User Profile Picture */}
           <img
             src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
