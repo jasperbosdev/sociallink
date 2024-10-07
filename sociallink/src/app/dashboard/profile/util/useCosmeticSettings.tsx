@@ -143,10 +143,11 @@ export default function CosmeticSettings() {
         <input
           type="range"
           min="0"
-          max="10"
+          max="1.5"
           value={borderRadius}
-          onChange={(e) => setBorderRadius(parseInt(e.target.value))}
+          onChange={(e) => setBorderRadius(parseFloat(e.target.value))}
           className="w-full"
+          step="0.25" // Set the step to allow values of 0.25 increments
         />
         <div className="text-white">{borderRadius}</div>
       </div>
