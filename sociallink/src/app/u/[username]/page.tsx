@@ -3,8 +3,9 @@
 import { useEffect } from 'react';
 import { useUserData } from './util/userDataLogic'; // Import userData logic
 import { useFetchAvatar } from './util/fetchAvatar'; // Import fetchAvatar logic
-import { useFetchBackground } from './util/fetchBackground'; // Import fetchAvatar logic
+import { useFetchBackground } from './util/fetchBackground'; // Import fetchBackground logic
 import localFont from "next/font/local"; // Import localFont from next/font/local
+import { useFetchConfig } from './util/fetchConfig';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -21,20 +22,33 @@ export default function UserProfile() {
   const { userData, loading: userLoading, error } = useUserData();
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
+  const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid); // Pass UID to fetchConfig
 
   // Combine loading states
-  const isLoading = userLoading || avatarLoading;
+  const isLoading = userLoading || avatarLoading || configLoading;
+
+  // Log fetched data
+  if (config) {
+    console.log("Fetched config data:", config);
+  }
+
+  // Determine border width, falling back to 3 if not found
+  const borderWidth = (config?.border_width !== undefined && config.border_width !== null) 
+  ? `${config.border_width}px` 
+  : '3px';
+
+const borderRadius = (config?.border_radius !== undefined && config.border_radius !== null) 
+  ? `${config.border_radius}rem` 
+  : '0.5rem';
 
   if (isLoading) {
     return (
-      <>
-        <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
-          <div className="border border-4 border-white/20 bg-[#101013] py-2 px-10 rounded-lg text-center">
-            <img className='max-w-64 rounded-lg mt-4 mb-4' src='https://c.tenor.com/4Ob0zR2MXm0AAAAC/tenor.gif' />
-            <h2 className="text-2xl font-bold">Loading... 🐈🐈</h2>
-          </div>
+      <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
+        <div className="border border-4 border-white/20 bg-[#101013] py-2 px-10 rounded-lg text-center">
+          <img className='max-w-64 rounded-lg mt-4 mb-4' src='https://c.tenor.com/4Ob0zR2MXm0AAAAC/tenor.gif' />
+          <h2 className="text-2xl font-bold">Loading... 🐈🐈</h2>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -57,7 +71,9 @@ export default function UserProfile() {
         />
       </aside>
       <div className={`transition flex items-center justify-center min-h-screen ${geistSans.variable} ${geistMono.variable}`}>
-        <div className="flex flex-col items-center space-y-4 p-6 bg-transparant border-red-500 border border-[3px] rounded-lg shadow-lg"> {/* bg-[#101013] */}
+        <div 
+          className="flex flex-col items-center space-y-4 p-6 bg-transparent border-red-500 shadow-lg"
+          style={{ borderWidth: borderWidth, borderRadius: borderRadius }}>
           {/* User Profile Picture */}
           <img
             src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
