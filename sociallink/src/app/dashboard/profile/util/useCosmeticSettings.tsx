@@ -1,6 +1,8 @@
 // components/CosmeticSettings.tsx
 
 import { useState } from "react";
+import { useUserData } from "./useUserData";
+import { supabase } from "../../../supabase";
 
 export default function CosmeticSettings() {
   const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
@@ -20,6 +22,78 @@ export default function CosmeticSettings() {
   const [tiltEffect, setTiltEffect] = useState(false);
   const [cursorEffect, setCursorEffect] = useState(false);
   const [themeColoredIcons, setThemeColoredIcons] = useState(false);
+
+  const { loading, error, userData } = useUserData();
+
+  const uploadConfig = async () => {
+    if (loading || !userData) {
+      console.error("User data not ready or still loading");
+      return;
+    }
+
+    const id = userData.id; // UUID from auth.users
+
+    // Fetch the uid from public.users based on auth.users id
+    const { data: publicUserData, error: publicUserError } = await supabase
+      .from("users")
+      .select("uid")
+      .eq("id", id)
+      .single();
+
+    if (publicUserError) {
+      console.error("Error fetching public user data:", publicUserError.message);
+      return;
+    }
+
+    const uid = publicUserData.uid; // uid from public.users (int4)
+
+    // Check if there is already an entry in profileCosmetics for this user
+    const { data: existingEntry, error: fetchError } = await supabase
+      .from("profileCosmetics")
+      .select("id")
+      .eq("uid", uid)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      console.error("Error fetching existing entry:", fetchError.message);
+      return;
+    }
+
+    if (existingEntry) {
+      // Update existing entry
+      const { error: updateError } = await supabase
+        .from("profileCosmetics")
+        .update({
+          border_width: borderWidth,
+          border_radius: borderRadius,
+        })
+        .eq("id", existingEntry.id);
+
+      if (updateError) {
+        console.error("Error updating config:", updateError.message);
+        return;
+      }
+
+      console.log("Config updated successfully");
+    } else {
+      // Insert new entry
+      const { error: insertError } = await supabase
+        .from("profileCosmetics")
+        .insert({
+          id: id, // UUID from auth.users
+          uid: uid, // int4 from public.users
+          border_width: borderWidth,
+          border_radius: borderRadius,
+        });
+
+      if (insertError) {
+        console.error("Error inserting config:", insertError.message);
+        return;
+      }
+
+      console.log("Config inserted successfully");
+    }
+  };
 
   return (
     <div className="mt-2 grid grid-cols-2 gap-4">
@@ -203,7 +277,9 @@ export default function CosmeticSettings() {
           className="toggle-input"
         />
       </div> */}
-      <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
+      <div
+        className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
+        onClick={uploadConfig}>
         Save Changes
       </div>
     </div>
