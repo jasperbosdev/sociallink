@@ -166,8 +166,8 @@ export default function CosmeticSettings() {
         <input
           type="range"
           min="0"
-          max="1"
-          step="0.1"
+          max="100"
+          step="10"
           value={cardOpacity}
           onChange={(e) => setCardOpacity(parseFloat(e.target.value))}
           className="w-full"
