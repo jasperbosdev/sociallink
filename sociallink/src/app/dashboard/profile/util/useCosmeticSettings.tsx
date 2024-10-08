@@ -20,6 +20,7 @@ export default function CosmeticSettings() {
   const [tiltEffect, setTiltEffect] = useState(false);
   const [cursorEffect, setCursorEffect] = useState(false);
   const [themeColoredIcons, setThemeColoredIcons] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(""); // For showing save status
 
   const { loading, error, userData } = useUserData();
 
@@ -64,8 +65,8 @@ export default function CosmeticSettings() {
         // For example:
         setCardOpacity(existingSettings.card_opacity || 0);
         setCardBlur(existingSettings.card_blur || 0);
-        // setBackgroundBlur(existingSettings.background_blur || 0);
-        // setBackgroundBrightness(existingSettings.background_brightness || 0);
+        setBackgroundBlur(existingSettings.background_blur || 0);
+        setBackgroundBrightness(existingSettings.background_brightness || 0);
         // setShowViews(existingSettings.show_views || false);
         // setShowBadges(existingSettings.show_badges || false);
         // setGlow(existingSettings.glow || false);
@@ -90,7 +91,6 @@ export default function CosmeticSettings() {
 
     const id = userData.id; // UUID from auth.users
 
-    // Fetch the uid from public.users based on auth.users id
     const { data: publicUserData, error: publicUserError } = await supabase
       .from("users")
       .select("uid")
@@ -104,7 +104,6 @@ export default function CosmeticSettings() {
 
     const uid = publicUserData.uid; // uid from public.users (int4)
 
-    // Check if there is already an entry in profileCosmetics for this user
     const { data: existingEntry, error: fetchError } = await supabase
       .from("profileCosmetics")
       .select("id")
@@ -116,8 +115,9 @@ export default function CosmeticSettings() {
       return;
     }
 
+    let success = false;
+
     if (existingEntry) {
-      // Update existing entry
       const { error: updateError } = await supabase
         .from("profileCosmetics")
         .update({
@@ -125,36 +125,40 @@ export default function CosmeticSettings() {
           border_radius: borderRadius,
           card_opacity: cardOpacity,
           card_blur: cardBlur,
-          // Update other fields here as necessary
+          background_brightness: backgroundBrightness,
+          background_blur: backgroundBlur,
         })
         .eq("id", existingEntry.id);
 
       if (updateError) {
         console.error("Error updating config:", updateError.message);
-        return;
+      } else {
+        success = true;
       }
-
-      console.log("Config updated successfully");
     } else {
-      // Insert new entry
       const { error: insertError } = await supabase
         .from("profileCosmetics")
         .insert({
-          id: id, // UUID from auth.users
-          uid: uid, // int4 from public.users
+          id: id,
+          uid: uid,
           border_width: borderWidth,
           border_radius: borderRadius,
           card_opacity: cardOpacity,
           card_blur: cardBlur,
-          // Insert other fields here as necessary
+          background_brightness: backgroundBrightness,
+          background_blur: backgroundBlur,
         });
 
       if (insertError) {
         console.error("Error inserting config:", insertError.message);
-        return;
+      } else {
+        success = true;
       }
+    }
 
-      console.log("Config inserted successfully");
+    if (success) {
+      setSaveStatus("Saved changes");
+      setTimeout(() => setSaveStatus(""), 3000); // Hide message after 3 seconds
     }
   };
 
@@ -216,13 +220,49 @@ export default function CosmeticSettings() {
         <div className="text-white">{borderRadius}</div>
       </div>
 
+      <div>
+        <label className="text-white">Background Blur</label>
+        <input
+          type="range"
+          min="0"
+          max="25"
+          step={1}
+          value={backgroundBlur}
+          onChange={(e) => setBackgroundBlur(parseInt(e.target.value))}
+          className="w-full"
+        />
+        <div className="text-white">{backgroundBlur}</div>
+      </div>
+
+      <div>
+        <label className="text-white">Background Brightness</label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value={backgroundBrightness}
+          onChange={(e) => setBackgroundBrightness(parseFloat(e.target.value))}
+          className="w-full"
+        />
+        <div className="text-white">{backgroundBrightness}</div>
+      </div>
+
       {/* Other sliders and toggles can be added similarly */}
 
-      <div
-        className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
-        onClick={uploadConfig}
-      >
-        Save Changes
+      <div className="flex flex-col">
+        <div
+          className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
+          onClick={uploadConfig}
+        >
+          Save Changes
+        </div>
+
+        {saveStatus && (
+          <div className="text-green-500 text-sm mt-2">
+            {saveStatus}
+          </div>
+        )}
       </div>
     </div>
   );
