@@ -6,6 +6,7 @@ import { useFetchAvatar } from './util/fetchAvatar'; // Import fetchAvatar logic
 import { useFetchBackground } from './util/fetchBackground'; // Import fetchBackground logic
 import localFont from "next/font/local"; // Import localFont from next/font/local
 import { useFetchConfig } from './util/fetchConfig';
+import { configConsts } from './util/configConsts';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -23,6 +24,7 @@ export default function UserProfile() {
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid); // Pass UID to fetchConfig
+  const { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx } = configConsts(config);
 
   // Combine loading states
   const isLoading = userLoading || avatarLoading || configLoading;
@@ -31,31 +33,6 @@ export default function UserProfile() {
   if (config) {
     console.log("Fetched config data:", config);
   }
-
-  // config variable definitions
-  const borderWidth = (config?.border_width !== undefined && config.border_width !== null) 
-  ? `${config.border_width}px` 
-  : '3px';
-
-  const borderRadius = (config?.border_radius !== undefined && config.border_radius !== null) 
-  ? `${config.border_radius}rem` 
-  : '0.5rem';
-
-  const cardOpacity = (config?.card_opacity !== undefined && config.card_opacity !== null)
-    ? config.card_opacity / 100 
-    : 0.9;
-
-  const cardBlur = (config?.card_blur !== undefined && config.card_blur !== null)
-  ? `backdrop-blur-[${config.card_blur}px]`
-  : 'backdrop-blur-[0px]';
-
-  const bgBlurValue = (config?.background_blur !== undefined && config.background_blur !== null)
-    ? `${config.background_blur}px`
-    : '0px';
-
-  const bgBrightnessValue = (config?.background_brightness !== undefined && config.background_brightness !== null)
-  ? config.background_brightness / 100 // Convert to percentage value for CSS brightness
-  : 1;
 
   if (isLoading) {
     return (
@@ -101,7 +78,8 @@ export default function UserProfile() {
             draggable='false'
           />
           {/* User Username */}
-          <h1 className="text-3xl font-bold text-center"> 
+          <h1 className="text-3xl font-bold text-center"
+          style={{ backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none"}}>
             {userData?.username}
           </h1>
           {/* Additional User Information */}
