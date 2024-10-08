@@ -49,6 +49,14 @@ export default function UserProfile() {
   ? `backdrop-blur-[${config.card_blur}px]`
   : 'backdrop-blur-[0px]';
 
+  const bgBlurValue = (config?.background_blur !== undefined && config.background_blur !== null)
+    ? `${config.background_blur}px`
+    : '0px';
+
+  const bgBrightnessValue = (config?.background_brightness !== undefined && config.background_brightness !== null)
+  ? config.background_brightness / 100 // Convert to percentage value for CSS brightness
+  : 1;
+
   if (isLoading) {
     return (
       <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
@@ -70,10 +78,13 @@ export default function UserProfile() {
 
   return (
     <>
-      <aside className='fixed w-screen h-screen z-[-5] duration-500'> {/* Change z-index */}
+      <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
         <img
           src={fetchedBackgroundUrl}
-          className='object-cover w-full h-full'
+          style={{ 
+            filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`  // Apply both blur and brightness dynamically
+          }}
+          className="object-cover w-full h-full"
           alt=''
           draggable='false'
         />
