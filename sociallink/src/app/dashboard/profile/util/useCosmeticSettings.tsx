@@ -325,7 +325,7 @@ export default function CosmeticSettings() {
       </div>
       
       <div className="flex items-center space-x-2">
-        <label className="text-white">школа не нудна</label>
+        <label className="text-white">школа не нужна</label>
         <div
           className={`${
             fullRoundedSocials ? "bg-blue-500" : "bg-gray-500"
