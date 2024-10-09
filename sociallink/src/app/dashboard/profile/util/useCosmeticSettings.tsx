@@ -17,6 +17,7 @@ export default function CosmeticSettings() {
   const [usernameFx, useUsernameFx] = useState(false);
   const [pfpDecoration, usePfpDecoration] = useState(false);
   const [decorationValue, setDecorationValue] = useState('');
+  const [cardTilt, setCardTilt] = useState(false);
   const [saveStatus, setSaveStatus] = useState(""); // For showing save status
 
   const { loading, error, userData } = useUserData();
@@ -69,6 +70,7 @@ export default function CosmeticSettings() {
         useUsernameFx(existingSettings.username_fx || false);
         usePfpDecoration(existingSettings.pfp_decoration || false);
         setDecorationValue(existingSettings.decoration_value || '');
+        setCardTilt(existingSettings.card_tilt || false);
       }
     };
 
@@ -125,6 +127,7 @@ export default function CosmeticSettings() {
           username_fx: usernameFx,
           pfp_decoration: pfpDecoration,
           decoration_value: decorationValue,
+          card_tilt: cardTilt,
         })
         .eq("id", existingEntry.id);
   
@@ -150,6 +153,7 @@ export default function CosmeticSettings() {
           username_fx: usernameFx,
           pfp_decoration: pfpDecoration,
           decoration_value: decorationValue,
+          card_tilt: cardTilt,
         });
   
       if (insertError) {
@@ -337,13 +341,13 @@ export default function CosmeticSettings() {
         <label className="text-white">Tilt Effect</label>
         <div
           className={`${
-            fullRoundedSocials ? "bg-blue-500" : "bg-gray-500"
+            cardTilt ? "bg-blue-500" : "bg-gray-500"
           } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setFullRoundedSocials(!fullRoundedSocials)}
+          onClick={() => setCardTilt(!cardTilt)}
         >
           <div
             className={`${
-              fullRoundedSocials ? "translate-x-6" : "translate-x-0"
+              cardTilt ? "translate-x-6" : "translate-x-0"
             } w-5 h-5 bg-white rounded-full transform transition`}
           ></div>
         </div>

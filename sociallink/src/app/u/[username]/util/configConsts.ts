@@ -39,6 +39,10 @@ export const configConsts = (config: any) => {
     const decorationValue = (config?.decoration_value !== undefined && config.decoration_value !== null)
     ? config.decoration_value
     : null;
+
+    const cardTilt = config?.card_tilt !== undefined && config.card_tilt !== null
+    ? config.card_tilt
+    : false;
   
-    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue };
+    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt };
 };  
