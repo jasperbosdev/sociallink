@@ -27,6 +27,10 @@ export const configConsts = (config: any) => {
     const usernameFx = (config?.username_fx !== undefined && config.username_fx !== null)
     ? config.username_fx
     : false;
+
+    const cardGlow = (config?.card_glow !== undefined && config.card_glow !== null)
+    ? config.card_glow
+    : false;
   
-    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx };
+    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow };
 };  

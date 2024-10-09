@@ -24,7 +24,7 @@ export default function UserProfile() {
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid); // Pass UID to fetchConfig
-  const { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx } = configConsts(config);
+  const { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow } = configConsts(config);
 
   // Combine loading states
   const isLoading = userLoading || avatarLoading || configLoading;
@@ -69,7 +69,7 @@ export default function UserProfile() {
       <div className={`transition flex items-center justify-center min-h-screen mx-4 ${geistSans.variable} ${geistMono.variable}`}>
         <div 
           className={`flex w-full max-w-[45em] flex-col items-center space-y-4 p-6 border-red-500 shadow-lg ${cardBlur}`}
-          style={{ borderWidth: borderWidth, borderRadius: borderRadius, backgroundColor: `rgba(0, 0, 0, ${cardOpacity})` }}>
+          style={{ borderWidth: borderWidth, borderRadius: borderRadius, backgroundColor: `rgba(0, 0, 0, ${cardOpacity})`, boxShadow: cardGlow ? `0px 0px 10px 4px rgba(239,68,68,1)` : "" }}>
           {/* User Profile Picture */}
           <img
             src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
@@ -82,6 +82,7 @@ export default function UserProfile() {
           style={{ backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none"}}>
             {userData?.username}
           </h1>
+          <span>{cardGlow ? 'glowwwwinnn' : "nah no glow cuh"}</span>
           {/* Additional User Information */}
           <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
         </div>

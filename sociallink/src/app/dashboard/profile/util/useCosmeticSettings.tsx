@@ -12,7 +12,7 @@ export default function CosmeticSettings() {
   const [backgroundBrightness, setBackgroundBrightness] = useState(0);
   const [showViews, setShowViews] = useState(false);
   const [showBadges, setShowBadges] = useState(false);
-  const [glow, setGlow] = useState(false);
+  const [cardGlow, setCardGlow] = useState(false);
   const [fullRoundedSocials, setFullRoundedSocials] = useState(false);
   const [usernameFx, useUsernameFx] = useState(false);
   const [saveStatus, setSaveStatus] = useState(""); // For showing save status
@@ -58,11 +58,11 @@ export default function CosmeticSettings() {
         setBorderRadius(existingSettings.border_radius || 0);
         setCardOpacity(existingSettings.card_opacity || 0);
         setCardBlur(existingSettings.card_blur || 0);
+        setCardGlow(existingSettings.card_glow || false);
         setBackgroundBlur(existingSettings.background_blur || 0);
         setBackgroundBrightness(existingSettings.background_brightness || 0);
         setShowViews(existingSettings.show_views || false);
         setShowBadges(existingSettings.show_badges || false);
-        setGlow(existingSettings.glow || false);
         setFullRoundedSocials(existingSettings.full_rounded_socials || false);
         useUsernameFx(existingSettings.username_fx || false);
         
@@ -116,6 +116,7 @@ export default function CosmeticSettings() {
           border_radius: borderRadius,
           card_opacity: cardOpacity,
           card_blur: cardBlur,
+          card_glow: cardGlow,
           background_brightness: backgroundBrightness,
           background_blur: backgroundBlur,
           username_fx: usernameFx,
@@ -138,6 +139,7 @@ export default function CosmeticSettings() {
           border_radius: borderRadius,
           card_opacity: cardOpacity,
           card_blur: cardBlur,
+          card_glow: cardGlow,
           background_brightness: backgroundBrightness,
           background_blur: backgroundBlur,
           username_fx: usernameFx,
@@ -280,13 +282,13 @@ export default function CosmeticSettings() {
         <label className="text-white">Glow</label>
         <div
           className={`${
-            glow ? "bg-blue-500" : "bg-gray-500"
+            cardGlow ? "bg-blue-500" : "bg-gray-500"
           } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setGlow(!glow)}
+          onClick={() => setCardGlow(!cardGlow)}
         >
           <div
             className={`${
-              glow ? "translate-x-6" : "translate-x-0"
+              cardGlow ? "translate-x-6" : "translate-x-0"
             } w-5 h-5 bg-white rounded-full transform transition`}
           ></div>
         </div>
