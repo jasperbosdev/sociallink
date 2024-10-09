@@ -82,7 +82,6 @@ export default function UserProfile() {
           style={{ backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none"}}>
             {userData?.username}
           </h1>
-          <span>{cardGlow ? 'glowwwwinnn' : "nah no glow cuh"}</span>
           {/* Additional User Information */}
           <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
         </div>
