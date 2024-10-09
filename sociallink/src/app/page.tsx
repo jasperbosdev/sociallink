@@ -116,50 +116,26 @@ export default function Home() {
           {/* Image Cards */}
           <div className="relative flex flex-row justify-center mt-5 space-x-12 z-10">
             {/* Card 1 */}
-            <div className="flex flex-col w-1/3 group">
-              <div className="border border-4 border-white/60 rounded-lg relative overflow-hidden">
-                <SpotlightEffect>
-                  <img
-                    className="transition-transform transform scale-100 group-hover:scale-110 rounded brightness-[60%] blur-[2px] group-hover:blur-0 group-hover:brightness-100 transition duration-300"
-                    src="/static/assets/activity.png"
-                  />
-                  <p className="absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
-                    Discord Activity
-                  </p>
-                </SpotlightEffect>
+            {[
+              { src: '/static/assets/activity.png', label: 'Discord Activity' },
+              { src: '/static/assets/bg.gif', label: 'Video Background' },
+              { src: '/static/assets/song.png', label: 'Play Music' },
+            ].map((item, index) => (
+              <div key={index} className="flex flex-col w-1/3 group">
+                <div className="border border-4 border-white/60 rounded-lg relative overflow-hidden">
+                  <SpotlightEffect>
+                    <img
+                      className="transition-transform transform scale-100 group-hover:scale-110 rounded brightness-[60%] blur-[2px] group-hover:blur-0 group-hover:brightness-100 transition duration-300"
+                      src={item.src}
+                      alt={item.label}
+                    />
+                    <p className="absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
+                      {item.label}
+                    </p>
+                  </SpotlightEffect>
+                </div>
               </div>
-            </div>
-
-            {/* Card 2 */}
-            <div className="flex flex-col w-1/3 group">
-              <div className="border border-4 border-white/60 rounded-lg relative overflow-hidden">
-                <SpotlightEffect>
-                  <img
-                    className="transition-transform transform scale-100 group-hover:scale-110 rounded brightness-[60%] blur-[2px] group-hover:blur-0 group-hover:brightness-100 transition duration-300"
-                    src="/static/assets/bg.gif"
-                  />
-                  <p className="absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
-                    Video Background
-                  </p>
-                </SpotlightEffect>
-              </div>
-            </div>
-
-            {/* Card 3 */}
-            <div className="flex flex-col w-1/3 group">
-              <div className="border border-4 border-white/60 rounded-lg relative overflow-hidden">
-                <SpotlightEffect>
-                  <img
-                    className="transition-transform transform scale-100 group-hover:scale-110 blur-[2px] group-hover:blur-0 brightness-[60%] group-hover:brightness-100"
-                    src="/static/assets/song.png"
-                    alt="Play Music"
-                  />
-                  <p className="absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
-                    Play Music
-                  </p>
-                </SpotlightEffect>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
