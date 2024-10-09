@@ -31,6 +31,14 @@ export const configConsts = (config: any) => {
     const cardGlow = (config?.card_glow !== undefined && config.card_glow !== null)
     ? config.card_glow
     : false;
+
+    const pfpDecoration = (config?.pfp_decoration !== undefined && config.pfp_decoration !== null)
+    ? config.pfp_decoration
+    : false;
+
+    const decorationValue = (config?.decoration_value !== undefined && config.decoration_value !== null)
+    ? config.decoration_value
+    : null;
   
-    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow };
+    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue };
 };  

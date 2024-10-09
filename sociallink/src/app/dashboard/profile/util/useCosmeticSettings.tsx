@@ -15,6 +15,8 @@ export default function CosmeticSettings() {
   const [cardGlow, setCardGlow] = useState(false);
   const [fullRoundedSocials, setFullRoundedSocials] = useState(false);
   const [usernameFx, useUsernameFx] = useState(false);
+  const [pfpDecoration, usePfpDecoration] = useState(false);
+  const [decorationValue, setDecorationValue] = useState('');
   const [saveStatus, setSaveStatus] = useState(""); // For showing save status
 
   const { loading, error, userData } = useUserData();
@@ -65,7 +67,8 @@ export default function CosmeticSettings() {
         setShowBadges(existingSettings.show_badges || false);
         setFullRoundedSocials(existingSettings.full_rounded_socials || false);
         useUsernameFx(existingSettings.username_fx || false);
-        
+        usePfpDecoration(existingSettings.pfp_decoration || false);
+        setDecorationValue(existingSettings.decoration_value || '');
       }
     };
 
@@ -120,6 +123,8 @@ export default function CosmeticSettings() {
           background_brightness: backgroundBrightness,
           background_blur: backgroundBlur,
           username_fx: usernameFx,
+          pfp_decoration: pfpDecoration,
+          decoration_value: decorationValue,
         })
         .eq("id", existingEntry.id);
   
@@ -143,6 +148,8 @@ export default function CosmeticSettings() {
           background_brightness: backgroundBrightness,
           background_blur: backgroundBlur,
           username_fx: usernameFx,
+          pfp_decoration: pfpDecoration,
+          decoration_value: decorationValue,
         });
   
       if (insertError) {
@@ -279,7 +286,7 @@ export default function CosmeticSettings() {
       </div>
 
       <div className="flex items-center space-x-2">
-        <label className="text-white">Glow</label>
+        <label className="text-white">Card Glow</label>
         <div
           className={`${
             cardGlow ? "bg-blue-500" : "bg-gray-500"
@@ -327,7 +334,7 @@ export default function CosmeticSettings() {
       </div>
       
       <div className="flex items-center space-x-2">
-        <label className="text-white">школа не нужна</label>
+        <label className="text-white">Tilt Effect</label>
         <div
           className={`${
             fullRoundedSocials ? "bg-blue-500" : "bg-gray-500"
@@ -337,6 +344,50 @@ export default function CosmeticSettings() {
           <div
             className={`${
               fullRoundedSocials ? "translate-x-6" : "translate-x-0"
+            } w-5 h-5 bg-white rounded-full transform transition`}
+          ></div>
+        </div>
+      </div>
+
+      <div className="flex items-center flex-wrap">
+        <label className="text-white mr-2">Avatar Decoration</label>
+        <div
+          className={`${
+            pfpDecoration ? "bg-blue-500" : "bg-gray-500"
+          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+          onClick={() => usePfpDecoration(!pfpDecoration)}
+        >
+          <div
+            className={`${
+              pfpDecoration ? "translate-x-6" : "translate-x-0"
+            } w-5 h-5 bg-white rounded-full transform transition`}
+          ></div>
+        </div>
+        {pfpDecoration && (
+          <div className="w-full mt-2">
+            <label className="text-white">Select Option</label>
+            <select
+              className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
+              value={decorationValue}
+              onChange={(e) => setDecorationValue(e.target.value)}
+            >
+              <option value="catears">Cat Ears</option>
+            </select>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex items-center space-x-2 h-fit">
+        <label className="text-white">Cursor Effect</label>
+        <div
+          className={`${
+            '' ? "bg-blue-500" : "bg-gray-500"
+          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+          onClick={() => ''}
+        >
+          <div
+            className={`${
+              '' ? "translate-x-6" : "translate-x-0"
             } w-5 h-5 bg-white rounded-full transform transition`}
           ></div>
         </div>
