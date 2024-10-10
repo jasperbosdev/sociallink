@@ -1,7 +1,7 @@
 'use client';
 
 import ParticleEffectComponent from './components/utils/particles';
-import { Tilt } from 'react-next-tilt';
+import VanillaTilt from 'vanilla-tilt';
 import SpotlightEffect from './components/utils/spotlightHome';
 import { users } from './components/utils/usersData';
 
@@ -41,12 +41,25 @@ export default function Home() {
             <ellipse cx="50%" cy="50%" ry="50%" rx="50%" fill="currentColor"></ellipse>
           </svg>
 
-          <Tilt className="w-2/6 z-20" lineGlareEnable={false} tiltReverse={false} spotGlareEnable={false}>
+            <div
+            className="w-[24em] z-20"
+            ref={(el) => {
+              if (el) {
+              VanillaTilt.init(el, {
+                max: 25,
+                speed: 400,
+                glare: false,
+                "max-glare": 0.5,
+                reverse: false,
+              });
+              }
+            }}
+            >
             <img
               src="./static/images/placeholderc.png"
               className="w-full animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
             />
-          </Tilt>
+            </div>
         </div>
 
         {/* Description Section */}
@@ -79,21 +92,34 @@ export default function Home() {
         {/* What Do We Do Section */}
         <div className="mb-10 w-3/4">
           <div className="flex md:flex-row flex-col justify-between space-x-20">
-            <div className="text-start">
+            <div className="text-start md:w-full">
               <p className="text-4xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
                 What do we do and why?
               </p>
-              <p className="text-white/60 font-bold mt-2 w-3/4">
+              <p className="text-white/60 font-bold mt-2">
                 We offer a wide range of features to help you connect with others, and share your online presence.
                 Using our endless customizability you can really tweak everything the way you like it.
                 This projected started as an idea abandoned months ago, but revived to be used as school project.
               </p>
             </div>
             <div className="relative w-full">
-              <img src="/static/assets/square.png" className="absolute top-[-30%] z-0" />
-              <Tilt className="" lineGlareEnable={false} tiltReverse={false} spotGlareEnable={false}>
-                <img src="/static/assets/whatdowedo.png" className="rounded relative z-10 border border-white/60 border-4 rounded-lg" />
-              </Tilt>
+              <img src="/static/assets/square.png" className="absolute top-[-28%] z-0" />
+                <div
+                className="relative z-10 border border-white/60 border-4 rounded-lg"
+                ref={(el) => {
+                  if (el) {
+                  VanillaTilt.init(el, {
+                    max: 25,
+                    speed: 400,
+                    glare: false,
+                    "max-glare": 0.5,
+                    reverse: false,
+                  });
+                  }
+                }}
+                >
+                <img src="/static/assets/whatdowedo.png" className="rounded" />
+                </div>
             </div>
           </div>
         </div>
