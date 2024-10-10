@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useUserData } from "./useUserData";
 import { supabase } from "../../../supabase";
 
@@ -66,12 +66,12 @@ export default function CosmeticSettings() {
         setBackgroundBrightness(existingSettings.background_brightness || 0);
         setShowViews(existingSettings.show_views || false);
         setShowBadges(existingSettings.show_badges || false);
-        setFullRoundedSocials(existingSettings.full_rounded_socials || false);
         useUsernameFx(existingSettings.username_fx || false);
         usePfpDecoration(existingSettings.pfp_decoration || false);
         setDecorationValue(existingSettings.decoration_value || '');
         setCardTilt(existingSettings.card_tilt || false);
         setShowBadges(existingSettings.show_badges || false);
+        setFullRoundedSocials(existingSettings.rounded_socials || false);
       }
     };
 
@@ -130,6 +130,7 @@ export default function CosmeticSettings() {
           decoration_value: decorationValue,
           card_tilt: cardTilt,
           show_badges: showBadges,
+          rounded_socials: fullRoundedSocials,
         })
         .eq("id", existingEntry.id);
   
@@ -157,6 +158,7 @@ export default function CosmeticSettings() {
           decoration_value: decorationValue,
           card_tilt: cardTilt,
           show_badges: showBadges,
+          rounded_socials: fullRoundedSocials,
         });
   
       if (insertError) {
