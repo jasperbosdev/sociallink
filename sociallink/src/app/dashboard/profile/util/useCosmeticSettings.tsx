@@ -131,6 +131,7 @@ export default function CosmeticSettings() {
           card_tilt: cardTilt,
           show_badges: showBadges,
           rounded_socials: fullRoundedSocials,
+          show_views: showViews,
         })
         .eq("id", existingEntry.id);
   
@@ -159,6 +160,7 @@ export default function CosmeticSettings() {
           card_tilt: cardTilt,
           show_badges: showBadges,
           rounded_socials: fullRoundedSocials,
+          show_views: showViews,
         });
   
       if (insertError) {
@@ -262,19 +264,18 @@ export default function CosmeticSettings() {
       </div>
 
       {/* Toggles */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 opacity-50 pointer-events-none">
         <label className="text-white">Show Views</label>
         <div
           className={`${
-            showViews ? "bg-blue-500" : "bg-gray-500"
+        showViews ? "bg-blue-500" : "bg-gray-500"
           } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setShowViews(!showViews)}
         >
           <div
-            className={`${
-              showViews ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
+        className={`${
+          showViews ? "translate-x-6" : "translate-x-0"
+        } w-5 h-5 bg-white rounded-full transform transition`}
+        ></div>
         </div>
       </div>
 
