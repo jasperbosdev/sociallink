@@ -159,6 +159,7 @@ export default function GeneralSettings() {
                         onChange={(e) => setPageTitle(e.target.value)}
                         className="w-full bg-[#101013] border-[3px] border-white/20 p-2 rounded-lg"
                         placeholder={`${userData.username}'s profile`}
+                        maxLength={30}
                     />
                     <div className="flex items-center space-x-2">
                         <label className="text-white font-bold">Animated Title</label>
@@ -184,15 +185,17 @@ export default function GeneralSettings() {
                         onChange={(e) => setDisplayName(e.target.value)}
                         className="w-full bg-[#101013] border-[3px] border-white/20 p-2 rounded-lg"
                         placeholder={`${userData.username}`}
+                        maxLength={16}
                     />
                 </div>
                 <div className="flex flex-col space-y-2">
-                    <p className="font-bold text-lg">Description</p>
+                    <p className="font-bold text-lg">Description<span className="text-sm font-normal"> (100 char max.)</span></p>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         className="w-full bg-[#101013] border-[3px] border-white/20 p-2 rounded-lg"
                         placeholder={`hello I am ${userData.username}`}
+                        maxLength={100}
                     />
                     <div className="flex items-center space-x-2">
                         <label className="text-white font-bold">Typing Description</label>
