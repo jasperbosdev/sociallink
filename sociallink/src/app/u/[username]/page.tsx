@@ -8,7 +8,7 @@ import { useFetchBackground } from './util/fetchBackground'; // Import fetchBack
 import localFont from "next/font/local"; // Import localFont from next/font/local
 import { useFetchConfig } from './util/fetchConfig';
 import { configConsts } from './util/configConsts';
-import { reverse } from 'dns';
+import { useFetchBadges } from './util/fetchBadges';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -28,7 +28,9 @@ export default function UserProfile() {
   const { userData, loading: userLoading, error } = useUserData();
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
-  const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid); // Pass UID to fetchConfig
+  const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
+  const { badges, isLoadingBadges } = useFetchBadges();  // Uses the updated fetch logic
+
   const {
     borderWidth,
     borderRadius,
@@ -40,7 +42,8 @@ export default function UserProfile() {
     cardGlow,
     pfpDecoration,
     decorationValue,
-    cardTilt
+    cardTilt,
+    showBadges,
   } = configConsts(config);
 
   useEffect(() => {
@@ -69,12 +72,7 @@ export default function UserProfile() {
   }
 
   // Combine loading states
-  const isLoading = userLoading || avatarLoading || configLoading;
-
-  // Log fetched data
-  if (config) {
-    console.log("Fetched config data:", config);
-  }
+  const isLoading = userLoading || avatarLoading || configLoading || isLoadingBadges;
 
   if (isLoading) {
     return (
@@ -146,13 +144,39 @@ export default function UserProfile() {
               />
             )}
           </div>
-          <h1 className="text-3xl font-bold text-center"
-            style={{
-              backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none"
-            }}
-          >
-            {userData?.username}
-          </h1>
+          
+          <div className="flex items-center justify-center space-x-2">
+            <h1
+              className="text-3xl font-bold text-center"
+              style={{
+                backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
+              }}
+            >
+              {userData?.username}
+            </h1>
+            
+            {showBadges && (
+              <span className="flex items-center space-x-2 h-full">
+              {badges.length > 0 ? (
+                badges.map((badge) => {
+                const iconStyle = badge.icon_style && typeof badge.icon_style === 'object' ? badge.icon_style : {};
+                
+                // Log to ensure badge data is correct
+                console.log('Rendering badge:', badge);
+                
+                return (
+                  <div key={badge.id} className="badge-container flex items-center mt-[2.75px]">
+                  <i className={`${badge.icon_style} fa-${badge.icon}`} style={{ filter: 'drop-shadow(0px 0px 3.5px rgb(255, 255, 255))' }}
+                  title={`${badge.badge}`}></i>
+                  </div>
+                );
+                })
+              ) : (
+                <p>No badges available</p>
+              )}
+              </span>
+            )}
+          </div>
           <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
         </div>
       </div>

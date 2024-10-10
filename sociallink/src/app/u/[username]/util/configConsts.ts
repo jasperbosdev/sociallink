@@ -43,6 +43,10 @@ export const configConsts = (config: any) => {
     const cardTilt = config?.card_tilt !== undefined && config.card_tilt !== null
     ? config.card_tilt
     : false;
+
+    const showBadges = config?.show_badges !== undefined && config.show_badges !== null
+    ? config.show_badges
+    : false;
   
-    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt };
+    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges };
 };  

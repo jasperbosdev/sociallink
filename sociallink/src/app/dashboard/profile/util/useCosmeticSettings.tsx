@@ -71,6 +71,7 @@ export default function CosmeticSettings() {
         usePfpDecoration(existingSettings.pfp_decoration || false);
         setDecorationValue(existingSettings.decoration_value || '');
         setCardTilt(existingSettings.card_tilt || false);
+        setShowBadges(existingSettings.show_badges || false);
       }
     };
 
@@ -128,6 +129,7 @@ export default function CosmeticSettings() {
           pfp_decoration: pfpDecoration,
           decoration_value: decorationValue,
           card_tilt: cardTilt,
+          show_badges: showBadges,
         })
         .eq("id", existingEntry.id);
   
@@ -154,6 +156,7 @@ export default function CosmeticSettings() {
           pfp_decoration: pfpDecoration,
           decoration_value: decorationValue,
           card_tilt: cardTilt,
+          show_badges: showBadges,
         });
   
       if (insertError) {
