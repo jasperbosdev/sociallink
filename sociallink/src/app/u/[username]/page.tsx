@@ -62,6 +62,30 @@ export default function UserProfile() {
     };
   }, [cardTilt]);
 
+  const username = userData?.username;
+
+  useEffect(() => {
+    if (username) {
+      trackView(username as string);  // Track the view when the page loads
+    }
+  }, [username]);
+
+  const trackView = async (username: string) => {
+    try {
+      const res = await fetch('/api/trackView', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      });
+      const data = await res.json();
+      console.log(data.message);
+    } catch (error) {
+      console.error('Error tracking view:', error);
+    }
+  };
+
   const tiltOptions = {
     reverse: true,
     max: 10,
