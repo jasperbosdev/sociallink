@@ -165,16 +165,7 @@ export default function UserProfile() {
           )}
         </div>
         
-        <div className="flex items-center justify-center space-x-2">
-          <h1
-            className="text-3xl font-bold text-center"
-            style={{
-              backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
-            }}
-          >
-            {userData?.username}
-          </h1>
-          
+        <div className="flex flex-col items-center justify-center">
           {showBadges && (
             <span className="flex items-center space-x-2 h-full">
               {badges.map((badge, index) => (
@@ -189,6 +180,14 @@ export default function UserProfile() {
               ))}
             </span>
           )}
+          <h1
+            className="text-3xl font-bold text-center"
+            style={{
+              backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
+            }}
+          >
+            {userData?.username}
+          </h1>
         </div>
         {/* user socials */}
         <div className="flex">
