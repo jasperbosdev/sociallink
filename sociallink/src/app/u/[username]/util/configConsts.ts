@@ -47,6 +47,12 @@ export const configConsts = (config: any) => {
     const showBadges = config?.show_badges !== undefined && config.show_badges !== null
     ? config.show_badges
     : false;
+
+    const fullRoundedSocials = config?.rounded_socials !== undefined && config.rounded_socials !== null
+    ? config.rounded_socials
+    : false;
   
-    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges };
+    return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
+    , fullRoundedSocials
+     };
 };  

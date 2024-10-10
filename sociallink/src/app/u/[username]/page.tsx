@@ -9,6 +9,7 @@ import localFont from "next/font/local"; // Import localFont from next/font/loca
 import { useFetchConfig } from './util/fetchConfig';
 import { configConsts } from './util/configConsts';
 import { useFetchBadges } from './util/fetchBadges';
+import { useFetchSocials } from './util/fetchSocials';
 import { Tooltip } from "@nextui-org/tooltip"; // Import Tooltip from NextUI
 
 const geistSans = localFont({
@@ -30,7 +31,8 @@ export default function UserProfile() {
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
-  const { badges, isLoadingBadges } = useFetchBadges();  // Uses the updated fetch logic
+  const { badges, isLoadingBadges } = useFetchBadges();
+  const { socials, isLoadingSocials } = useFetchSocials();
 
   const {
     borderWidth,
@@ -45,6 +47,7 @@ export default function UserProfile() {
     decorationValue,
     cardTilt,
     showBadges,
+    fullRoundedSocials
   } = configConsts(config);
 
   useEffect(() => {
@@ -185,6 +188,29 @@ export default function UserProfile() {
                 </Tooltip>
               ))}
             </span>
+          )}
+        </div>
+        {/* user socials */}
+        <div className="flex">
+          {socials.length > 0 ? (
+            <span className="flex items-center space-x-2 h-full">
+              {socials.map((social, index) => (
+                <Tooltip key={social.id || index} content={
+                  <div className='font-bold text-sm bg-black py-1 px-2 rounded-md'>{social.platform}</div>
+                } closeDelay={100} offset={0}>
+                  <a href={social.platform_value} target="_blank" rel="noopener noreferrer">
+                    <div className={`border border-2 border-red-500 px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
+                      <i
+                        className={`fab fa-${social.platform} fa-2xl`}
+                        style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
+                      ></i>
+                    </div>
+                  </a>
+                </Tooltip>
+              ))}
+            </span>
+          ) : (
+            <div className='hidden'></div>
           )}
         </div>
         <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
