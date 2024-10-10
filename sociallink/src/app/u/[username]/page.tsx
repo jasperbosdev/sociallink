@@ -9,6 +9,7 @@ import localFont from "next/font/local"; // Import localFont from next/font/loca
 import { useFetchConfig } from './util/fetchConfig';
 import { configConsts } from './util/configConsts';
 import { useFetchBadges } from './util/fetchBadges';
+import { Tooltip } from "@nextui-org/tooltip"; // Import Tooltip from NextUI
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -109,76 +110,85 @@ export default function UserProfile() {
         </aside>
       )}
       <div className={`transition flex items-center justify-center min-h-screen mx-4 ${geistSans.variable} ${geistMono.variable}`}>
-        <div
-          ref={cardTilt ? tiltRef : null} // Only attach the ref if cardTilt is enabled
-          className={`relative flex w-full max-w-[45em] flex-col items-center space-y-4 p-6 border-red-500 shadow-lg ${cardBlur}`}
-          style={{
-            borderWidth: borderWidth,
-            borderRadius: borderRadius,
-            backgroundColor: `rgba(0, 0, 0, ${cardOpacity})`,
-            boxShadow: cardGlow ? `0px 0px 10px 4px rgba(239,68,68,1)` : "",
-          }}
-        >
-          <div className="relative flex flex-col items-center">
-            {pfpDecoration ? (
-              <>
-                <img
-                  src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
-                  className="w-40 h-auto"
-                  alt={`${userData?.username}'s decoration`}
-                  draggable="false"
-                />
-                <img
-                  src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-                  className="absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] border-red-500 mt-[-2rem]"
-                  alt={`${userData?.username}'s profile`}
-                  draggable="false"
-                />
-              </>
-            ) : (
+      <div
+        ref={(el) => {
+          if (el && cardTilt) {
+            // Initialize VanillaTilt only if cardTilt is true
+            VanillaTilt.init(el, {
+              max: 5,
+              speed: 2000,
+              glare: false,
+              reverse: true,
+              transition: true,
+              easing: "cubic-bezier(.03,.98,.52,.99)",
+              reset: true,
+            });
+          } else if (el && !cardTilt && el.vanillaTilt) {
+            // Destroy VanillaTilt if cardTilt is false or null
+            el.vanillaTilt.destroy();
+          }
+        }}
+        className={`relative flex w-full max-w-[45em] flex-col items-center space-y-4 p-6 border-red-500 shadow-lg ${cardBlur}`}
+        style={{
+          borderWidth: borderWidth,
+          borderRadius: borderRadius,
+          backgroundColor: `rgba(0, 0, 0, ${cardOpacity})`,
+          boxShadow: cardGlow ? `0px 0px 10px 4px rgba(239,68,68,1)` : "",
+        }}
+      >
+        <div className="relative flex flex-col items-center">
+          {pfpDecoration ? (
+            <>
+              <img
+                src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
+                className="w-40 h-auto"
+                alt={`${userData?.username}'s decoration`}
+                draggable="false"
+              />
               <img
                 src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-                className="w-32 h-32 object-cover border-[3px] border-red-500 rounded-full"
+                className="absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] border-red-500 mt-[-2rem]"
                 alt={`${userData?.username}'s profile`}
                 draggable="false"
               />
-            )}
-          </div>
-          
-          <div className="flex items-center justify-center space-x-2">
-            <h1
-              className="text-3xl font-bold text-center"
-              style={{
-                backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
-              }}
-            >
-              {userData?.username}
-            </h1>
-            
-            {showBadges && (
-              <span className="flex items-center space-x-2 h-full">
-              {badges.length > 0 ? (
-                badges.map((badge) => {
-                const iconStyle = badge.icon_style && typeof badge.icon_style === 'object' ? badge.icon_style : {};
-                
-                // Log to ensure badge data is correct
-                console.log('Rendering badge:', badge);
-                
-                return (
-                  <div key={badge.id} className="badge-container flex items-center mt-[2.75px]">
-                  <i className={`${badge.icon_style} fa-${badge.icon}`} style={{ filter: 'drop-shadow(0px 0px 3.5px rgb(255, 255, 255))' }}
-                  title={`${badge.badge}`}></i>
-                  </div>
-                );
-                })
-              ) : (
-                <p>No badges available</p>
-              )}
-              </span>
-            )}
-          </div>
-          <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
+            </>
+          ) : (
+            <img
+              src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+              className="w-32 h-32 object-cover border-[3px] border-red-500 rounded-full"
+              alt={`${userData?.username}'s profile`}
+              draggable="false"
+            />
+          )}
         </div>
+        
+        <div className="flex items-center justify-center space-x-2">
+          <h1
+            className="text-3xl font-bold text-center"
+            style={{
+              backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
+            }}
+          >
+            {userData?.username}
+          </h1>
+          
+          {showBadges && (
+            <span className="flex items-center space-x-2 h-full">
+              {badges.map((badge, index) => (
+                <Tooltip key={badge.id || index} content={
+                  <div className='font-bold text-sm'>{badge.badge}</div>
+                }>
+                    <i
+                    className={`${badge.icon_style} fa-${badge.icon}`}
+                    style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
+                    ></i>
+                </Tooltip>
+              ))}
+            </span>
+          )}
+        </div>
+        <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
+      </div>
       </div>
     </>
   );

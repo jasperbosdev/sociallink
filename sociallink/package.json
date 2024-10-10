@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/tooltip": "^2.0.41",
     "@supabase/supabase-js": "^2.45.4",
     "@tailwindcss/forms": "^0.5.9",
     "chart.js": "^4.4.4",
