@@ -2,15 +2,18 @@
 
 import { useEffect, useState, useRef } from 'react';
 import VanillaTilt from 'vanilla-tilt';
-import { useUserData } from './util/userDataLogic'; // Import userData logic
-import { useFetchAvatar } from './util/fetchAvatar'; // Import fetchAvatar logic
-import { useFetchBackground } from './util/fetchBackground'; // Import fetchBackground logic
-import localFont from "next/font/local"; // Import localFont from next/font/local
+import { useUserData } from './util/userDataLogic';
+import { useFetchAvatar } from './util/fetchAvatar';
+import { useFetchBackground } from './util/fetchBackground';
+import localFont from "next/font/local";
 import { useFetchConfig } from './util/fetchConfig';
 import { configConsts } from './util/configConsts';
+import { useFetchGeneralConfig } from './util/fetchGeneralConfig';
+import { generalConfigConsts } from './util/generalConfigConsts';
 import { useFetchBadges } from './util/fetchBadges';
 import { useFetchSocials } from './util/fetchSocials';
-import { Tooltip } from "@nextui-org/tooltip"; // Import Tooltip from NextUI
+import { Tooltip } from "@nextui-org/tooltip";
+import { TypeAnimation } from 'react-type-animation';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -31,8 +34,11 @@ export default function UserProfile() {
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
+  const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
   const { badges, isLoadingBadges } = useFetchBadges();
   const { socials, isLoadingSocials } = useFetchSocials();
+
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
 
   const {
     borderWidth,
@@ -50,17 +56,53 @@ export default function UserProfile() {
     fullRoundedSocials
   } = configConsts(config);
 
+  const {
+    pageTitle,
+    displayName,
+    description,
+    animatedTitle,
+    typingDesc
+  } = generalConfigConsts(generalConfig);
+
+  useEffect(() => {
+    if (pageTitle) {
+      const originalTitle = document.title;
+      if (animatedTitle) {
+        let titleIndex = 0;
+        const scrollTitle = () => {
+          document.title = pageTitle.slice(titleIndex) + " " + pageTitle.slice(0, titleIndex);
+          titleIndex = (titleIndex + 1) % pageTitle.length;
+        };
+        const titleInterval = setInterval(scrollTitle, 100);
+
+        return () => {
+          clearInterval(titleInterval);
+          document.title = originalTitle;
+        };
+      } else {
+        document.title = pageTitle;
+      }
+    }
+  }, [pageTitle, animatedTitle]);
+
   useEffect(() => {
     if (cardTilt && tiltRef.current) {
-      VanillaTilt.init(tiltRef.current, tiltOptions); // Pass the options here
+      VanillaTilt.init(tiltRef.current, tiltOptions);
     }
-    // Cleanup effect
     return () => {
       if (tiltRef.current && cardTilt) {
         tiltRef.current.vanillaTilt?.destroy();
       }
     };
   }, [cardTilt]);
+
+  useEffect(() => {
+    const handleLoad = () => {
+      setIsPageLoaded(true); // Set page as loaded once the window finishes loading
+    };
+    window.addEventListener('load', handleLoad);
+    return () => window.removeEventListener('load', handleLoad);
+  }, []);
 
   const username = userData?.username;
 
@@ -99,7 +141,6 @@ export default function UserProfile() {
     speed: 600,
   }
 
-  // Combine loading states
   const isLoading = userLoading || avatarLoading || configLoading || isLoadingBadges;
 
   if (isLoading) {
@@ -155,7 +196,7 @@ export default function UserProfile() {
             el.vanillaTilt.destroy();
           }
         }}
-        className={`relative flex w-full max-w-[45em] flex-col items-center space-y-4 p-6 border-red-500 shadow-lg ${cardBlur}`}
+        className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-red-500 shadow-lg ${cardBlur}`}
         style={{
           borderWidth: borderWidth,
           borderRadius: borderRadius,
@@ -210,8 +251,23 @@ export default function UserProfile() {
               backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
             }}
           >
-            {userData?.username}
+            {displayName}
           </h1>
+        </div>
+        {/* user description */}
+        <div className=''>
+            {typingDesc ? (
+            <TypeAnimation
+              sequence={[
+              description
+              ]}
+              wrapper='p'
+              speed={25}
+              repeat={0}
+            />
+            ) : (
+            <p>{description}</p>
+            )}
         </div>
         {/* user socials */}
         <div className="flex">
