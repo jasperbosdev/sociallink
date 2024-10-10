@@ -6,6 +6,7 @@ import { supabase } from "../../supabase";
 import { useUserData } from "./util/useUserData";
 import Nav from "../components/nav";
 import CosmeticSettings from "./util/useCosmeticSettings";
+import GeneralSettings from "./util/useGeneralSettings";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function Dashboard() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   // State for collapsible sections
+  const [isGeneralSettingsOpen, setGeneralSettingsOpen] = useState(false);
   const [isAccountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const [isFileSettingsOpen, setFileSettingsOpen] = useState(false);
   const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
@@ -299,6 +301,28 @@ export default function Dashboard() {
                       Disable Profile
                     </div>
                   </div>
+                </div>
+
+                <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 w-full rounded-md p-4">
+                  <h2
+                    className="text-white font-bold text-xl cursor-pointer flex justify-between items-center"
+                    onClick={() =>
+                      setGeneralSettingsOpen(!isGeneralSettingsOpen)
+                    }
+                  >
+                    <span className="select-none">
+                      <i className="fas fa-file mr-2"></i>{" "}
+                      General Settings
+                    </span>
+                    <i
+                      className={`fas fa-chevron-${
+                        isGeneralSettingsOpen ? "down" : "right"
+                      } text-white`}
+                    ></i>
+                  </h2>
+                  {isGeneralSettingsOpen && (
+                    <GeneralSettings />
+                  )}
                 </div>
 
                 <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 w-full rounded-md p-4">
