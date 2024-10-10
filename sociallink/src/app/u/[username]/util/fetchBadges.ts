@@ -11,7 +11,7 @@ export const useFetchBadges = () => {
   // Function to fetch badges from the Supabase database
   const fetchBadges = async (uid: number) => {
     try {
-      console.log("Fetching badges for user ID:", uid); // Debugging log
+    // console.log("Fetching badges for user ID:", uid); // Debugging log
 
       const { data, error } = await supabase
         .from("badges") // The badges table
@@ -22,7 +22,7 @@ export const useFetchBadges = () => {
         throw new Error(error.message);
       }
 
-      console.log("Fetched badge data:", data); // Debugging log to see the fetched data
+    // console.log("Fetched badge data:", data); // Debugging log to see the fetched data
       setBadges(data || []); // Set the badges data or empty array if no data
     } catch (error) {
       console.error("Error fetching badges:", error);
