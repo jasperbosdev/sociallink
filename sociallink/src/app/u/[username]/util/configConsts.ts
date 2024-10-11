@@ -51,8 +51,32 @@ export const configConsts = (config: any) => {
     const fullRoundedSocials = config?.rounded_socials !== undefined && config.rounded_socials !== null
     ? config.rounded_socials
     : false;
+
+    const primaryColor = (config?.primary_color !== undefined && config.primary_color !== null)
+    ? config.primary_color
+    : '09090B';
+
+    const secondaryColor = (config?.secondary_color !== undefined && config.secondary_color !== null)
+    ? config.secondary_color
+    : '101013';
+
+    const accentColor = (config?.accent_color !== undefined && config.accent_color !== null)
+    ? config.accent_color
+    : 'FFFFFF';
+
+    const textColor = (config?.text_color !== undefined && config.text_color !== null)
+    ? config.text_color
+    : 'FFFFFF';
+
+    const backgroundColor = (config?.background_color !== undefined && config.background_color !== null)
+    ? config.background_color
+    : '101013';
+
+    const embedColor = (config?.embed_color !== undefined && config.embed_color !== null)
+    ? config.embed_color
+    : '09090B';
   
     return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
-    , fullRoundedSocials
+    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor
      };
-};  
+};
