@@ -1,6 +1,7 @@
 import { use, useEffect, useState } from "react";
 import { useUserData } from "./useUserData";
 import { supabase } from "../../../supabase";
+import ColorPicker from "./colorPicker";
 
 export default function CosmeticSettings() {
   const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
@@ -178,243 +179,250 @@ export default function CosmeticSettings() {
   };  
 
   return (
-    <div className="mt-2 grid grid-cols-2 gap-4">
-      {/* Sliders */}
-      <div>
-        <label className="text-white">Card Opacity</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="10"
-          value={cardOpacity}
-          onChange={(e) => setCardOpacity(parseFloat(e.target.value))}
-          className="w-full"
-        />
-        <div className="text-white">{cardOpacity}</div>
-      </div>
-
-      <div>
-        <label className="text-white">Card Blur</label>
-        <input
-          type="range"
-          min="0"
-          max="25"
-          step={1}
-          value={cardBlur}
-          onChange={(e) => setCardBlur(parseInt(e.target.value))}
-          className="w-full"
-        />
-        <div className="text-white">{cardBlur}</div>
-      </div>
-
-      <div>
-        <label className="text-white">Border Width</label>
-        <input
-          type="range"
-          min="0"
-          max="5"
-          value={borderWidth}
-          onChange={(e) => setBorderWidth(parseInt(e.target.value))}
-          className="w-full"
-        />
-        <div className="text-white">{borderWidth}</div>
-      </div>
-
-      <div>
-        <label className="text-white">Border Radius</label>
-        <input
-          type="range"
-          min="0"
-          max="1.5"
-          value={borderRadius}
-          onChange={(e) => setBorderRadius(parseFloat(e.target.value))}
-          className="w-full"
-          step="0.25" 
-        />
-        <div className="text-white">{borderRadius}</div>
-      </div>
-
-      <div>
-        <label className="text-white">Background Blur</label>
-        <input
-          type="range"
-          min="0"
-          max="25"
-          step={1}
-          value={backgroundBlur}
-          onChange={(e) => setBackgroundBlur(parseInt(e.target.value))}
-          className="w-full"
-        />
-        <div className="text-white">{backgroundBlur}</div>
-      </div>
-
-      <div>
-        <label className="text-white">Background Brightness</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="1"
-          value={backgroundBrightness}
-          onChange={(e) => setBackgroundBrightness(parseFloat(e.target.value))}
-          className="w-full"
-        />
-        <div className="text-white">{backgroundBrightness}</div>
-      </div>
-
-      {/* Toggles */}
-      <div className="flex items-center space-x-2 opacity-50 pointer-events-none">
-        <label className="text-white">Show Views</label>
-        <div
-          className={`${
-        showViews ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-        >
-          <div
-        className={`${
-          showViews ? "translate-x-6" : "translate-x-0"
-        } w-5 h-5 bg-white rounded-full transform transition`}
-        ></div>
+    <>
+      <div className="mt-2">
+        <div className="gap-4">
+          <ColorPicker />
         </div>
       </div>
+      <div className="mt-2 grid grid-cols-2 gap-4">
+        {/* Sliders */}
+        <div>
+          <label className="text-white">Card Opacity</label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="10"
+            value={cardOpacity}
+            onChange={(e) => setCardOpacity(parseFloat(e.target.value))}
+            className="w-full"
+          />
+          <div className="text-white">{cardOpacity}</div>
+        </div>
 
-      <div className="flex items-center space-x-2">
-        <label className="text-white">Show Badges</label>
-        <div
-          className={`${
-            showBadges ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setShowBadges(!showBadges)}
-        >
+        <div>
+          <label className="text-white">Card Blur</label>
+          <input
+            type="range"
+            min="0"
+            max="25"
+            step={1}
+            value={cardBlur}
+            onChange={(e) => setCardBlur(parseInt(e.target.value))}
+            className="w-full"
+          />
+          <div className="text-white">{cardBlur}</div>
+        </div>
+
+        <div>
+          <label className="text-white">Border Width</label>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            value={borderWidth}
+            onChange={(e) => setBorderWidth(parseInt(e.target.value))}
+            className="w-full"
+          />
+          <div className="text-white">{borderWidth}</div>
+        </div>
+
+        <div>
+          <label className="text-white">Border Radius</label>
+          <input
+            type="range"
+            min="0"
+            max="1.5"
+            value={borderRadius}
+            onChange={(e) => setBorderRadius(parseFloat(e.target.value))}
+            className="w-full"
+            step="0.25" 
+          />
+          <div className="text-white">{borderRadius}</div>
+        </div>
+
+        <div>
+          <label className="text-white">Background Blur</label>
+          <input
+            type="range"
+            min="0"
+            max="25"
+            step={1}
+            value={backgroundBlur}
+            onChange={(e) => setBackgroundBlur(parseInt(e.target.value))}
+            className="w-full"
+          />
+          <div className="text-white">{backgroundBlur}</div>
+        </div>
+
+        <div>
+          <label className="text-white">Background Brightness</label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={backgroundBrightness}
+            onChange={(e) => setBackgroundBrightness(parseFloat(e.target.value))}
+            className="w-full"
+          />
+          <div className="text-white">{backgroundBrightness}</div>
+        </div>
+
+        {/* Toggles */}
+        <div className="flex items-center space-x-2 opacity-50 pointer-events-none">
+          <label className="text-white">Show Views</label>
           <div
             className={`${
-              showBadges ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <label className="text-white">Card Glow</label>
-        <div
+          showViews ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+          >
+            <div
           className={`${
-            cardGlow ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setCardGlow(!cardGlow)}
-        >
-          <div
-            className={`${
-              cardGlow ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
+            showViews ? "translate-x-6" : "translate-x-0"
+          } w-5 h-5 bg-white rounded-full transform transition`}
           ></div>
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <label className="text-white">Full Rounded Socials</label>
-        <div
-          className={`${
-            fullRoundedSocials ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setFullRoundedSocials(!fullRoundedSocials)}
-        >
-          <div
-            className={`${
-              fullRoundedSocials ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <label className="text-white">Username Effect</label>
-        <div
-          className={`${
-            usernameFx ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => useUsernameFx(!usernameFx)}
-        >
-          <div
-            className={`${
-              usernameFx ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
-        </div>
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <label className="text-white">Tilt Effect</label>
-        <div
-          className={`${
-            cardTilt ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => setCardTilt(!cardTilt)}
-        >
-          <div
-            className={`${
-              cardTilt ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
-        </div>
-      </div>
-
-      <div className="flex items-center flex-wrap">
-        <label className="text-white mr-2">Avatar Decoration</label>
-        <div
-          className={`${
-            pfpDecoration ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => usePfpDecoration(!pfpDecoration)}
-        >
-          <div
-            className={`${
-              pfpDecoration ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
-        </div>
-        {pfpDecoration && (
-          <div className="w-full mt-2">
-            <label className="text-white">Select Option</label>
-            <select
-              className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
-              value={decorationValue}
-              onChange={(e) => setDecorationValue(e.target.value)}
-            >
-              <option value="catears">Cat Ears</option>
-            </select>
           </div>
-        )}
-      </div>
-      
-      <div className="flex items-center space-x-2 h-fit">
-        <label className="text-white">Cursor Effect</label>
-        <div
-          className={`${
-            '' ? "bg-blue-500" : "bg-gray-500"
-          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
-          onClick={() => ''}
-        >
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <label className="text-white">Show Badges</label>
           <div
             className={`${
-              '' ? "translate-x-6" : "translate-x-0"
-            } w-5 h-5 bg-white rounded-full transform transition`}
-          ></div>
+              showBadges ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => setShowBadges(!showBadges)}
+          >
+            <div
+              className={`${
+                showBadges ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <label className="text-white">Card Glow</label>
+          <div
+            className={`${
+              cardGlow ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => setCardGlow(!cardGlow)}
+          >
+            <div
+              className={`${
+                cardGlow ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <label className="text-white">Full Rounded Socials</label>
+          <div
+            className={`${
+              fullRoundedSocials ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => setFullRoundedSocials(!fullRoundedSocials)}
+          >
+            <div
+              className={`${
+                fullRoundedSocials ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <label className="text-white">Username Effect</label>
+          <div
+            className={`${
+              usernameFx ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => useUsernameFx(!usernameFx)}
+          >
+            <div
+              className={`${
+                usernameFx ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+        </div>
+            
+        <div className="flex items-center space-x-2">
+          <label className="text-white">Tilt Effect</label>
+          <div
+            className={`${
+              cardTilt ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => setCardTilt(!cardTilt)}
+          >
+            <div
+              className={`${
+                cardTilt ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+        </div>
+
+        <div className="flex items-center flex-wrap">
+          <label className="text-white mr-2">Avatar Decoration</label>
+          <div
+            className={`${
+              pfpDecoration ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => usePfpDecoration(!pfpDecoration)}
+          >
+            <div
+              className={`${
+                pfpDecoration ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+          {pfpDecoration && (
+            <div className="w-full mt-2">
+              <label className="text-white">Select Option</label>
+              <select
+                className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
+                value={decorationValue}
+                onChange={(e) => setDecorationValue(e.target.value)}
+              >
+                <option value="catears">Cat Ears</option>
+              </select>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex items-center space-x-2 h-fit">
+          <label className="text-white">Cursor Effect</label>
+          <div
+            className={`${
+              '' ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => ''}
+          >
+            <div
+              className={`${
+                '' ? "translate-x-6" : "translate-x-0"
+              } w-5 h-5 bg-white rounded-full transform transition`}
+            ></div>
+          </div>
+        </div>
+
+        {/* Save button */}
+        <div className="col-span-2">
+          <button
+            className="border border-[3px] border-white/60 text-white font-bold py-2 px-4 rounded-lg"
+            onClick={uploadConfig}
+          >
+            Save Cosmetic Settings
+          </button>
+          {saveStatus && (
+            <p className="text-green-400 mt-2 text-sm">{saveStatus}</p>
+          )}
         </div>
       </div>
-
-      {/* Save button */}
-      <div className="col-span-2">
-        <button
-          className="border border-[3px] border-white/60 text-white font-bold py-2 px-4 rounded-lg"
-          onClick={uploadConfig}
-        >
-          Save Cosmetic Settings
-        </button>
-        {saveStatus && (
-          <p className="text-green-400 mt-2 text-sm">{saveStatus}</p>
-        )}
-      </div>
-    </div>
+    </>
   );
 }

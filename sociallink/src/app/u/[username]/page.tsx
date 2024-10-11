@@ -53,7 +53,13 @@ export default function UserProfile() {
     decorationValue,
     cardTilt,
     showBadges,
-    fullRoundedSocials
+    fullRoundedSocials,
+    primaryColor,
+    secondaryColor,
+    accentColor,
+    textColor,
+    embedColor,
+    backgroundColor,
   } = configConsts(config);
 
   const {
@@ -164,136 +170,143 @@ export default function UserProfile() {
 
   return (
     <>
-      {fetchedBackgroundUrl && (
+      {fetchedBackgroundUrl ? (
         <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
           <img
             src={fetchedBackgroundUrl}
             style={{
-              filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`  // Apply both blur and brightness dynamically
+              filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`,
             }}
             className="object-cover w-full h-full"
             alt=""
             draggable="false"
           />
         </aside>
+      ) : (
+        <div className="fixed w-screen h-screen z-[-5]" style={{ backgroundColor: `#${backgroundColor}` }}></div>
       )}
       <div className={`transition flex items-center justify-center min-h-screen mx-4 ${geistSans.variable} ${geistMono.variable}`}>
-      <div
-        ref={(el) => {
-          if (el && cardTilt) {
-            // Initialize VanillaTilt only if cardTilt is true
-            VanillaTilt.init(el, {
-              max: 5,
-              speed: 2000,
-              glare: false,
-              reverse: true,
-              transition: true,
-              easing: "cubic-bezier(.03,.98,.52,.99)",
-              reset: true,
-            });
-          } else if (el && !cardTilt && el.vanillaTilt) {
-            // Destroy VanillaTilt if cardTilt is false or null
-            el.vanillaTilt.destroy();
-          }
-        }}
-        className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-red-500 shadow-lg ${cardBlur}`}
-        style={{
-          borderWidth: borderWidth,
-          borderRadius: borderRadius,
-          backgroundColor: `rgba(0, 0, 0, ${cardOpacity})`,
-          boxShadow: cardGlow ? `0px 0px 10px 4px rgba(239,68,68,1)` : "",
-        }}
-      >
-        <div className="relative flex flex-col items-center">
-          {pfpDecoration ? (
-            <>
-              <img
-                src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
-                className="w-40 h-auto"
-                alt={`${userData?.username}'s decoration`}
-                draggable="false"
-              />
+        <div
+          ref={(el) => {
+            if (el && cardTilt) {
+              VanillaTilt.init(el, {
+                max: 5,
+                speed: 2000,
+                glare: false,
+                reverse: true,
+                transition: true,
+                easing: "cubic-bezier(.03,.98,.52,.99)",
+                reset: true,
+              });
+            } else if (el && !cardTilt && el.vanillaTilt) {
+              el.vanillaTilt.destroy();
+            }
+          }}
+          className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-[#${accentColor}] shadow-lg ${cardBlur}`}
+          style={{
+            borderWidth,
+            borderColor: `#${accentColor}`,
+            borderRadius,
+            backgroundColor: `rgba(0, 0, 0, ${cardOpacity})`,
+            boxShadow: cardGlow
+              ? `0px 0px 10px 4px ${accentColor ? `#${accentColor}` : "rgba(239,68,68,1)"}`
+              : "",
+          }}
+        >
+          <div className="relative flex flex-col items-center">
+            {pfpDecoration ? (
+              <>
+                <img
+                  src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
+                  className="w-40 h-auto"
+                  alt={`${userData?.username}'s decoration`}
+                  draggable="false"
+                />
+                <img
+                  src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+                  className={`absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] mt-[-2rem]`}
+                  alt={`${userData?.username}'s profile`}
+                  draggable="false"
+                  style={{ borderColor: `#${accentColor}` }}
+                />
+              </>
+            ) : (
               <img
                 src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-                className="absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] border-red-500 mt-[-2rem]"
+                className={`w-32 h-32 object-cover border-[3px] rounded-full`}
                 alt={`${userData?.username}'s profile`}
                 draggable="false"
+                style={{ borderColor: `#${accentColor}` }}
               />
-            </>
-          ) : (
-            <img
-              src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-              className="w-32 h-32 object-cover border-[3px] border-red-500 rounded-full"
-              alt={`${userData?.username}'s profile`}
-              draggable="false"
-            />
-          )}
-        </div>
-        
-        <div className="flex flex-col items-center justify-center">
-          {showBadges && (
-            <span className="flex items-center space-x-2 h-full">
-              {badges.map((badge, index) => (
-                <Tooltip key={badge.id || index} content={
-                  <div className='font-bold text-sm'>{badge.badge}</div>
-                }>
-                    <i
-                    className={`${badge.icon_style} fa-${badge.icon}`}
-                    style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
-                    ></i>
-                </Tooltip>
-              ))}
-            </span>
-          )}
-          <h1
-            className="text-3xl font-bold text-center"
-            style={{
-              backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
-            }}
-          >
-            {displayName}
-          </h1>
-        </div>
-        {/* user description */}
-        <div className=''>
-            {typingDesc ? (
-            <TypeAnimation
-              sequence={[
-              description
-              ]}
-              wrapper='p'
-              speed={25}
-              repeat={0}
-            />
-            ) : (
-            <p>{description}</p>
             )}
+          </div>
+
+          <div className="flex flex-col items-center justify-center">
+            {showBadges && (
+              <span className="flex items-center space-x-2 h-full">
+                {badges.map((badge, index) => (
+                  <Tooltip key={badge.id || index} content={
+                    <div className='font-bold text-sm'>{badge.badge}</div>
+                  }>
+                    <i
+                      className={`${badge.icon_style} fa-${badge.icon}`}
+                      style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
+                    ></i>
+                  </Tooltip>
+                ))}
+              </span>
+            )}
+            <h1
+              className="text-3xl font-bold text-center"
+              style={{
+                backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
+              }}
+            >
+              <p style={{ color: `#${textColor}` }}>{displayName}</p>
+            </h1>
+          </div>
+
+          {/* user description */}
+          <div className=''>
+            {typingDesc ? (
+              <TypeAnimation
+                sequence={[description]}
+                wrapper='p'
+                speed={25}
+                repeat={0}
+                style={{ color: `#${textColor}` }}
+              />
+            ) : (
+              <p style={{ color: `#${textColor}` }}>{description}</p>
+            )}
+          </div>
+
+          {/* user socials */}
+          <div className="flex">
+            {socials.length > 0 ? (
+              <span className="flex items-center space-x-2 h-full">
+                {socials.map((social, index) => (
+                  <Tooltip key={social.id || index} content={
+                    <div className='font-bold text-sm bg-black py-1 px-2 rounded-md'>{social.platform}</div>
+                  } closeDelay={100} offset={0}>
+                    <a href={social.platform_value} target="_blank" rel="noopener noreferrer">
+                      <div className={`border border-2 border-[#${accentColor}] px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
+                        <i
+                          className={`fab fa-${social.platform} fa-2xl`}
+                          style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
+                        ></i>
+                      </div>
+                    </a>
+                  </Tooltip>
+                ))}
+              </span>
+            ) : (
+              <div className='hidden'></div>
+            )}
+          </div>
+
+          <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
         </div>
-        {/* user socials */}
-        <div className="flex">
-          {socials.length > 0 ? (
-            <span className="flex items-center space-x-2 h-full">
-              {socials.map((social, index) => (
-                <Tooltip key={social.id || index} content={
-                  <div className='font-bold text-sm bg-black py-1 px-2 rounded-md'>{social.platform}</div>
-                } closeDelay={100} offset={0}>
-                  <a href={social.platform_value} target="_blank" rel="noopener noreferrer">
-                    <div className={`border border-2 border-red-500 px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
-                      <i
-                        className={`fab fa-${social.platform} fa-2xl`}
-                        style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
-                      ></i>
-                    </div>
-                  </a>
-                </Tooltip>
-              ))}
-            </span>
-          ) : (
-            <div className='hidden'></div>
-          )}
-        </div>
-        <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
-      </div>
       </div>
     </>
   );
