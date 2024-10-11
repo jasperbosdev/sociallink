@@ -21,7 +21,7 @@ export const configConsts = (config: any) => {
       : '0px';
   
     const bgBrightnessValue = (config?.background_brightness !== undefined && config.background_brightness !== null)
-      ? config.background_brightness / 100 
+      ? config.background_brightness / 100
       : 1;
 
     const usernameFx = (config?.username_fx !== undefined && config.username_fx !== null)
@@ -54,7 +54,7 @@ export const configConsts = (config: any) => {
 
     const primaryColor = (config?.primary_color !== undefined && config.primary_color !== null)
     ? config.primary_color
-    : '09090B';
+    : '0, 0, 0';
 
     const secondaryColor = (config?.secondary_color !== undefined && config.secondary_color !== null)
     ? config.secondary_color
@@ -70,7 +70,7 @@ export const configConsts = (config: any) => {
 
     const backgroundColor = (config?.background_color !== undefined && config.background_color !== null)
     ? config.background_color
-    : '101013';
+    : '10, 10, 13';
 
     const embedColor = (config?.embed_color !== undefined && config.embed_color !== null)
     ? config.embed_color

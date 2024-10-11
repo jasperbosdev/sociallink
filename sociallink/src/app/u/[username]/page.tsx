@@ -183,7 +183,7 @@ export default function UserProfile() {
           />
         </aside>
       ) : (
-        <div className="fixed w-screen h-screen z-[-5]" style={{ backgroundColor: `#${backgroundColor}` }}></div>
+        <div className="fixed w-screen h-screen z-[-5]" style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}></div>
       )}
       <div className={`transition flex items-center justify-center min-h-screen mx-4 ${geistSans.variable} ${geistMono.variable}`}>
         <div
@@ -207,7 +207,7 @@ export default function UserProfile() {
             borderWidth,
             borderColor: `#${accentColor}`,
             borderRadius,
-            backgroundColor: `rgba(0, 0, 0, ${cardOpacity})`,
+            backgroundColor: `rgba(${primaryColor}, ${cardOpacity})`,
             boxShadow: cardGlow
               ? `0px 0px 10px 4px ${accentColor ? `#${accentColor}` : "rgba(239,68,68,1)"}`
               : "",
