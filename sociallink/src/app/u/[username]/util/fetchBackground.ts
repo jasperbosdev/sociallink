@@ -21,7 +21,8 @@ export const useFetchBackground = () => {
             // console.log("Fetched Background URL:", publicUrl);
         } catch (error) {
             console.error("Error fetching Background:", error);
-            setFetchedBackgroundUrl("");
+            // Gracefully handle the error by not setting an empty string
+            setFetchedBackgroundUrl(null); // Return null if there's an error fetching the background
         } finally {
             setIsBackgroundLoading(false);
         }
