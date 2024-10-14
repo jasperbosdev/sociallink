@@ -1,136 +1,141 @@
 import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
+import { useUserData } from "./useUserData"; // Import your custom hook
 
-const ColorPicker: React.FC = () => {
-  // State for each type of color
-  const [primaryColor, setPrimaryColor] = useState<string>("#aabbcc");
-  const [secondaryColor, setSecondaryColor] = useState<string>("#bbccdd");
-  const [accentColor, setAccentColor] = useState<string>("#ccddee");
-  const [textColor, setTextColor] = useState<string>("#ffffff");
-  const [backgroundColor, setBackgroundColor] = useState<string>("#000000");
-  const [embedColor, setEmbedColor] = useState<string>("#000000");
+interface ColorPickerProps {
+  onColorChange: (colors: { primary: string; secondary: string; accent: string; text: string; background: string; embed: string; }) => void;
+  initialColors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    background: string;
+    embed: string;
+  };
+}
 
+// Helper function to convert hex to a comma-separated string of RGB values
+const hexToRgbString = (hex: string): string => {
+  const parsedHex = hex.replace("#", "");
+  const bigint = parseInt(parsedHex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`; // Return RGB values as a string with no brackets
+};
+
+const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColors }) => {
+  const { loading, error, userData } = useUserData(); // Fetch user data
+
+  // Default color values
+  const defaultColors = {
+    primary: "#ffffff",
+    secondary: "#ffffff",
+    accent: "#ffffff",
+    text: "#000000",
+    background: "#ffffff",
+    embed: "#ffffff",
+  };
+
+  // Check if userData and profileCosmetics are available
+  // const initialColors = userData?.profileCosmetics || defaultColors; 
+
+  // Initialize color states
+  const [primaryColor, setPrimaryColor] = useState(initialColors.primary);
+  const [secondaryColor, setSecondaryColor] = useState(initialColors.secondary);
+  const [accentColor, setAccentColor] = useState(initialColors.accent);
+  const [textColor, setTextColor] = useState(initialColors.text);
+  const [backgroundColor, setBackgroundColor] = useState(initialColors.background);
+  const [embedColor, setEmbedColor] = useState(initialColors.embed);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeColor, setActiveColor] = useState<"primary" | "secondary" | "accent" | "text" | "background" | "embed" | null>(null);
-
   const pickerRef = useRef<HTMLDivElement>(null);
 
-  // Toggle Color Picker
-  const handleClick = (colorType: "primary" | "secondary" | "accent" | "text" | "background" | "embed" ) => {
+  // Handle opening and closing the color picker
+  const handleClick = (colorType: "primary" | "secondary" | "accent" | "text" | "background" | "embed") => {
     setActiveColor(colorType);
     setIsOpen(!isOpen);
   };
 
-  // Close the color picker when clicking outside
+  // Handle clicking outside to close the color picker
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Function to set color based on active color type
+  // Handle color changes
   const handleColorChange = (newColor: string) => {
-    if (activeColor === "primary") {
-      setPrimaryColor(newColor);
-    } else if (activeColor === "secondary") {
-      setSecondaryColor(newColor);
-    } else if (activeColor === "accent") {
-      setAccentColor(newColor);
-    } else if (activeColor === "text") {
-      setTextColor(newColor);
-    } else if (activeColor === "background") {
-      setBackgroundColor(newColor);
-    } else if (activeColor === "embed") {
-      setEmbedColor(newColor);
-    }
+    // Set the selected color based on activeColor
+    if (activeColor === "primary") setPrimaryColor(newColor);
+    else if (activeColor === "secondary") setSecondaryColor(newColor);
+    else if (activeColor === "accent") setAccentColor(newColor);
+    else if (activeColor === "text") setTextColor(newColor);
+    else if (activeColor === "background") setBackgroundColor(newColor);
+    else if (activeColor === "embed") setEmbedColor(newColor);
+  
+    // Send RGB values as a comma-separated string to the parent component
+    onColorChange({
+      primary: hexToRgbString(newColor), // Convert new color to RGB string
+      secondary: hexToRgbString(secondaryColor),
+      accent: hexToRgbString(accentColor),
+      text: hexToRgbString(textColor),
+      background: hexToRgbString(backgroundColor),
+      embed: hexToRgbString(embedColor),
+    });
   };
+
+
+  // Handle loading state
+  if (loading) {
+    return <div>Loading...</div>; // Loading indicator
+  }
+
+  if (error) {
+    return <div>Error fetching user data: {error}</div>; // Error message
+  }
 
   return (
     <div className="flex flex-wrap gap-4 relative">
-      {/* Primary Color */}
-      <div className="flex flex-col">
-      <p className="font-bold mb-2 select-none">Primary Color</p>
-      <div
-        onClick={() => handleClick("primary")}
-        className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
-        style={{ backgroundColor: primaryColor }}
-      ></div>
-      </div>
-
-      {/* Secondary Color */}
-      <div className="flex flex-col">
-      <p className="font-bold mb-2 select-none">Secondary Color</p>
-      <div
-        onClick={() => handleClick("secondary")}
-        className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
-        style={{ backgroundColor: secondaryColor }}
-      ></div>
-      </div>
-
-      {/* Accent Color */}
-      <div className="flex flex-col">
-      <p className="font-bold mb-2 select-none">Accent Color</p>
-      <div
-        onClick={() => handleClick("accent")}
-        className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
-        style={{ backgroundColor: accentColor }}
-      ></div>
-      </div>
-
-      {/* Text Color */}
-      <div className="flex flex-col">
-      <p className="font-bold mb-2 select-none">Text Color</p>
-      <div
-        onClick={() => handleClick("text")}
-        className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
-        style={{ backgroundColor: textColor }}
-      ></div>
-      </div>
-
-      <div className="flex flex-col">
-      <p className="font-bold mb-2 select-none">Background Color</p>
-      <div
-        onClick={() => handleClick("background")}
-        className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
-        style={{ backgroundColor: backgroundColor }}
-      ></div>
-      </div>
-
-      {/* embed Color */}
-      <div className="flex flex-col">
-      <p className="font-bold mb-2 select-none">Embed Color</p>
-      <div
-        onClick={() => handleClick("embed")}
-        className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
-        style={{ backgroundColor: embedColor }}
-      ></div>
-      </div>
-
-      {/* Color Picker Display */}
-      {isOpen && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-zinc-700 border-4 border-white/20 p-4 rounded-xl" ref={pickerRef}>
-        <HexColorPicker color={
-          activeColor === "primary" ? primaryColor :
-          activeColor === "secondary" ? secondaryColor :
-          activeColor === "accent" ? accentColor :
-          activeColor === "text" ? textColor : backgroundColor
-        } onChange={handleColorChange} />
-        <p className="text-center text-white mt-3 font-bold">Selected Color: {activeColor === "primary" ? primaryColor.toUpperCase() : 
-          activeColor === "secondary" ? secondaryColor.toUpperCase() : 
-          activeColor === "accent" ? accentColor.toUpperCase() : 
-          activeColor === "text" ? textColor.toUpperCase() : backgroundColor.toUpperCase()
-        }</p>
+      {["primary", "secondary", "accent", "text", "background", "embed"].map((colorType) => (
+        <div className="flex flex-col" key={colorType}>
+          <p className="font-bold mb-2 select-none">{`${colorType.charAt(0).toUpperCase() + colorType.slice(1)} Color`}</p>
+          <div
+            onClick={() => handleClick(colorType as any)}
+            className="w-[10em] h-[4em] rounded-xl cursor-pointer shadow-md border border-[3px] border-white/60"
+            style={{
+              backgroundColor:
+                colorType === "primary" ? primaryColor :
+                colorType === "secondary" ? secondaryColor :
+                colorType === "accent" ? accentColor :
+                colorType === "text" ? textColor :
+                colorType === "background" ? backgroundColor : embedColor,
+            }}
+          ></div>
         </div>
-      </div>
+      ))}
+      {isOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-zinc-700 border-4 border-white/20 p-4 rounded-xl" ref={pickerRef}>
+            <HexColorPicker
+              color={
+                activeColor === "primary" ? primaryColor :
+                activeColor === "secondary" ? secondaryColor :
+                activeColor === "accent" ? accentColor :
+                activeColor === "text" ? textColor :
+                activeColor === "background" ? backgroundColor : embedColor
+              }
+              onChange={handleColorChange}
+            />
+            <p className="text-center text-white mt-3 font-bold">
+              Selected Color: {activeColor ? (activeColor === "primary" ? primaryColor : activeColor).toUpperCase() : ""}
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

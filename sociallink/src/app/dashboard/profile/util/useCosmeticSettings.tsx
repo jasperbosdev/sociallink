@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { SetStateAction, use, useEffect, useState } from "react";
 import { useUserData } from "./useUserData";
 import { supabase } from "../../../supabase";
 import ColorPicker from "./colorPicker";
@@ -19,9 +19,35 @@ export default function CosmeticSettings() {
   const [pfpDecoration, usePfpDecoration] = useState(false);
   const [decorationValue, setDecorationValue] = useState('');
   const [cardTilt, setCardTilt] = useState(false);
-  const [saveStatus, setSaveStatus] = useState(""); // For showing save status
+  const [saveStatus, setSaveStatus] = useState("");
+  const [primaryColor, setPrimaryColor] = useState("#aabbcc");
+  const [secondaryColor, setSecondaryColor] = useState("#bbccdd");
+  const [accentColor, setAccentColor] = useState("#ccddee");
+  const [textColor, setTextColor] = useState("#ffffff");
+  const [backgroundColor, setBackgroundColor] = useState("#000000");
+  const [embedColor, setEmbedColor] = useState("#000000");
 
   const { loading, error, userData } = useUserData();
+
+  const [colors, setColors] = useState({
+    primaryColor: "#ff0000",
+    secondaryColor: "#00ff00",
+    accentColor: "#0000ff",
+    textColor: "#ffffff",
+    backgroundColor: "#000000",
+    embedColor: "#ff00ff",
+  });
+
+  const handleColorChange = (newColors: {
+    primaryColor: string;
+    secondaryColor: string;
+    accentColor: string;
+    textColor: string;
+    backgroundColor: string;
+    embedColor: string;
+  }) => {
+    setColors(newColors); // Update colors state as user picks colors
+  };
 
   useEffect(() => {
     const fetchCosmeticSettings = async () => {
@@ -73,6 +99,12 @@ export default function CosmeticSettings() {
         setCardTilt(existingSettings.card_tilt || false);
         setShowBadges(existingSettings.show_badges || false);
         setFullRoundedSocials(existingSettings.rounded_socials || false);
+        setPrimaryColor(existingSettings.primary_color || "#aabbcc");
+        setSecondaryColor(existingSettings.secondary_color || "#bbccdd");
+        setAccentColor(existingSettings.accent_color || "#ccddee");
+        setTextColor(existingSettings.text_color || "#ffffff");
+        setBackgroundColor(existingSettings.background_color || "#000000");
+        setEmbedColor(existingSettings.embed_color || "#000000");
       }
     };
 
@@ -115,25 +147,33 @@ export default function CosmeticSettings() {
   
     let success = false;
   
+    const configData = {
+      border_width: borderWidth,
+      border_radius: borderRadius,
+      card_opacity: cardOpacity,
+      card_blur: cardBlur,
+      card_glow: cardGlow,
+      background_brightness: backgroundBrightness,
+      background_blur: backgroundBlur,
+      username_fx: usernameFx,
+      pfp_decoration: pfpDecoration,
+      decoration_value: decorationValue,
+      card_tilt: cardTilt,
+      show_badges: showBadges,
+      rounded_socials: fullRoundedSocials,
+      show_views: showViews,
+      primary_color: colors.primaryColor, // RGB format
+      secondary_color: colors.secondaryColor, // RGB format
+      accent_color: colors.accentColor, // RGB format
+      text_color: colors.textColor, // RGB format
+      background_color: colors.backgroundColor, // RGB format
+      embed_color: colors.embedColor, // RGB format
+    };
+  
     if (existingEntry) {
       const { error: updateError } = await supabase
         .from("profileCosmetics")
-        .update({
-          border_width: borderWidth,
-          border_radius: borderRadius,
-          card_opacity: cardOpacity,
-          card_blur: cardBlur,
-          card_glow: cardGlow,
-          background_brightness: backgroundBrightness,
-          background_blur: backgroundBlur,
-          username_fx: usernameFx,
-          pfp_decoration: pfpDecoration,
-          decoration_value: decorationValue,
-          card_tilt: cardTilt,
-          show_badges: showBadges,
-          rounded_socials: fullRoundedSocials,
-          show_views: showViews,
-        })
+        .update(configData)
         .eq("id", existingEntry.id);
   
       if (updateError) {
@@ -148,20 +188,7 @@ export default function CosmeticSettings() {
         .insert({
           id: id,
           uid: uid,
-          border_width: borderWidth,
-          border_radius: borderRadius,
-          card_opacity: cardOpacity,
-          card_blur: cardBlur,
-          card_glow: cardGlow,
-          background_brightness: backgroundBrightness,
-          background_blur: backgroundBlur,
-          username_fx: usernameFx,
-          pfp_decoration: pfpDecoration,
-          decoration_value: decorationValue,
-          card_tilt: cardTilt,
-          show_badges: showBadges,
-          rounded_socials: fullRoundedSocials,
-          show_views: showViews,
+          ...configData, // Spread the config data
         });
   
       if (insertError) {
@@ -176,13 +203,30 @@ export default function CosmeticSettings() {
       setSaveStatus("Saved changes");
       setTimeout(() => setSaveStatus(""), 3000); // Clear after 3 seconds
     }
-  };  
+  };
 
   return (
     <>
       <div className="mt-2">
         <div className="gap-4">
-          <ColorPicker />
+        <ColorPicker 
+          onColorChange={(colors) => setColors({
+            primaryColor: colors.primary,
+            secondaryColor: colors.secondary,
+            accentColor: colors.accent,
+            textColor: colors.text,
+            backgroundColor: colors.background,
+            embedColor: colors.embed,
+          })}
+          initialColors={{
+            primary: primaryColor,
+            secondary: secondaryColor,
+            accent: accentColor,
+            text: textColor,
+            background: backgroundColor,
+            embed: embedColor,
+          }}
+        />
         </div>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-4">
