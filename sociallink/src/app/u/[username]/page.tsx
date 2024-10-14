@@ -202,14 +202,14 @@ export default function UserProfile() {
               el.vanillaTilt.destroy();
             }
           }}
-          className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-[#${accentColor}] shadow-lg ${cardBlur}`}
+          className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-[rgb(${accentColor})] shadow-lg ${cardBlur}`}
           style={{
             borderWidth,
-            borderColor: `#${accentColor}`,
+            borderColor: `rgb(${accentColor})`,
             borderRadius,
             backgroundColor: `rgba(${primaryColor}, ${cardOpacity})`,
             boxShadow: cardGlow
-              ? `0px 0px 10px 4px ${accentColor ? `#${accentColor}` : "rgba(239,68,68,1)"}`
+              ? `0px 0px 10px 4px ${accentColor ? `rgba(${accentColor},1)` : "rgba(239,68,68,1)"}`
               : "",
           }}
         >
@@ -227,7 +227,7 @@ export default function UserProfile() {
                   className={`absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] mt-[-2rem]`}
                   alt={`${userData?.username}'s profile`}
                   draggable="false"
-                  style={{ borderColor: `#${accentColor}` }}
+                  style={{ borderColor: `rgb(${accentColor})` }}
                 />
               </>
             ) : (
@@ -236,7 +236,7 @@ export default function UserProfile() {
                 className={`w-32 h-32 object-cover border-[3px] rounded-full`}
                 alt={`${userData?.username}'s profile`}
                 draggable="false"
-                style={{ borderColor: `#${accentColor}` }}
+                style={{ borderColor: `rgb(${accentColor})` }}
               />
             )}
           </div>
@@ -262,7 +262,7 @@ export default function UserProfile() {
                 backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
               }}
             >
-              <p style={{ color: `#${textColor}` }}>{displayName}</p>
+              <p style={{ color: `rgb(${textColor})` }}>{displayName}</p>
             </h1>
           </div>
 
@@ -274,10 +274,10 @@ export default function UserProfile() {
                 wrapper='p'
                 speed={25}
                 repeat={0}
-                style={{ color: `#${textColor}` }}
+                style={{ color: `rgb(${textColor})` }}
               />
             ) : (
-              <p style={{ color: `#${textColor}` }}>{description}</p>
+              <p style={{ color: `rgb(${textColor})` }}>{description}</p>
             )}
           </div>
 
@@ -290,7 +290,7 @@ export default function UserProfile() {
                     <div className='font-bold text-sm bg-black py-1 px-2 rounded-md'>{social.platform}</div>
                   } closeDelay={100} offset={0}>
                     <a href={social.platform_value} target="_blank" rel="noopener noreferrer">
-                      <div className={`border border-2 border-[#${accentColor}] px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
+                      <div className={`border border-2 border-[rgb(${accentColor})] px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
                         <i
                           className={`fab fa-${social.platform} fa-2xl`}
                           style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
