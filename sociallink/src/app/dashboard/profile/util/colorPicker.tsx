@@ -132,7 +132,13 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColors 
               onChange={handleColorChange}
             />
             <p className="text-center text-white mt-3 font-bold">
-              Selected Color: {activeColor ? (activeColor === "primary" ? primaryColor : activeColor).toUpperCase() : ""}
+              Selected Color: {activeColor ? (
+              activeColor === "primary" ? primaryColor :
+              activeColor === "secondary" ? secondaryColor :
+              activeColor === "accent" ? accentColor :
+              activeColor === "text" ? textColor :
+              activeColor === "background" ? backgroundColor : embedColor
+              ).toUpperCase() : ""}
             </p>
           </div>
         </div>
