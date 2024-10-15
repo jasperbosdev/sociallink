@@ -7,6 +7,15 @@ interface ColorPickerProps {
   onColorChange: (colors: { primary: string; secondary: string; accent: string; text: string; background: string; embed: string; }) => void;
 }
 
+const hexToRgb = (hex: string): string => {
+  // Convert hex to RGB and return as "r, g, b"
+  const bigint = parseInt(hex.replace(/^#/, ''), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`;
+};
+
 const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange }) => {
   const { loading, error, userData } = useUserData(); // Fetch user data
   const [isLoadingColors, setIsLoadingColors] = useState(true);
@@ -96,14 +105,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange }) => {
       setEmbedColor(newColor);
     }
 
-    // Send updated colors as a comma-separated string to the parent component
+    // Send updated colors as RGB formatted string to the parent component
     onColorChange({
-      primary: activeColor === "primary" ? newColor : primaryColor,
-      secondary: activeColor === "secondary" ? newColor : secondaryColor,
-      accent: activeColor === "accent" ? newColor : accentColor,
-      text: activeColor === "text" ? newColor : textColor,
-      background: activeColor === "background" ? newColor : backgroundColor,
-      embed: activeColor === "embed" ? newColor : embedColor,
+      primary: activeColor === "primary" ? hexToRgb(newColor) : hexToRgb(primaryColor),
+      secondary: activeColor === "secondary" ? hexToRgb(newColor) : hexToRgb(secondaryColor),
+      accent: activeColor === "accent" ? hexToRgb(newColor) : hexToRgb(accentColor),
+      text: activeColor === "text" ? hexToRgb(newColor) : hexToRgb(textColor),
+      background: activeColor === "background" ? hexToRgb(newColor) : hexToRgb(backgroundColor),
+      embed: activeColor === "embed" ? hexToRgb(newColor) : hexToRgb(embedColor),
     });
   };
 
