@@ -218,7 +218,7 @@ export default function UserProfile() {
               <>
                 <img
                   src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
-                  className="w-40 h-auto"
+                  className="w-40 h-auto z-10"
                   alt={`${userData?.username}'s decoration`}
                   draggable="false"
                 />
