@@ -1,55 +1,66 @@
 import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
-import { useUserData } from "./useUserData"; // Import your custom hook
+import { useUserData } from "./useUserData";
+import { supabase } from "../../../supabase";
 
 interface ColorPickerProps {
   onColorChange: (colors: { primary: string; secondary: string; accent: string; text: string; background: string; embed: string; }) => void;
-  initialColors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    text: string;
-    background: string;
-    embed: string;
-  };
 }
 
-// Helper function to convert hex to a comma-separated string of RGB values
-const hexToRgbString = (hex: string): string => {
-  const parsedHex = hex.replace("#", "");
-  const bigint = parseInt(parsedHex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `${r}, ${g}, ${b}`; // Return RGB values as a string with no brackets
-};
-
-const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColors }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange }) => {
   const { loading, error, userData } = useUserData(); // Fetch user data
-
-  // Default color values
-  const defaultColors = {
-    primary: "#ffffff",
-    secondary: "#ffffff",
-    accent: "#ffffff",
-    text: "#000000",
-    background: "#ffffff",
-    embed: "#ffffff",
-  };
-
-  // Check if userData and profileCosmetics are available
-  // const initialColors = userData?.profileCosmetics || defaultColors; 
-
-  // Initialize color states
-  const [primaryColor, setPrimaryColor] = useState(initialColors.primary);
-  const [secondaryColor, setSecondaryColor] = useState(initialColors.secondary);
-  const [accentColor, setAccentColor] = useState(initialColors.accent);
-  const [textColor, setTextColor] = useState(initialColors.text);
-  const [backgroundColor, setBackgroundColor] = useState(initialColors.background);
-  const [embedColor, setEmbedColor] = useState(initialColors.embed);
+  const [isLoadingColors, setIsLoadingColors] = useState(true);
+  
+  // State for colors, initialized to empty strings or defaults
+  const [primaryColor, setPrimaryColor] = useState("");
+  const [secondaryColor, setSecondaryColor] = useState("");
+  const [accentColor, setAccentColor] = useState("");
+  const [textColor, setTextColor] = useState("");
+  const [backgroundColor, setBackgroundColor] = useState("");
+  const [embedColor, setEmbedColor] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeColor, setActiveColor] = useState<"primary" | "secondary" | "accent" | "text" | "background" | "embed" | null>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchColors = async (uid: number) => {
+      try {
+        const { data, error } = await supabase
+          .from("profileCosmetics")
+          .select("primary_color, secondary_color, accent_color, text_color, background_color, embed_color")
+          .eq("uid", uid);
+  
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        // Check if data is received
+        if (data && data.length > 0) {
+          const fetchedColors = data[0]; // Get the first item from the data array
+          
+          // Log fetched color data
+          // console.log("Fetched color data:", fetchedColors);
+          
+          // Set colors directly based on fetched colors
+          setPrimaryColor(fetchedColors.primary_color);
+          setSecondaryColor(fetchedColors.secondary_color);
+          setAccentColor(fetchedColors.accent_color);
+          setTextColor(fetchedColors.text_color);
+          setBackgroundColor(fetchedColors.background_color);
+          setEmbedColor(fetchedColors.embed_color);
+        }
+        
+      } catch (error) {
+        console.error("Error fetching Colors:", error);
+      } finally {
+        setIsLoadingColors(false);
+      }
+    };
+  
+    if (userData) {
+      fetchColors(userData.uid);
+    }
+  }, [userData]);
 
   // Handle opening and closing the color picker
   const handleClick = (colorType: "primary" | "secondary" | "accent" | "text" | "background" | "embed") => {
@@ -71,24 +82,30 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColors 
   // Handle color changes
   const handleColorChange = (newColor: string) => {
     // Set the selected color based on activeColor
-    if (activeColor === "primary") setPrimaryColor(newColor);
-    else if (activeColor === "secondary") setSecondaryColor(newColor);
-    else if (activeColor === "accent") setAccentColor(newColor);
-    else if (activeColor === "text") setTextColor(newColor);
-    else if (activeColor === "background") setBackgroundColor(newColor);
-    else if (activeColor === "embed") setEmbedColor(newColor);
-  
-    // Send RGB values as a comma-separated string to the parent component
+    if (activeColor === "primary") {
+      setPrimaryColor(newColor);
+    } else if (activeColor === "secondary") {
+      setSecondaryColor(newColor);
+    } else if (activeColor === "accent") {
+      setAccentColor(newColor);
+    } else if (activeColor === "text") {
+      setTextColor(newColor);
+    } else if (activeColor === "background") {
+      setBackgroundColor(newColor);
+    } else if (activeColor === "embed") {
+      setEmbedColor(newColor);
+    }
+
+    // Send updated colors as a comma-separated string to the parent component
     onColorChange({
-      primary: hexToRgbString(newColor), // Convert new color to RGB string
-      secondary: hexToRgbString(secondaryColor),
-      accent: hexToRgbString(accentColor),
-      text: hexToRgbString(textColor),
-      background: hexToRgbString(backgroundColor),
-      embed: hexToRgbString(embedColor),
+      primary: activeColor === "primary" ? newColor : primaryColor,
+      secondary: activeColor === "secondary" ? newColor : secondaryColor,
+      accent: activeColor === "accent" ? newColor : accentColor,
+      text: activeColor === "text" ? newColor : textColor,
+      background: activeColor === "background" ? newColor : backgroundColor,
+      embed: activeColor === "embed" ? newColor : embedColor,
     });
   };
-
 
   // Handle loading state
   if (loading) {
