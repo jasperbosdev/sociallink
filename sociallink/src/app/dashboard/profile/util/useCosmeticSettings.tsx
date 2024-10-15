@@ -428,11 +428,21 @@ export default function CosmeticSettings() {
             <div className="w-full mt-2">
               <label className="text-white">Select Option</label>
               <select
-                className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
-                value={decorationValue}
-                onChange={(e) => setDecorationValue(e.target.value)}
+              className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
+              value={decorationValue}
+              onChange={(e) => setDecorationValue(e.target.value)}
               >
-                <option value="catears">Cat Ears</option>
+              <option value="catears">Anime Cat Ears</option>
+              <option value="angry">Anime Angry</option>
+              <option value="dismay">Anime Dismay</option>
+              <option value="energy">Anime Energy</option>
+              <option value="heart">Anime Hearts</option>
+              <option value="kienergy">Anime Ki Energy</option>
+              <option value="love">Anime Love</option>
+              <option value="soul">Anime Soul</option>
+              <option value="stars">Anime Stars</option>
+              <option value="sweat">Anime Sweat</option>
+              <option value="tears">Anime Tears</option>
               </select>
             </div>
           )}
