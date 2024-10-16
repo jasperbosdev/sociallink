@@ -19,6 +19,7 @@ export default function CosmeticSettings() {
   const [usernameFx, useUsernameFx] = useState(false);
   const [pfpDecoration, usePfpDecoration] = useState(false);
   const [decorationValue, setDecorationValue] = useState('');
+  const [usernameFxColor, setUsernameFxColor] = useState('White');
   const [profileFont, setProfileFont] = useState('geistSans');
   const [cardTilt, setCardTilt] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
@@ -98,6 +99,7 @@ export default function CosmeticSettings() {
         useUsernameFx(existingSettings.username_fx || false);
         usePfpDecoration(existingSettings.pfp_decoration || false);
         setDecorationValue(existingSettings.decoration_value || '');
+        setUsernameFxColor(existingSettings.username_fx_color || '');
         setCardTilt(existingSettings.card_tilt || false);
         setShowBadges(existingSettings.show_badges || false);
         setFullRoundedSocials(existingSettings.rounded_socials || false);
@@ -161,6 +163,7 @@ export default function CosmeticSettings() {
       username_fx: usernameFx,
       pfp_decoration: pfpDecoration,
       decoration_value: decorationValue,
+      usernamefx_color: usernameFxColor,
       card_tilt: cardTilt,
       show_badges: showBadges,
       rounded_socials: fullRoundedSocials,
@@ -394,8 +397,8 @@ export default function CosmeticSettings() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <label className="text-white">Username Effect</label>
+        <div className="flex items-center flex-wrap">
+          <label className="text-white mr-2">Username Effect</label>
           <div
             className={`${
               usernameFx ? "bg-blue-500" : "bg-gray-500"
@@ -408,6 +411,26 @@ export default function CosmeticSettings() {
               } w-5 h-5 bg-white rounded-full transform transition`}
             ></div>
           </div>
+          {usernameFx && (
+            <div className="w-full mt-2">
+              <label className="text-white">Effect Color</label>
+              <select
+              className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
+              value={usernameFxColor}
+              onChange={(e) => setUsernameFxColor(e.target.value)}
+              >
+              <option value="white">White</option>
+              <option value="rainbow">Rainbow</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+              <option value="black">Black</option>
+              <option value="pink">Pink</option>
+              <option value="yellow">Yellow</option>
+              <option value="red">Red</option>
+              <option value="purple">Purple</option>
+              </select>
+            </div>
+          )}
         </div>
             
         <div className="flex items-center space-x-2">
@@ -442,7 +465,7 @@ export default function CosmeticSettings() {
           </div>
           {pfpDecoration && (
             <div className="w-full mt-2">
-              <label className="text-white">Select Option</label>
+              <label className="text-white">Decoration Style</label>
               <select
               className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
               value={decorationValue}
