@@ -75,8 +75,12 @@ export const configConsts = (config: any) => {
     const embedColor = (config?.embed_color !== undefined && config.embed_color !== null)
     ? config.embed_color
     : '09090B';
+
+    const profileFont = (config?.profile_font !== undefined && config.profile_font !== null)
+    ? config.profile_font
+    : 'geistSans';
   
     return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
-    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor
+    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont
      };
 };

@@ -2,6 +2,7 @@ import { SetStateAction, use, useEffect, useState } from "react";
 import { useUserData } from "./useUserData";
 import { supabase } from "../../../supabase";
 import ColorPicker from "./colorPicker";
+import { profile } from "console";
 
 export default function CosmeticSettings() {
   const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
@@ -18,24 +19,25 @@ export default function CosmeticSettings() {
   const [usernameFx, useUsernameFx] = useState(false);
   const [pfpDecoration, usePfpDecoration] = useState(false);
   const [decorationValue, setDecorationValue] = useState('');
+  const [profileFont, setProfileFont] = useState('geistSans');
   const [cardTilt, setCardTilt] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
-  const [primaryColor, setPrimaryColor] = useState("#aabbcc");
-  const [secondaryColor, setSecondaryColor] = useState("#bbccdd");
-  const [accentColor, setAccentColor] = useState("#ccddee");
-  const [textColor, setTextColor] = useState("#ffffff");
-  const [backgroundColor, setBackgroundColor] = useState("#000000");
-  const [embedColor, setEmbedColor] = useState("#000000");
+  const [primaryColor, setPrimaryColor] = useState("255, 255, 255");
+  const [secondaryColor, setSecondaryColor] = useState("0, 0, 0");
+  const [accentColor, setAccentColor] = useState("255, 255, 255");
+  const [textColor, setTextColor] = useState("255, 255, 255");
+  const [backgroundColor, setBackgroundColor] = useState("0, 0, 0");
+  const [embedColor, setEmbedColor] = useState("255, 0, 255");
 
   const { loading, error, userData } = useUserData();
 
   const [colors, setColors] = useState({
-    primaryColor: "#ff0000",
-    secondaryColor: "#00ff00",
-    accentColor: "#0000ff",
-    textColor: "#ffffff",
-    backgroundColor: "#000000",
-    embedColor: "#ff00ff",
+    primaryColor: "255, 255, 255",
+    secondaryColor: "0, 0, 0",
+    accentColor: "255, 255, 255",
+    textColor: "255, 255, 255",
+    backgroundColor: "0, 0, 0",
+    embedColor: "255, 0, 255",
   });
 
   const handleColorChange = (newColors: {
@@ -105,6 +107,7 @@ export default function CosmeticSettings() {
         setTextColor(existingSettings.text_color || "#ffffff");
         setBackgroundColor(existingSettings.background_color || "#000000");
         setEmbedColor(existingSettings.embed_color || "#000000");
+        setProfileFont(existingSettings.profile_font || 'geistSans');
       }
     };
 
@@ -168,6 +171,7 @@ export default function CosmeticSettings() {
       text_color: colors.textColor, // RGB format
       background_color: colors.backgroundColor, // RGB format
       embed_color: colors.embedColor, // RGB format
+      profile_font: profileFont,
     };
   
     if (existingEntry) {
@@ -209,24 +213,36 @@ export default function CosmeticSettings() {
     <>
       <div className="mt-2">
         <div className="gap-4">
-        <ColorPicker 
-          onColorChange={(colors) => setColors({
-            primaryColor: colors.primary,
-            secondaryColor: colors.secondary,
-            accentColor: colors.accent,
-            textColor: colors.text,
-            backgroundColor: colors.background,
-            embedColor: colors.embed,
-          })}
-          initialColors={{
-            primary: primaryColor,
-            secondary: secondaryColor,
-            accent: accentColor,
-            text: textColor,
-            background: backgroundColor,
-            embed: embedColor,
-          }}
-        />
+          <ColorPicker 
+            onColorChange={(colors) => setColors({
+              primaryColor: colors.primary,
+              secondaryColor: colors.secondary,
+              accentColor: colors.accent,
+              textColor: colors.text,
+              backgroundColor: colors.background,
+              embedColor: colors.embed,
+            })}
+            initialColors={{
+              primary: primaryColor,
+              secondary: secondaryColor,
+              accent: accentColor,
+              text: textColor,
+              background: backgroundColor,
+              embed: embedColor,
+            }}
+          />
+          <div className="w-full mt-2">
+            <label className="text-white">Profile Font</label>
+            <select
+            className="w-full p-2 mt-2 bg-[#101013] text-white rounded border-[3px] border-white/20"
+            value={profileFont}
+            onChange={(e) => setProfileFont(e.target.value)}
+            >
+            <option value="geist-sans">Geist</option>
+            <option value="minecraftia">Minecraftia</option>
+            <option value="poppins">Poppins</option>
+            </select>
+          </div>
         </div>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-4">

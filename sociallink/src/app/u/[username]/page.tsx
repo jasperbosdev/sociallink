@@ -14,6 +14,7 @@ import { useFetchBadges } from './util/fetchBadges';
 import { useFetchSocials } from './util/fetchSocials';
 import { Tooltip } from "@nextui-org/tooltip";
 import { TypeAnimation } from 'react-type-animation';
+import { profile } from 'console';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -24,6 +25,18 @@ const geistSans = localFont({
 const geistMono = localFont({
   src: "../../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
+  weight: "100 900",
+});
+
+const Minecraftia = localFont({
+  src: "../../fonts/Minecraftia.ttf",
+  variable: "--font-minecraftia",
+  weight: "normal",
+});
+
+const Poppins = localFont({
+  src: "../../fonts/Poppins-SemiBold.ttf",
+  variable: "--font-poppins",
   weight: "100 900",
 });
 
@@ -60,6 +73,7 @@ export default function UserProfile() {
     textColor,
     embedColor,
     backgroundColor,
+    profileFont,
   } = configConsts(config);
 
   const {
@@ -128,7 +142,7 @@ export default function UserProfile() {
         body: JSON.stringify({ username }),
       });
       const data = await res.json();
-      console.log(data.message);
+      // console.log(data.message);
     } catch (error) {
       console.error('Error tracking view:', error);
     }
@@ -170,6 +184,12 @@ export default function UserProfile() {
 
   return (
     <>
+      <style jsx global>{`
+        body {
+          font-family: var(--font-${profileFont}) !important;
+          font-weight: 500;
+        }
+      `}</style>
       {fetchedBackgroundUrl ? (
         <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
           <img
@@ -185,7 +205,7 @@ export default function UserProfile() {
       ) : (
         <div className="fixed w-screen h-screen z-[-5]" style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}></div>
       )}
-      <div className={`transition flex items-center justify-center min-h-screen mx-4 ${geistSans.variable} ${geistMono.variable}`}>
+      <div className={`transition flex items-center justify-center min-h-screen mx-4 ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <div
           ref={(el) => {
             if (el && cardTilt) {
