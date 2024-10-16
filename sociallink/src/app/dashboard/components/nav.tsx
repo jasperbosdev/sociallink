@@ -79,6 +79,8 @@ export default function Nav() {
                       <div className="flex flex-col space-y-5 mt-4 mb-4">
                         <div className="">
                           <p className='text-center font-bold'>Admin</p>
+                        </div><div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/badge')}>
+                          <i className="far fa-id-badge text-white fa-2xl"></i>
                         </div>
                         <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/motd')}>
                           <i className="far fa-message text-white fa-2xl"></i>
