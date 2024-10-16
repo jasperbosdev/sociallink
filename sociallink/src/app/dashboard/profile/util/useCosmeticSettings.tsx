@@ -99,7 +99,7 @@ export default function CosmeticSettings() {
         useUsernameFx(existingSettings.username_fx || false);
         usePfpDecoration(existingSettings.pfp_decoration || false);
         setDecorationValue(existingSettings.decoration_value || '');
-        setUsernameFxColor(existingSettings.username_fx_color || '');
+        setUsernameFxColor(existingSettings.usernamefx_color || '');
         setCardTilt(existingSettings.card_tilt || false);
         setShowBadges(existingSettings.show_badges || false);
         setFullRoundedSocials(existingSettings.rounded_socials || false);
@@ -168,12 +168,12 @@ export default function CosmeticSettings() {
       show_badges: showBadges,
       rounded_socials: fullRoundedSocials,
       show_views: showViews,
-      primary_color: colors.primaryColor, // RGB format
-      secondary_color: colors.secondaryColor, // RGB format
-      accent_color: colors.accentColor, // RGB format
-      text_color: colors.textColor, // RGB format
-      background_color: colors.backgroundColor, // RGB format
-      embed_color: colors.embedColor, // RGB format
+      primary_color: colors.primaryColor,
+      secondary_color: colors.secondaryColor,
+      accent_color: colors.accentColor,
+      text_color: colors.textColor,
+      background_color: colors.backgroundColor,
+      embed_color: colors.embedColor,
       profile_font: profileFont,
     };
   

@@ -79,8 +79,12 @@ export const configConsts = (config: any) => {
     const profileFont = (config?.profile_font !== undefined && config.profile_font !== null)
     ? config.profile_font
     : 'geistSans';
+
+    const usernameFxColor = (config?.usernamefx_color !== undefined && config.usernamefx_color !== null)
+    ? config.usernamefx_color
+    : 'white';
   
     return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
-    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont
+    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont, usernameFxColor
      };
 };

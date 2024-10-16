@@ -74,6 +74,7 @@ export default function UserProfile() {
     embedColor,
     backgroundColor,
     profileFont,
+    usernameFxColor,
   } = configConsts(config);
 
   const {
@@ -279,7 +280,7 @@ export default function UserProfile() {
             <h1
               className="text-3xl font-bold text-center"
               style={{
-                backgroundImage: usernameFx ? "url('/static/assets/textFx/fxWhite.gif')" : "none",
+                backgroundImage: usernameFx ? `url('/static/assets/textFx/${usernameFxColor}sparkle.gif')` : "none",
               }}
             >
               <p style={{ color: `rgb(${textColor})` }}>{displayName}</p>
