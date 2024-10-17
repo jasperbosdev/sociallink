@@ -7,6 +7,7 @@ import { useUserData } from "./util/useUserData";
 import Nav from "../components/nav";
 import CosmeticSettings from "./util/useCosmeticSettings";
 import GeneralSettings from "./util/useGeneralSettings";
+import SocialSettings from "./util/useSocialSettings";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -600,9 +601,7 @@ export default function Dashboard() {
                     ></i>
                   </h2>
                   {isSocialSettingsOpen && (
-                    <div className="mt-2">
-                      <p>Social settings options go here.</p>
-                    </div>
+                    <SocialSettings />
                   )}
                 </div>
 
