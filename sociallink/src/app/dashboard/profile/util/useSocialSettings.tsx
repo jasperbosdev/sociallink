@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../../../supabase";
 import { useUserData } from "./useUserData";
 
@@ -8,6 +8,9 @@ export default function SocialSettings() {
   const [existingSocials, setExistingSocials] = useState([]); // State to store existing socials
   const [newPlatform, setNewPlatform] = useState(""); // State for selected platform
   const [newUsername, setNewUsername] = useState(""); // State for input username
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const [selectedSocial, setSelectedSocial] = useState(null); // State for selected social to edit
+  const modalRef = useRef(null); // Ref for the modal
 
   const { loading, error, userData } = useUserData();
 
@@ -53,6 +56,23 @@ export default function SocialSettings() {
 
     fetchSocialSettings();
   }, [loading, userData]);
+
+  // Close modal when clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModalOpen]);
 
   const uploadConfig = async () => {
     if (loading || !userData) {
@@ -198,6 +218,68 @@ export default function SocialSettings() {
     setTimeout(() => setSaveStatus(""), 3000); // Clear the status after 3 seconds
   };
 
+  // Function to handle when a social item is clicked to open the modal
+  const handleSocialClick = (social) => {
+    setSelectedSocial(social);
+    setIsModalOpen(true);
+  };
+
+  // Function to handle closing the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedSocial(null);
+  };
+
+  // Function to handle updating the selected social
+  const handleUpdateSocial = async () => {
+    const { id, platform_value } = selectedSocial;
+
+    const { error } = await supabase
+      .from("socials")
+      .update({ platform_value })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating social:", error.message);
+    } else {
+      // Refresh the socials list after updating
+      const { data: updatedSocials, error: fetchError } = await supabase
+        .from("socials")
+        .select("*")
+        .eq("uid", userData.uid);
+
+      if (!fetchError) {
+        setExistingSocials(updatedSocials);
+      }
+      closeModal();
+    }
+  };
+
+  // Function to handle deleting the selected social
+  const handleDeleteSocial = async () => {
+    const { id } = selectedSocial;
+
+    const { error } = await supabase
+      .from("socials")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting social:", error.message);
+    } else {
+      // Refresh the socials list after deleting
+      const { data: updatedSocials, error: fetchError } = await supabase
+        .from("socials")
+        .select("*")
+        .eq("uid", userData.uid);
+
+      if (!fetchError) {
+        setExistingSocials(updatedSocials);
+      }
+      closeModal();
+    }
+  };
+
   return (
     <>
       {/* Add New Social Section */}
@@ -241,9 +323,9 @@ export default function SocialSettings() {
               <ul className="flex gap-2 flex-wrap">
                 {existingSocials.map((social) => (
                   <div className="border border-[3px] border-white/40 px-3 py-3 rounded-lg flex-1 text-center min-w-[150px] hover:scale-[1.05] transition cursor-pointer select-none" key={social.id}>
-                    <li className="text-white">
-                      <i className={`fab fa-${social.platform} fa-2xl mr-2`}></i>
-                      <span className="font-bold">{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}</span>
+                    <li key={social.id} className="text-white" onClick={() => handleSocialClick(social)}>
+                        <i className={`fab fa-${social.platform} fa-2xl mr-2`}></i>
+                        <span className="font-bold">{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}</span>
                     </li>
                   </div>
                 ))}
@@ -252,6 +334,42 @@ export default function SocialSettings() {
           )}
         </div>
       </div>
+
+      {/* Modal for editing or deleting a social */}
+      {isModalOpen && selectedSocial && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div
+            ref={modalRef}
+            className="bg-zinc-900 border border-4 border-white/20 p-8 rounded-lg shadow-lg"
+          >
+            <h2>Edit {selectedSocial.platform}</h2>
+            <input
+              className="border bg-zinc-800 border-[3px] border-white/20 rounded-lg p-2 mt-2 text-white"
+              type="text"
+              value={selectedSocial.platform_value}
+              onChange={(e) =>
+                setSelectedSocial({
+                  ...selectedSocial,
+                  platform_value: e.target.value,
+                })
+              }
+            />
+            <div className="flex mt-2 gap-2">
+                <div className="border border-[3px] border-white/20 p-2 w-full text-center cursor-pointer rounded-lg" onClick={handleUpdateSocial}>Save</div>
+                <div
+                  className="border border-[3px] border-white/20 p-2 w-full text-center cursor-pointer rounded-lg" onClick={() => {
+                    if (window.confirm("Are you sure you want to delete this social?")) {
+                      handleDeleteSocial();
+                    }
+                  }}
+                >
+                  Delete
+                </div>
+                <div className="border border-[3px] border-white/20 p-2 w-full text-center cursor-pointer rounded-lg" onClick={closeModal}>Cancel</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Discord Settings Section */}
       <div className="flex flex-wrap mt-2">
