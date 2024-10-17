@@ -310,7 +310,7 @@ export default function UserProfile() {
                   <Tooltip key={social.id || index} content={
                     <div className='font-bold text-sm bg-black py-1 px-2 rounded-md'>{social.platform}</div>
                   } closeDelay={100} offset={0}>
-                    <a href={social.platform_value} target="_blank" rel="noopener noreferrer">
+                    <a href={`${social.platform_link}${social.platform_value}`} target="_blank" rel="noopener noreferrer">
                       <div className={`border border-2 border-[rgb(${accentColor})] px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
                         <i
                           className={`fab fa-${social.platform} fa-2xl`}

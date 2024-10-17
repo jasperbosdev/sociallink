@@ -1,0 +1,344 @@
+import { useEffect, useState } from "react";
+import { supabase } from "../../../supabase";
+import { useUserData } from "./useUserData";
+
+export default function SocialSettings() {
+  const [richPresence, setRichPresence] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
+  const [existingSocials, setExistingSocials] = useState([]); // State to store existing socials
+  const [newPlatform, setNewPlatform] = useState(""); // State for selected platform
+  const [newUsername, setNewUsername] = useState(""); // State for input username
+
+  const { loading, error, userData } = useUserData();
+
+  // Fetch social settings
+  useEffect(() => {
+    const fetchSocialSettings = async () => {
+      if (loading || !userData) {
+        return;
+      }
+
+      const id = userData.id;
+
+      // Fetch the uid from public.users based on auth.user's id
+      const { data: publicUserData, error: publicUserError } = await supabase
+        .from("users")
+        .select("uid")
+        .eq("id", id)
+        .single();
+
+      if (publicUserError) {
+        console.error("Error fetching public user data:", publicUserError.message);
+        return;
+      }
+
+      const uid = publicUserData.uid;
+
+      // Fetch the existing settings for this user
+      const { data: existingSettings, error: fetchError } = await supabase
+        .from("socials")
+        .select("*")
+        .eq("uid", uid);
+
+      if (fetchError) {
+        console.error("Error fetching existing settings:", fetchError.message);
+        return;
+      }
+
+      if (existingSettings && existingSettings.length > 0) {
+        setExistingSocials(existingSettings); // Set existing socials
+        setRichPresence(existingSettings[0].use_presence); // Assuming use_presence is common across socials
+      }
+    };
+
+    fetchSocialSettings();
+  }, [loading, userData]);
+
+  const uploadConfig = async () => {
+    if (loading || !userData) {
+      console.error("User data not ready or still loading");
+      return;
+    }
+
+    const id = userData.id; // UUID from auth.users
+
+    // Fetch the user's public data
+    const { data: publicUserData, error: publicUserError } = await supabase
+      .from("users")
+      .select("uid")
+      .eq("id", id)
+      .single();
+
+    if (publicUserError) {
+      console.error("Error fetching public user data:", publicUserError.message);
+      setSaveStatus("Error saving changes");
+      return;
+    }
+
+    const uid = publicUserData.uid;
+
+    // Update use_presence in public.users table
+    const { error: updateUserError } = await supabase
+      .from("users")
+      .update({ use_presence: richPresence }) // Update use_presence
+      .eq("uid", uid);
+
+    if (updateUserError) {
+      console.error("Error updating user presence:", updateUserError.message);
+      setSaveStatus("Error saving changes");
+      return;
+    }
+
+    // If everything is successful
+    setSaveStatus("Saved changes");
+    setTimeout(() => setSaveStatus(""), 3000); // Clear the status after 3 seconds
+  };
+
+  const handleAddSocial = async () => {
+    if (loading || !userData || !newPlatform || !newUsername) {
+      console.error("User data not ready, platform, or username not provided");
+      return;
+    }
+
+    const id = userData.id;
+
+    // Fetch the user's public data
+    const { data: publicUserData, error: publicUserError } = await supabase
+      .from("users")
+      .select("uid")
+      .eq("id", id)
+      .single();
+
+    if (publicUserError) {
+      console.error("Error fetching public user data:", publicUserError.message);
+      setSaveStatus("Error adding social link");
+      return;
+    }
+
+    const uid = publicUserData.uid;
+
+    // Map platforms to their base URLs
+    const platformLinkMapping = {
+      youtube: `https://www.youtube.com/`,
+      twitch: `https://www.twitch.tv/`,
+      kick: `https://www.kick.com/`,
+      twitter: `https://twitter.com/`,
+      instagram: `https://www.instagram.com/`,
+      threads: `https://www.threads.net/`,
+      github: `https://github.com/`,
+      reddit: `https://www.reddit.com/user/`,
+      namemc: `https://namemc.com/profile/`,
+      telegram: `https://t.me/`,
+      soundcloud: `https://soundcloud.com/`,
+      spotify: `https://open.spotify.com/user/`,
+      discord: `https://discord.com/users/`, // Assuming user has the Discord user ID
+      snapchat: `https://www.snapchat.com/add/`,
+      steam: `https://steamcommunity.com/id/`,
+      email: `mailto:`,
+      tiktok: `https://www.tiktok.com/@`,
+      paypal: `https://paypal.me/`,
+      cashapp: `https://cash.app/$`,
+      bitcoin: `bitcoin:`, // Assuming this is a wallet address
+      ethereum: `ethereum:`,
+      litecoin: `litecoin:`,
+      'battle net': `https://battle.net/`,
+      valorant: `https://playvalorant.com/`,
+      'osu!': `https://osu.ppy.sh/users/`,
+      'last.fm': `https://www.last.fm/user/`,
+      myanimelist: `https://myanimelist.net/profile/`,
+      deezer: `https://www.deezer.com/user/`,
+      pinterest: `https://www.pinterest.com/`,
+      xbox: `https://account.xbox.com/en-us/profile/`,
+      playstation: `https://psnprofiles.com/`,
+      patreon: `https://www.patreon.com/`,
+      roblox: `https://www.roblox.com/users/`,
+      vk: `https://vk.com/`,
+    };
+
+    // Generate platform link
+    const platformLink = platformLinkMapping[newPlatform];
+
+    // Insert new social into the socials table, no need to set the id field manually
+    const { error: insertError } = await supabase
+      .from("socials")
+      .insert([
+        {
+          username: userData.username,
+          platform: newPlatform,
+          platform_value: newUsername,
+          platform_link: platformLink, // Add the platform link
+          uid: uid,
+          added_on: new Date().toISOString(), // Insert current timestamp
+        }
+      ]);
+
+    if (insertError) {
+      console.error("Error inserting new social:", insertError.message);
+      setSaveStatus("Error adding social link");
+      return;
+    }
+
+    // Refresh the socials list after adding a new entry
+    const { data: updatedSocials, error: fetchError } = await supabase
+      .from("socials")
+      .select("*")
+      .eq("uid", uid);
+
+    if (fetchError) {
+      console.error("Error fetching updated socials:", fetchError.message);
+      setSaveStatus("Error refreshing socials");
+      return;
+    }
+
+    // Update state with the new socials list and clear input fields
+    setExistingSocials(updatedSocials);
+    setNewPlatform("");
+    setNewUsername("");
+    setSaveStatus("Social added successfully");
+    setTimeout(() => setSaveStatus(""), 3000); // Clear the status after 3 seconds
+  };
+
+  return (
+    <>
+      {/* Add New Social Section */}
+      <div className="flex mt-2 gap-2 flex-wrap">
+        <div className="mt-2 flex-1">
+          <label className="text-white font-bold">Platform</label>
+          <select
+            className="w-full p-2 mt-2 bg-[#101013] text-white rounded-lg border-[3px] border-white/20"
+            value={newPlatform}
+            onChange={(e) => setNewPlatform(e.target.value)} // Set platform value
+          >
+            <PlatformList />
+          </select>
+        </div>
+        <div className="mt-2 flex-1">
+          <label className="text-white font-bold">Username/Value</label>
+          <input
+            className="w-full p-2 mt-2 bg-[#101013] text-white rounded-lg border-[3px] border-white/20"
+            placeholder="leeuwz (username only)"
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)} // Set username value
+          />
+        </div>
+      </div>
+      <button
+        className="border border-[2px] border-white/60 bg-zinc-900 text-white font-bold py-2 px-2 rounded-lg mt-2 text-sm"
+        onClick={handleAddSocial} // Add social button functionality
+      >
+        Add Social
+      </button>
+
+      {/* Save status display */}
+      {saveStatus && <p className="mt-2 text-green-500">{saveStatus}</p>}
+
+      {/* Existing Socials Section */}
+      <div className="py-2">
+        <h3 className="text-white font-bold my-2">Existing Socials</h3>
+        <div className="bg-zinc-900 border border-[3px] border-white/20 rounded-lg p-4">
+          {existingSocials.length > 0 && (
+            <div className="">
+              <ul className="flex gap-2 flex-wrap">
+                {existingSocials.map((social) => (
+                  <div className="border border-[3px] border-white/40 px-3 py-3 rounded-lg flex-1 text-center min-w-[150px] hover:scale-[1.05] transition cursor-pointer select-none" key={social.id}>
+                    <li className="text-white">
+                      <i className={`fab fa-${social.platform} fa-2xl mr-2`}></i>
+                      <span className="font-bold">{social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}</span>
+                    </li>
+                  </div>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Discord Settings Section */}
+      <div className="flex flex-wrap mt-2">
+        <div className="mt-2 w-full">
+          <label className="text-white font-bold">Discord Invite</label>
+          <input
+            className="w-full p-2 mt-2 bg-[#101013] text-white rounded-lg border-[3px] border-white/20"
+            placeholder="https://discord.gg/komako"
+          />
+        </div>
+        <div className="flex mt-2">
+          <label className="text-white mr-2 font-bold">Discord Presence <span className="text-sm font-normal">(requires discord to be linked)</span></label>
+          <div
+            className={`${
+              richPresence ? "bg-blue-500" : "bg-gray-500"
+            } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+            onClick={() => setRichPresence(!richPresence)}
+          >
+            <div
+              className={`${
+                richPresence ? "translate-x-6" : "translate-x-0"
+              } bg-white w-4 h-4 rounded-full transition`}
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Save Button */}
+      <div className="mt-4">
+        <button
+          className="border border-[2px] border-white/60 bg-zinc-900 text-white font-bold py-2 px-4 rounded-lg"
+          onClick={uploadConfig}
+        >
+          Save Social Settings
+        </button>
+      </div>
+    </>
+  );
+}
+
+// A separate component for platform options
+const PlatformList = () => {
+const platforms = [
+    "youtube",
+    "twitch",
+    "kick",
+    "twitter",
+    "instagram",
+    "threads",
+    "github",
+    "reddit",
+    "namemc",
+    "telegram",
+    "soundcloud",
+    "spotify",
+    // "discord",
+    "snapchat",
+    "steam",
+    "email",
+    "tiktok",
+    "paypal",
+    "cashapp",
+    "bitcoin",
+    "ethereum",
+    "litecoin",
+    "battle net",
+    "valorant",
+    // "osu!",
+    "last.fm",
+    "myanimelist",
+    "deezer",
+    "pinterest",
+    "xbox",
+    "playstation",
+    "patreon",
+    "roblox",
+    "vk",
+];
+
+  return (
+    <>
+      <option value="">Select a platform...</option>
+      {platforms.map((platform) => (
+        <option key={platform} value={platform}>
+          {platform}
+        </option>
+      ))}
+    </>
+  );
+};
