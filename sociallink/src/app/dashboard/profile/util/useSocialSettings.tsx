@@ -20,40 +20,43 @@ export default function SocialSettings() {
       if (loading || !userData) {
         return;
       }
-
+  
       const id = userData.id;
-
-      // Fetch the uid from public.users based on auth.user's id
+  
       const { data: publicUserData, error: publicUserError } = await supabase
         .from("users")
         .select("uid")
         .eq("id", id)
         .single();
-
+  
       if (publicUserError) {
         console.error("Error fetching public user data:", publicUserError.message);
         return;
       }
-
+  
       const uid = publicUserData.uid;
-
-      // Fetch the existing settings for this user
+  
       const { data: existingSettings, error: fetchError } = await supabase
         .from("socials")
         .select("*")
         .eq("uid", uid);
-
+  
       if (fetchError) {
         console.error("Error fetching existing settings:", fetchError.message);
         return;
       }
-
+  
       if (existingSettings && existingSettings.length > 0) {
-        setExistingSocials(existingSettings); // Set existing socials
+        // Sort socials alphabetically by platform name
+        const sortedSocials = existingSettings.sort((a, b) => 
+          a.platform.localeCompare(b.platform)
+        );
+  
+        setExistingSocials(sortedSocials);
         setRichPresence(existingSettings[0].use_presence); // Assuming use_presence is common across socials
       }
     };
-
+  
     fetchSocialSettings();
   }, [loading, userData]);
 
@@ -316,7 +319,8 @@ export default function SocialSettings() {
 
       {/* Existing Socials Section */}
       <div className="py-2">
-        <h3 className="text-white font-bold my-2">Existing Socials</h3>
+        <h3 className="text-white font-bold mt-2">Existing Socials</h3>
+        <p className="text-sm mb-2">(will be displayed in alphabetical order)</p>
         <div className="bg-zinc-900 border border-[3px] border-white/20 rounded-lg p-4">
           {existingSocials.length > 0 && (
             <div className="">

@@ -302,29 +302,49 @@ export default function UserProfile() {
             )}
           </div>
 
-          {/* user socials */}
-          <div className="flex">
-            {socials.length > 0 ? (
-              <span className="flex items-center space-x-2 h-full">
-                {socials.map((social, index) => (
-                  <Tooltip key={social.id || index} content={
-                    <div className='font-bold text-sm bg-black py-1 px-2 rounded-md'>{social.platform}</div>
-                  } closeDelay={100} offset={0}>
-                    <a href={`${social.platform_link}${social.platform_value}`} target="_blank" rel="noopener noreferrer">
-                      <div className={`border border-2 border-[rgb(${accentColor})] px-[8px] py-[10px] ${fullRoundedSocials ? 'rounded-full' : 'rounded-lg'}`}>
+        {/* user socials */}
+        <div className="flex">
+          {socials.length > 0 ? (
+            <span className="flex items-center space-x-2 h-full">
+              {socials
+                .slice() // Create a shallow copy to avoid mutating the original array
+                .sort((a, b) => a.platform.localeCompare(b.platform)) // Sort alphabetically by platform
+                .map((social, index) => (
+                  <Tooltip
+                    key={social.id || index}
+                    content={
+                      <div className="font-bold text-sm bg-black py-1 px-2 rounded-md">
+                        {social.platform}
+                      </div>
+                    }
+                    closeDelay={100}
+                    offset={0}
+                  >
+                    <a
+                      href={`${social.platform_link}${social.platform_value}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div
+                        className={`border border-2 border-[rgb(${accentColor})] px-[8px] py-[10px] ${
+                          fullRoundedSocials ? 'rounded-full' : 'rounded-lg'
+                        }`}
+                      >
                         <i
                           className={`fab fa-${social.platform} fa-2xl`}
-                          style={{ filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)' }}
+                          style={{
+                            filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)',
+                          }}
                         ></i>
                       </div>
                     </a>
                   </Tooltip>
                 ))}
-              </span>
-            ) : (
-              <div className='hidden'></div>
-            )}
-          </div>
+            </span>
+          ) : (
+            <div className="hidden"></div>
+          )}
+        </div>
 
           <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
         </div>
