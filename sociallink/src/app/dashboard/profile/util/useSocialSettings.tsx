@@ -10,6 +10,7 @@ export default function SocialSettings() {
   const [newUsername, setNewUsername] = useState(""); // State for input username
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   const [selectedSocial, setSelectedSocial] = useState(null); // State for selected social to edit
+  const [discordLink, setDiscordLink] = useState("");
   const modalRef = useRef(null); // Ref for the modal
 
   const { loading, error, userData } = useUserData();
@@ -283,6 +284,77 @@ export default function SocialSettings() {
     }
   };
 
+  // Function to upload Discord link to profileSocial table
+  const handleSaveDiscordLink = async () => {
+    if (loading || !userData || !discordLink) {
+      console.error("User data not ready or Discord link is empty");
+      return;
+    }
+
+    const id = userData.id;
+    const { data: publicUserData, error: publicUserError } = await supabase
+      .from("users")
+      .select("uid")
+      .eq("id", id)
+      .single();
+
+    if (publicUserError) {
+      console.error("Error fetching public user data:", publicUserError.message);
+      setSaveStatus("Error saving Discord link");
+      return;
+    }
+
+    const uid = publicUserData.uid;
+
+    // First, check if a record with the given uid already exists
+    const { data: existingRecord, error: fetchError } = await supabase
+      .from("profileSocial")
+      .select("uid")
+      .eq("uid", uid)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") { // PGRST116 means no rows found
+      console.error("Error checking for existing Discord link:", fetchError.message);
+      setSaveStatus("Error saving Discord link");
+      return;
+    }
+
+    let saveError;
+
+    if (existingRecord) {
+      // If the record exists, update it
+      const { error: updateError } = await supabase
+        .from("profileSocial")
+        .update({
+          discord_link: discordLink,
+          updated_at: new Date().toISOString() // Use 'updated_at' for updates
+        })
+        .eq("uid", uid);
+
+      saveError = updateError;
+    } else {
+      // If the record doesn't exist, insert a new one
+      const { error: insertError } = await supabase
+        .from("profileSocial")
+        .insert({
+          uid: uid,
+          discord_link: discordLink,
+          created_at: new Date().toISOString()
+        });
+
+      saveError = insertError;
+    }
+
+    if (saveError) {
+      console.error("Error saving Discord link:", saveError.message);
+      setSaveStatus("Error saving Discord link");
+      return;
+    }
+
+    setSaveStatus("Discord link saved successfully");
+    setTimeout(() => setSaveStatus(""), 3000); // Clear the status after 3 seconds
+  };
+
   return (
     <>
       {/* Add New Social Section */}
@@ -382,6 +454,8 @@ export default function SocialSettings() {
           <input
             className="w-full p-2 mt-2 bg-[#101013] text-white rounded-lg border-[3px] border-white/20"
             placeholder="https://discord.gg/komako"
+            value={discordLink}
+            onChange={(e) => setDiscordLink(e.target.value)} // Update Discord link state
           />
         </div>
         <div className="flex mt-2">
@@ -399,6 +473,16 @@ export default function SocialSettings() {
             ></div>
           </div>
         </div>
+      </div>
+
+      {/* Save Button for Discord link */}
+      <div className="mt-4">
+        <button
+          className="border border-[2px] border-white/60 bg-zinc-900 text-white font-bold py-2 px-4 rounded-lg"
+          onClick={handleSaveDiscordLink} // Save Discord link functionality
+        >
+          Save Discord Link
+        </button>
       </div>
 
       {/* Save Button */}
