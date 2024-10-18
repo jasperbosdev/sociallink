@@ -458,6 +458,15 @@ export default function SocialSettings() {
             onChange={(e) => setDiscordLink(e.target.value)} // Update Discord link state
           />
         </div>
+        {/* Save Button for Discord link */}
+        <div className="mt-4">
+          <button
+            className="border border-[2px] border-white/60 bg-zinc-900 text-white font-bold py-2 px-4 rounded-lg"
+            onClick={handleSaveDiscordLink} // Save Discord link functionality
+          >
+            Save Discord Link
+          </button>
+        </div>
         <div className="flex mt-2">
           <label className="text-white mr-2 font-bold">Discord Presence <span className="text-sm font-normal">(requires discord to be linked)</span></label>
           <div
@@ -473,16 +482,6 @@ export default function SocialSettings() {
             ></div>
           </div>
         </div>
-      </div>
-
-      {/* Save Button for Discord link */}
-      <div className="mt-4">
-        <button
-          className="border border-[2px] border-white/60 bg-zinc-900 text-white font-bold py-2 px-4 rounded-lg"
-          onClick={handleSaveDiscordLink} // Save Discord link functionality
-        >
-          Save Discord Link
-        </button>
       </div>
 
       {/* Save Button */}
