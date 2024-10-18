@@ -12,6 +12,7 @@ import { useFetchGeneralConfig } from './util/fetchGeneralConfig';
 import { generalConfigConsts } from './util/generalConfigConsts';
 import { useFetchBadges } from './util/fetchBadges';
 import { useFetchSocials } from './util/fetchSocials';
+import { useFetchCustomLinks } from './util/fetchCustomLinks';
 import { Tooltip } from "@nextui-org/tooltip";
 import { TypeAnimation } from 'react-type-animation';
 import { profile } from 'console';
@@ -50,6 +51,7 @@ export default function UserProfile() {
   const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
   const { badges, isLoadingBadges } = useFetchBadges();
   const { socials, isLoadingSocials } = useFetchSocials();
+  const { customLinks, isLoadingCustomLinks } = useFetchCustomLinks();
 
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -211,7 +213,7 @@ export default function UserProfile() {
           ref={(el) => {
             if (el && cardTilt) {
               VanillaTilt.init(el, {
-                max: 5,
+                max: 4,
                 speed: 2000,
                 glare: false,
                 reverse: true,
@@ -345,8 +347,59 @@ export default function UserProfile() {
             <div className="hidden"></div>
           )}
         </div>
-
-          <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
+        <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
+        
+        {/* other user data */}
+        {customLinks.length > 0 ? (
+          <>
+            <hr
+              className="border border-b border-2 border-white w-full rounded-lg"
+              style={{
+                borderColor: `rgb(${accentColor})`,
+              }}
+            />
+            <div className="w-full flex flex-col items-center space-y-2"> {/* Full width and centered content */}
+              {customLinks.map((link, index) => (
+                <a
+                  key={link.id}
+                  href={link.value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-center w-full" // Full width link
+                >
+                  <div
+                    className="flex border border-[3px] p-4 w-full mt-2 gap-4 items-center transition-all duration-300 hover:bg-opacity-90 hover:brightness-110" // Adjusted hover effects
+                    style={{
+                      borderColor: `rgb(${accentColor})`,
+                      borderRadius,
+                      backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
+                    }}
+                  >
+                    <div className="border border-[3px] rounded-lg h-12 w-14 flex items-center justify-center">
+                      <i
+                        className={`fas ${link.icon} fa-xl`}
+                        style={{
+                          borderColor: `rgb(${accentColor})`,
+                          borderRadius,
+                          backgroundColor: `rgba(${primaryColor}, ${cardOpacity})`,
+                        }}
+                      />
+                    </div>
+                    <div className="text-start w-full"> {/* Make this content full width */}
+                      <p className="font-bold">{link.title}</p>
+                      <p className="font-normal text-gray-400 text-sm">{link.value}</p>
+                    </div>
+                    <div className="flex items-center justify-end transition-transform duration-300 transform hover:translate-x-1">
+                      <i className={`fas fa-arrow-right fa-xl`} />
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="hidden"></div>
+        )}
         </div>
       </div>
     </>
