@@ -8,6 +8,7 @@ import Nav from "../components/nav";
 import CosmeticSettings from "./util/useCosmeticSettings";
 import GeneralSettings from "./util/useGeneralSettings";
 import SocialSettings from "./util/useSocialSettings";
+import CustomSettings from "./util/useCustomSettings";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function Dashboard() {
   const [isFileSettingsOpen, setFileSettingsOpen] = useState(false);
   const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
   const [isSocialSettingsOpen, setSocialSettingsOpen] = useState(false);
-  const [isCustomLinkSettingsOpen, setCustomLinkSettingsOpen] = useState(false);
+  const [isCustomSettingsOpen, setCustomSettingsOpen] = useState(false);
   const [isMediaEmbedSettingsOpen, setMediaEmbedSettingsOpen] = useState(false);
   // State for avatar upload
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -609,7 +610,7 @@ export default function Dashboard() {
                   <h2
                     className="text-white font-bold text-xl cursor-pointer flex justify-between items-center"
                     onClick={() =>
-                      setCustomLinkSettingsOpen(!isCustomLinkSettingsOpen)
+                      setCustomSettingsOpen(!isCustomSettingsOpen)
                     }
                   >
                     <span className="select-none">
@@ -617,13 +618,13 @@ export default function Dashboard() {
                     </span>
                     <i
                       className={`fas fa-chevron-${
-                        isCustomLinkSettingsOpen ? "down" : "right"
+                        isCustomSettingsOpen ? "down" : "right"
                       } text-white`}
                     ></i>
                   </h2>
-                  {isCustomLinkSettingsOpen && (
+                  {isCustomSettingsOpen && (
                     <div className="mt-2">
-                      <p>Custom link settings options go here.</p>
+                      <CustomSettings />
                     </div>
                   )}
                 </div>
