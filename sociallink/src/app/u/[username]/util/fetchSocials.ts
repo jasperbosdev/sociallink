@@ -20,7 +20,7 @@ export const useFetchSocials = () => {
         throw new Error(error.message);
       }
 
-      console.log("Fetched social data:", data); 
+      // console.log("Fetched social data:", data); 
       setSocials(data || []); 
     } catch (error) {
       console.error("Error fetching Socials:", error);
