@@ -374,7 +374,7 @@ export default function UserProfile() {
                   className={`text-center w-full ${customLinks.length % 2 !== 0 && index === customLinks.length - 1 ? 'col-span-2' : ''}`} // Full width link for the last odd item
                 >
                   <div
-                    className="customlink-card flex border border-[3px] p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90 hover:brightness-110" // Adjusted hover effects
+                    className="customlink-card hover:brightness-[200%] flex border border-[3px] p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90" // Adjusted hover effects
                     style={{
                       borderColor: `rgb(${accentColor})`,
                       borderRadius,
