@@ -127,3 +127,12 @@ button:hover {
     animation-play-state: paused;
   }
 }
+
+/* profile */
+.customlink-card .customlink-arrow i {
+  transition: transform 0.15s ease-in-out;
+}
+
+.customlink-card:hover .customlink-arrow i {
+  transform: translateX(5px);
+}

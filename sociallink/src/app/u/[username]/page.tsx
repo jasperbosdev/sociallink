@@ -213,7 +213,7 @@ export default function UserProfile() {
           ref={(el) => {
             if (el && cardTilt) {
               VanillaTilt.init(el, {
-                max: 4,
+                max: 2,
                 speed: 2000,
                 glare: false,
                 reverse: true,
@@ -293,10 +293,16 @@ export default function UserProfile() {
           <div className=''>
             {typingDesc ? (
               <TypeAnimation
-                sequence={[description]}
-                wrapper='p'
+                sequence={[
+                  description,  // Type the description
+                  5000,         // Wait for 1 second (1000ms)
+                  '',           // Erase everything
+                  1000,         // Wait for another second
+                  description,  // Retype the description
+                ]}
+                wrapper="p"
                 speed={25}
-                repeat={0}
+                repeat={999}
                 style={{ color: `rgb(${textColor})` }}
               />
             ) : (
@@ -347,49 +353,49 @@ export default function UserProfile() {
             <div className="hidden"></div>
           )}
         </div>
-        <p className="text-center">Joined on: {new Date(userData?.created_at).toLocaleDateString()}</p>
-        
         {/* other user data */}
         {customLinks.length > 0 ? (
           <>
             <hr
-              className="border border-b border-2 border-white w-full rounded-lg"
+              className="border-b border-2 border-white w-full rounded-lg"
               style={{
                 borderColor: `rgb(${accentColor})`,
+                marginTop: '1rem',
+                marginBottom: '1rem',
               }}
             />
-            <div className="w-full flex flex-col items-center space-y-2"> {/* Full width and centered content */}
+            <div className="w-full grid grid-cols-2 gap-2 items-center">
               {customLinks.map((link, index) => (
                 <a
                   key={link.id}
                   href={link.value}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-center w-full" // Full width link
+                  className={`text-center w-full ${customLinks.length % 2 !== 0 && index === customLinks.length - 1 ? 'col-span-2' : ''}`} // Full width link for the last odd item
                 >
                   <div
-                    className="flex border border-[3px] p-4 w-full mt-2 gap-4 items-center transition-all duration-300 hover:bg-opacity-90 hover:brightness-110" // Adjusted hover effects
+                    className="customlink-card flex border border-[3px] p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90 hover:brightness-110" // Adjusted hover effects
                     style={{
                       borderColor: `rgb(${accentColor})`,
                       borderRadius,
                       backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
                     }}
                   >
-                    <div className="border border-[3px] rounded-lg h-12 w-14 flex items-center justify-center">
+                    <div className="flex items-center justify-center">
                       <i
                         className={`fas ${link.icon} fa-xl`}
                         style={{
-                          borderColor: `rgb(${accentColor})`,
-                          borderRadius,
-                          backgroundColor: `rgba(${primaryColor}, ${cardOpacity})`,
+                          color: `rgb(${accentColor})`,
+                          lineHeight: '1',
+                          fontSize: '1.5rem',
                         }}
                       />
                     </div>
-                    <div className="text-start w-full"> {/* Make this content full width */}
+                    <div className="text-start w-full"> {/* Full width content */}
                       <p className="font-bold">{link.title}</p>
                       <p className="font-normal text-gray-400 text-sm">{link.value}</p>
                     </div>
-                    <div className="flex items-center justify-end transition-transform duration-300 transform hover:translate-x-1">
+                    <div className="customlink-arrow flex items-center justify-end transition-transform duration-300 transform">
                       <i className={`fas fa-arrow-right fa-xl`} />
                     </div>
                   </div>
