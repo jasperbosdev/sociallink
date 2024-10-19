@@ -13,6 +13,7 @@ import { generalConfigConsts } from './util/generalConfigConsts';
 import { useFetchBadges } from './util/fetchBadges';
 import { useFetchSocials } from './util/fetchSocials';
 import { useFetchCustomLinks } from './util/fetchCustomLinks';
+import { useFetchMediaEmbeds } from './util/fetchMediaEmbeds';
 import { Tooltip } from "@nextui-org/tooltip";
 import { TypeAnimation } from 'react-type-animation';
 import { profile } from 'console';
@@ -52,6 +53,19 @@ export default function UserProfile() {
   const { badges, isLoadingBadges } = useFetchBadges();
   const { socials, isLoadingSocials } = useFetchSocials();
   const { customLinks, isLoadingCustomLinks } = useFetchCustomLinks();
+  const { mediaEmbeds, isLoadingMediaEmbeds } = useFetchMediaEmbeds();
+  const [openStates, setOpenStates] = useState<boolean[]>(Array(mediaEmbeds.length).fill(false));
+
+  const toggleOpen = (index: number) => {
+    setOpenStates((prev) => {
+      const newState = [...prev];
+      newState[index] = !newState[index]; // Toggle the specific item
+      return newState;
+    });
+  };
+
+  const hasCustomLinks = customLinks.length > 0;
+  const hasMediaEmbeds = mediaEmbeds.length > 0;
 
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -213,7 +227,7 @@ export default function UserProfile() {
           ref={(el) => {
             if (el && cardTilt) {
               VanillaTilt.init(el, {
-                max: 2,
+                max: 3,
                 speed: 2000,
                 glare: false,
                 reverse: true,
@@ -310,52 +324,52 @@ export default function UserProfile() {
             )}
           </div>
 
-        {/* user socials */}
-        <div className="flex">
-          {socials.length > 0 ? (
-            <span className="flex items-center space-x-2 h-full">
-              {socials
-                .slice() // Create a shallow copy to avoid mutating the original array
-                .sort((a, b) => a.platform.localeCompare(b.platform)) // Sort alphabetically by platform
-                .map((social, index) => (
-                  <Tooltip
-                    key={social.id || index}
-                    content={
-                      <div className="font-bold text-sm bg-black py-1 px-2 rounded-md">
-                        {social.platform}
-                      </div>
-                    }
-                    closeDelay={100}
-                    offset={0}
-                  >
-                    <a
-                      href={`${social.platform_link}${social.platform_value}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+          {/* user socials */}
+          <div className="flex">
+            {socials.length > 0 ? (
+              <span className="flex items-center space-x-2 h-full">
+                {socials
+                  .slice() // Create a shallow copy to avoid mutating the original array
+                  .sort((a, b) => a.platform.localeCompare(b.platform)) // Sort alphabetically by platform
+                  .map((social, index) => (
+                    <Tooltip
+                      key={social.id || index}
+                      content={
+                        <div className="font-bold text-sm bg-black py-1 px-2 rounded-md">
+                          {social.platform}
+                        </div>
+                      }
+                      closeDelay={100}
+                      offset={0}
                     >
-                      <div
-                        className={`border border-2 border-[rgb(${accentColor})] px-[8px] py-[10px] ${
-                          fullRoundedSocials ? 'rounded-full' : 'rounded-lg'
-                        }`}
+                      <a
+                        href={`${social.platform_link}${social.platform_value}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <i
-                          className={`fab fa-${social.platform} fa-2xl`}
-                          style={{
-                            filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)',
-                          }}
-                        ></i>
-                      </div>
-                    </a>
-                  </Tooltip>
-                ))}
-            </span>
-          ) : (
-            <div className="hidden"></div>
-          )}
-        </div>
-        {/* other user data */}
-        {customLinks.length > 0 ? (
-          <>
+                        <div
+                          className={`border border-2 border-[rgb(${accentColor})] px-[8px] py-[10px] ${
+                            fullRoundedSocials ? 'rounded-full' : 'rounded-lg'
+                          }`}
+                        >
+                          <i
+                            className={`fab fa-${social.platform} fa-2xl`}
+                            style={{
+                              filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)',
+                            }}
+                          ></i>
+                        </div>
+                      </a>
+                    </Tooltip>
+                  ))}
+              </span>
+            ) : (
+              <div className="hidden"></div>
+            )}
+          </div>
+          
+          {/* Check if either customLinks or mediaEmbeds exist */}
+          {(customLinks.length > 0 || mediaEmbeds.length > 0) && (
             <hr
               className="border-b border-2 border-white w-full rounded-lg"
               style={{
@@ -364,49 +378,87 @@ export default function UserProfile() {
                 marginBottom: '1rem',
               }}
             />
-            <div className="w-full grid grid-cols-2 gap-2 items-center">
-              {customLinks.map((link, index) => (
-                <a
-                  key={link.id}
-                  href={link.value}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`text-center w-full ${customLinks.length % 2 !== 0 && index === customLinks.length - 1 ? 'col-span-2' : ''}`} // Full width link for the last odd item
-                >
-                  <div
-                    className="customlink-card hover:brightness-[200%] flex border border-[3px] p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90" // Adjusted hover effects
-                    style={{
-                      borderColor: `rgb(${accentColor})`,
-                      borderRadius,
-                      backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
-                    }}
+          )}
+
+            {/* Custom Links Section */}
+            {customLinks.length > 0 && (
+              <div className="w-full grid grid-cols-2 gap-2 items-center">
+                {customLinks.map((link, index) => (
+                  <a
+                    key={link.id}
+                    href={link.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-center w-full ${customLinks.length % 2 !== 0 && index === customLinks.length - 1 ? 'col-span-2' : ''}`}
                   >
-                    <div className="flex items-center justify-center">
-                      <i
-                        className={`fas ${link.icon} fa-xl`}
-                        style={{
-                          color: `rgb(${accentColor})`,
-                          lineHeight: '1',
-                          fontSize: '1.5rem',
-                        }}
-                      />
+                    <div
+                      className="customlink-card hover:brightness-[200%] flex border border-[3px] p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90"
+                      style={{
+                        borderColor: `rgb(${accentColor})`,
+                        borderRadius,
+                        backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
+                      }}
+                    >
+                      <div className="flex items-center justify-center">
+                        <i
+                          className={`fas ${link.icon} fa-xl`}
+                          style={{
+                            color: `rgb(${accentColor})`,
+                            lineHeight: '1',
+                            fontSize: '1.5rem',
+                          }}
+                        />
+                      </div>
+                      <div className="text-start w-full">
+                        <p className="font-bold" style={{ color: `rgb(${textColor})` }}>{link.title}</p>
+                        <p className="font-normal text-gray-400 text-sm">{link.value}</p>
+                      </div>
+                      <div className="customlink-arrow flex items-center justify-end transition-transform duration-300 transform">
+                        <i className={`fas fa-arrow-right fa-xl`} />
+                      </div>
                     </div>
-                    <div className="text-start w-full"> {/* Full width content */}
-                      <p className="font-bold">{link.title}</p>
-                      <p className="font-normal text-gray-400 text-sm">{link.value}</p>
-                    </div>
-                    <div className="customlink-arrow flex items-center justify-end transition-transform duration-300 transform">
-                      <i className={`fas fa-arrow-right fa-xl`} />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {/* Media Embeds Section */}
+            <div className="w-full">
+              {mediaEmbeds.length > 0 && (
+                mediaEmbeds.map((media, index) => (
+                  <div key={index} className="w-full">
+                    <div
+                      onClick={() => toggleOpen(index)}
+                      className="cursor-pointer flex flex-col justify-center border border-[3px] p-2 w-full gap-2 items-center transition-all duration-300"
+                      style={{
+                        borderColor: `rgb(${accentColor})`,
+                        borderRadius,
+                        backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
+                      }}
+                    >
+                      <p className="text-center" style={{ color: `rgb(${textColor})` }}>{media.title}</p>
+                      {openStates[index] && (
+                        <div className="flex flex-col">
+                          <iframe
+                            width="560"
+                            height="315"
+                            src={`${media.value}`}
+                            style={{ borderRadius: borderRadius, marginTop: '0' }}
+                            title="Media player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                            className="mt-4"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
-                </a>
-              ))}
+                ))
+              )}
             </div>
-          </>
-        ) : (
-          <div className="hidden"></div>
-        )}
-        </div>
+          </div>
       </div>
     </>
   );

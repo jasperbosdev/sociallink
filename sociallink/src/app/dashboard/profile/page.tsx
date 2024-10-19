@@ -9,6 +9,7 @@ import CosmeticSettings from "./util/useCosmeticSettings";
 import GeneralSettings from "./util/useGeneralSettings";
 import SocialSettings from "./util/useSocialSettings";
 import CustomSettings from "./util/useCustomSettings";
+import EmbedSettings from "./util/useEmbedSettings";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -647,7 +648,7 @@ export default function Dashboard() {
                   </h2>
                   {isMediaEmbedSettingsOpen && (
                     <div className="mt-2">
-                      <p>Media embed settings options go here.</p>
+                      <EmbedSettings />
                     </div>
                   )}
                 </div>
