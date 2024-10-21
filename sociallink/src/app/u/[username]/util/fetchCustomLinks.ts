@@ -20,7 +20,7 @@ export const useFetchCustomLinks = () => {
         throw new Error(error.message);
       }
 
-      console.log("Fetched custom link data:", data); 
+      // console.log("Fetched custom link data:", data); 
       setCustomLinks(data || []); 
     } catch (error) {
       console.error("Error fetching Socials:", error);

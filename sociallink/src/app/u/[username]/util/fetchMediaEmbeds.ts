@@ -20,7 +20,7 @@ export const useFetchMediaEmbeds = () => {
         throw new Error(error.message);
       }
 
-      console.log("Fetched custom link data:", data); 
+      // console.log("Fetched custom link data:", data); 
       setMediaEmbeds(data || []); 
     } catch (error) {
       console.error("Error fetching Socials:", error);
