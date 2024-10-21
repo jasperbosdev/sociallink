@@ -180,6 +180,57 @@ export default function UserProfile() {
 
   const isLoading = userLoading || avatarLoading || configLoading || isLoadingBadges;
 
+  const [actualPlatform, setActualPlatform] = useState("unknown");
+
+  // Check if the media embeds contain any Spotify or YouTube links
+  useEffect(() => {
+    if (!isLoadingMediaEmbeds) {
+      const embedPlatform = mediaEmbeds.map((media) => media.value);
+
+      const embedSetSpotify = embedPlatform.some(url => url.includes("spotify"));
+      const embedSetYoutube = embedPlatform.some(url => url.includes("youtube") || url.includes("youtu"));
+
+      if (embedSetSpotify) {
+        setActualPlatform("spotify");
+      } else if (embedSetYoutube) {
+        setActualPlatform("youtube");
+      } else {
+        console.log("platform not found");
+      }
+
+    }
+  }, [mediaEmbeds, isLoadingMediaEmbeds]);
+
+  // convert any spotify link to use as embed src for the iframe
+  const convertSpotifyToEmbedUrl = (url) => {
+    const spotifyRegex = /^(https?:\/\/)?(www\.)?(open\.spotify\.com)/;
+
+    if (spotifyRegex.test(url)) {
+      const spotifyMatch = url.match(/track\/([^?]+)/);
+      if (spotifyMatch && spotifyMatch[1]) {
+        const spotifyId = spotifyMatch[1];
+        return `https://open.spotify.com/embed/track/${spotifyId}`;
+      }
+    }
+
+    return url; // Return the original URL if it's not a valid Spotify link
+  };
+
+  // convert any youtube link to use as embed src for the iframe
+  const convertToEmbedUrl = (url) => {
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)/;
+  
+    if (youtubeRegex.test(url)) {
+      const videoIdMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=))([^&]+)/);
+      if (videoIdMatch && videoIdMatch[1]) {
+        const videoId = videoIdMatch[1];
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+    }
+    
+    return url; // Return the original URL if it's not a valid YouTube link
+  };  
+
   if (isLoading) {
     return (
       <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
@@ -425,37 +476,51 @@ export default function UserProfile() {
             {/* Media Embeds Section */}
             <div className="w-full">
               {mediaEmbeds.length > 0 && (
-                mediaEmbeds.map((media, index) => (
-                  <div key={index} className="w-full">
-                    <div
-                      onClick={() => toggleOpen(index)}
-                      className="cursor-pointer flex flex-col justify-center border border-[3px] p-2 w-full gap-2 items-center transition-all duration-300"
-                      style={{
-                        borderColor: `rgb(${accentColor})`,
-                        borderRadius,
-                        backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
-                      }}
-                    >
-                      <p className="text-center" style={{ color: `rgb(${textColor})` }}>{media.title}</p>
-                      {openStates[index] && (
-                        <div className="flex flex-col">
-                          <iframe
-                            width="560"
-                            height="315"
-                            src={`${media.value}`}
-                            style={{ borderRadius: borderRadius, marginTop: '0' }}
-                            title="Media player"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerPolicy="strict-origin-when-cross-origin"
-                            allowFullScreen
-                            className="mt-4"
-                          />
-                        </div>
-                      )}
+                mediaEmbeds.map((media, index) => {
+                  const embedUrl = convertToEmbedUrl(media.value);
+                  const embedUrlSpotify = convertSpotifyToEmbedUrl(media.value);
+                  return (
+                    <div key={index} className="w-full">
+                      <div
+                        onClick={() => toggleOpen(index)}
+                        className="cursor-pointer flex flex-col justify-center border border-[3px] p-2 w-full gap-2 items-center transition-all duration-300"
+                        style={{
+                          borderColor: `rgb(${accentColor})`,
+                          borderRadius,
+                          backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
+                        }}
+                      >
+                        <p className="text-center" style={{ color: `rgb(${textColor})` }}>{media.title}</p>
+                        {openStates[index] && (
+                          <div className="flex flex-col">
+                            {actualPlatform === "spotify" && (
+                              <iframe style={{ borderRadius: borderRadius, marginTop: '0', marginBottom: '8px' }}
+                                src={`${embedUrlSpotify}`}
+                                style={{ borderRadius: borderRadius}} 
+                                width={560} height={175} frameBorder="0" allowfullscreen="" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"
+                              />
+                            )}
+                            {actualPlatform === "youtube" && (
+                              <iframe
+                                width="560"
+                                height="315"
+                                src={`${embedUrl}`}
+                                style={{ borderRadius: borderRadius, marginTop: '0', marginBottom: '8px' }}
+                                title="Media player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                allowFullScreen
+                                className="mt-4"
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

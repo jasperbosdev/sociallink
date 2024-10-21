@@ -147,6 +147,7 @@ export default function EmbedSettings() {
             placeholder="My epic playlist <3"
             value={mediaTitle}
             onChange={(e) => setMediaTitle(e.target.value)}
+            disabled={existingSettings.length > 0}
           />
         </div>
         <div className="flex flex-col flex-1">
@@ -156,12 +157,13 @@ export default function EmbedSettings() {
             placeholder="https://spotify.com/playlist/blablabal"
             value={mediaValue}
             onChange={(e) => setMediaValue(e.target.value)}
+            disabled={existingSettings.length > 0}
           />
         </div>
       </div>
       <div
-        className="border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4"
-        onClick={handleAddMediaEmbed}
+        className={`border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4 ${existingSettings.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        onClick={existingSettings.length === 0 ? handleAddMediaEmbed : null}
       >
         Save Embed Settings
       </div>
