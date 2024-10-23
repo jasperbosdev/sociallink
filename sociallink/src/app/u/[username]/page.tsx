@@ -17,6 +17,7 @@ import { useFetchMediaEmbeds } from './util/fetchMediaEmbeds';
 import { Tooltip } from "@nextui-org/tooltip";
 import { TypeAnimation } from 'react-type-animation';
 import { profile } from 'console';
+import Head from 'next/head';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -43,6 +44,16 @@ const Poppins = localFont({
 });
 
 export default function UserProfile() {
+
+  // meta / test in prod
+  const PageMeta = () => (
+    <Head>
+      <meta property="og:title" content={`@${displayName }`} />
+      <meta property="og:description" content={description || `@${displayName}'s profile`} />
+      <meta name="theme-color" content={`rgb(${embedColor})`} />
+    </Head>
+  );
+
   const tiltRef = useRef<HTMLDivElement | null>(null);
 
   const { userData, loading: userLoading, error } = useUserData();
