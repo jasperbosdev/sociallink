@@ -151,7 +151,7 @@ export default function EmbedSettings() {
           />
         </div>
         <div className="flex flex-col flex-1">
-          <label className="font-bold">Media/Link</label>
+          <label className="font-bold">Media/Link <span className="text-sm font-normal">(youtube/spotify only)</span></label>
           <input
             className="bg-zinc-900 border border-[3px] rounded-lg border-white/20 p-2"
             placeholder="https://spotify.com/playlist/blablabal"

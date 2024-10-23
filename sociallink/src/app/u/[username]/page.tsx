@@ -195,26 +195,34 @@ export default function UserProfile() {
       } else if (embedSetYoutube) {
         setActualPlatform("youtube");
       } else {
+        mediaEmbeds.length = 0;
         console.log("platform not found");
       }
-
     }
   }, [mediaEmbeds, isLoadingMediaEmbeds]);
-
-  // convert any spotify link to use as embed src for the iframe
+  
+  // Convert any Spotify link (track or playlist) to use as embed src for the iframe
   const convertSpotifyToEmbedUrl = (url) => {
     const spotifyRegex = /^(https?:\/\/)?(www\.)?(open\.spotify\.com)/;
-
+  
     if (spotifyRegex.test(url)) {
-      const spotifyMatch = url.match(/track\/([^?]+)/);
-      if (spotifyMatch && spotifyMatch[1]) {
-        const spotifyId = spotifyMatch[1];
-        return `https://open.spotify.com/embed/track/${spotifyId}`;
+      // Check if it's a playlist link
+      const playlistMatch = url.match(/playlist\/([^?]+)/);
+      if (playlistMatch && playlistMatch[1]) {
+        const playlistId = playlistMatch[1];
+        return `https://open.spotify.com/embed/playlist/${playlistId}`;
+      }
+  
+      // Check if it's a track link
+      const trackMatch = url.match(/track\/([^?]+)/);
+      if (trackMatch && trackMatch[1]) {
+        const trackId = trackMatch[1];
+        return `https://open.spotify.com/embed/track/${trackId}`;
       }
     }
-
-    return url; // Return the original URL if it's not a valid Spotify link
-  };
+  
+    return url;
+  };  
 
   // convert any youtube link to use as embed src for the iframe
   const convertToEmbedUrl = (url) => {
