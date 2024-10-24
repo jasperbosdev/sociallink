@@ -5,6 +5,7 @@ import VanillaTilt from 'vanilla-tilt';
 import { useUserData } from './util/userDataLogic';
 import { useFetchAvatar } from './util/fetchAvatar';
 import { useFetchBackground } from './util/fetchBackground';
+import { useFetchBanner } from './util/fetchBanner';
 import localFont from "next/font/local";
 import { useFetchConfig } from './util/fetchConfig';
 import { configConsts } from './util/configConsts';
@@ -58,6 +59,7 @@ export default function UserProfile() {
 
   const { userData, loading: userLoading, error } = useUserData();
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
+  const { fetchedBannerUrl, loading: bannerLoading } = useFetchBanner();
   const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
   const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
@@ -102,6 +104,7 @@ export default function UserProfile() {
     backgroundColor,
     profileFont,
     usernameFxColor,
+    useBanner,
   } = configConsts(config);
 
   const {
@@ -320,33 +323,44 @@ export default function UserProfile() {
               : "",
           }}
         >
-          <div className="relative flex flex-col items-center">
-            {pfpDecoration ? (
+            {useBanner === true ? (
               <>
-                <img
-                  src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
-                  className="w-40 h-auto z-10"
-                  alt={`${userData?.username}'s decoration`}
-                  draggable="false"
-                />
-                <img
-                  src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-                  className={`absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] mt-[-2rem]`}
-                  alt={`${userData?.username}'s profile`}
-                  draggable="false"
-                  style={{ borderColor: `rgb(${accentColor})` }}
-                />
+                <div className='relative'>
+                  <img
+                  src={`${fetchedBannerUrl}`}
+                  className='w-[1000px] h-40 object-cover object-center p-0'
+                  />
+                </div>
               </>
             ) : (
-              <img
-                src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
-                className={`w-32 h-32 object-cover border-[3px] rounded-full`}
-                alt={`${userData?.username}'s profile`}
-                draggable="false"
-                style={{ borderColor: `rgb(${accentColor})` }}
-              />
+              <div className="relative flex flex-col items-center">
+                {pfpDecoration ? (
+                  <>
+                    <img
+                      src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
+                      className="w-40 h-auto z-10"
+                      alt={`${userData?.username}'s decoration`}
+                      draggable="false"
+                    />
+                    <img
+                      src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+                      className={`absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] mt-[-2rem]`}
+                      alt={`${userData?.username}'s profile`}
+                      draggable="false"
+                      style={{ borderColor: `rgb(${accentColor})` }}
+                    />
+                  </>
+                ) : (
+                  <img
+                    src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+                    className={`w-32 h-32 object-cover border-[3px] rounded-full`}
+                    alt={`${userData?.username}'s profile`}
+                    draggable="false"
+                    style={{ borderColor: `rgb(${accentColor})` }}
+                  />
+                )}
+              </div>
             )}
-          </div>
 
           <div className="flex flex-col items-center justify-center">
             {showBadges && (

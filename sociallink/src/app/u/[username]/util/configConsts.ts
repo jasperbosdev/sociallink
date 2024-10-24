@@ -83,8 +83,12 @@ export const configConsts = (config: any) => {
     const usernameFxColor = (config?.usernamefx_color !== undefined && config.usernamefx_color !== null)
     ? config.usernamefx_color
     : 'white';
+
+    const useBanner = config?.use_banner !== undefined && config.use_banner !== null
+    ? config.use_banner
+    : false;
   
     return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
-    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont, usernameFxColor
+    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont, usernameFxColor, useBanner
      };
 };

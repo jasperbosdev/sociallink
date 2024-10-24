@@ -18,10 +18,13 @@ export default function Dashboard() {
   // New state to hold the avatar URL fetched from Supabase
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState<string | null>(null);
   const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
+  const [fetchedBannerUrl, setFetchedBannerUrl] = useState<string | null>(null);
   const [isAvatarLoading, setIsAvatarLoading] = useState(true);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
+  const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [uploadAvaSuccess, setUploadAvaSuccess] = useState(false);
   const [uploadBgSuccess, setUploadBgSuccess] = useState(false);
+  const [uploadBannerSuccess, setUploadBannerSuccess] = useState(false);
   const [isAvatarEnabled, setIsAvatarEnabled] = useState(false);
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
   const [isBannerEnabled, setIsBannerEnabled] = useState(false);
@@ -41,8 +44,10 @@ export default function Dashboard() {
   // State for avatar upload
   const [avatar, setAvatar] = useState<File | null>(null);
   const [background, setBackground] = useState<File | null>(null);
+  const [banner, setBanner] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // Moved the fetchAvatar function here
@@ -84,9 +89,29 @@ export default function Dashboard() {
     }
   };
 
+  const fetchBanner = async () => {
+    if (userData && userData.username) {
+      const fileName = `${userData.username}-banner`; // Assuming the filename format
+      const { data, error } = await supabase.storage
+        .from("banners")
+        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
+
+      if (error) {
+        console.error("Error fetching banner:", error);
+        setIsBannerLoading(false); // Stop loading on error
+        return;
+      }
+
+      // console.log("Fetched Banner signed URL:", data.signedUrl); // Log the signed URL
+      setFetchedBannerUrl(data.signedUrl); // Set the signed URL
+      setIsBannerLoading(false); // Stop loading after fetching
+    }
+  };  
+
   useEffect(() => {
     fetchAvatar(); // Fetch avatar when component mounts
     fetchBackground(); // Fetch background when component mounts
+    fetchBanner(); // Fetch banner when component mounts
 
     return () => {
       if (fetchedAvatarUrl) {
@@ -94,6 +119,9 @@ export default function Dashboard() {
       }
       if (fetchedBackgroundUrl) {
         URL.revokeObjectURL(fetchedBackgroundUrl);
+      }
+      if (fetchedBannerUrl) {
+        URL.revokeObjectURL(fetchedBannerUrl);
       }
     };
   }, [userData]); // Dependency on userData to refetch if it changes
@@ -159,6 +187,21 @@ export default function Dashboard() {
     }
   };
 
+  const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newBanner = event.target.files[0];
+      // console.log("Selected file:", newBanner); // Log the selected file
+      setBanner(newBanner); // Set the Banner state
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // console.log("Banner preview data URL:", reader.result); // Log the preview URL
+        setBannerPreview(reader.result as string); // Set the Banner preview state
+      };
+      reader.readAsDataURL(newBanner); // Read the selected file as data URL
+    }
+  };
+
   const incrementPfpVersion = async () => {
     // Step 1: Fetch the current pfp_vers value
     const { data: user, error: fetchError } = await supabase
@@ -212,6 +255,34 @@ export default function Dashboard() {
       console.error("Error updating Bg_vers:", updateError);
     } else {
       // console.log("Bg_vers successfully incremented.");
+    }
+  };
+
+  const incrementBannerVersion = async () => {
+    // Step 1: Fetch the current pfp_vers value
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("banner_vers")
+      .eq("id", userData.id)
+      .single();
+  
+    if (fetchError || !user) {
+      console.error("Error fetching banner_vers:", fetchError);
+      return;
+    }
+  
+    const currentBgVers = user.banner_vers;
+  
+    // Step 2: Increment the pfp_vers value
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ banner_vers: currentBgVers + 1 })
+      .eq("id", userData.id);
+  
+    if (updateError) {
+      console.error("Error updating banner_vers:", updateError);
+    } else {
+      // console.log("banner_vers successfully incremented.");
     }
   };
 
@@ -269,6 +340,92 @@ export default function Dashboard() {
 
     setUploading(false);
     setBackground(null);
+  };
+
+  const uploadBanner = async () => {
+    if (!banner || !userData) return;
+
+    setUploading(true);
+    const { username } = userData;
+    const fileName = `${username}-banner`;
+
+    const { data, error: uploadError } = await supabase.storage
+      .from("banners")
+      .upload(fileName, banner, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Error uploading Banner:", uploadError);
+      setUploadBannerSuccess(false);
+    } else {
+      // Increment pfp_vers after successful upload
+      await incrementBannerVersion();
+      await fetchBanner(); // Refetch the Banner to update the UI
+      setUploadBgSuccess(true);
+    }
+
+    setUploading(false);
+    setBanner(null);
+  };
+
+  const [initialBannerState, setInitialBannerState] = useState(false); // Track initial state to detect changes
+  const [hasChanges, setHasChanges] = useState(false); // Track if there are unsaved changes
+
+  useEffect(() => {
+    if (userData) {
+      // Fetch the initial state of the banner usage from the database
+      const fetchBannerUsage = async () => {
+        const { data, error } = await supabase
+          .from('profileCosmetics')
+          .select('use_banner')
+          .eq('uid', userData.uid)
+          .single();
+
+        if (data) {
+          setIsBannerEnabled(data.use_banner);
+          setInitialBannerState(data.use_banner); // Set the initial state
+        }
+
+        if (error) {
+          console.error("Error fetching banner usage:", error);
+        }
+      };
+
+      fetchBannerUsage();
+    }
+  }, [userData]);
+
+  // Function to handle the toggle change
+  const handleToggleChange = () => {
+    const newState = !isBannerEnabled;
+    setIsBannerEnabled(newState);
+    setHasChanges(newState !== initialBannerState); // Check if the state has changed from the initial value
+  };
+
+  // Function to update the `use_banner` state in the database
+  const updateUseBanner = async () => {
+    if (!userData) return;
+
+    try {
+      // Update the `use_banner` field in the profileCosmetics table
+      const { error } = await supabase
+        .from('profileCosmetics')
+        .update({ use_banner: isBannerEnabled })
+        .eq('uid', userData.uid); // Assuming `uid` is the identifier for the user
+
+      if (error) {
+        console.error("Error updating banner usage:", error);
+        return;
+      }
+
+      console.log("Banner usage updated successfully!");
+      setInitialBannerState(isBannerEnabled); // Update initial state after successful save
+      setHasChanges(false); // Reset changes state after saving
+    } catch (error) {
+      console.error("Error saving use_banner state:", error);
+    }
   };
 
   return (
@@ -516,12 +673,94 @@ export default function Dashboard() {
                         <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
                           Banner
                         </h3>
-                        <div className="flex flex-col items-center justify-center px-10 rounded-lg py-5 space-y-2 border border-2 border-white/20 bg-white/10">
-                          <i className="fas fa-image text-white/60 text-4xl"></i>
-                          <p className="text-base text-white/60 font-semibold">
-                            Click to upload a file
-                          </p>
+                        <div
+                          className={`flex flex-col items-center justify-center rounded-lg ${
+                            bannerPreview || fetchedBannerUrl
+                              ? ""
+                              : "px-10 py-5"
+                          } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
+                          onClick={() =>
+                            document
+                              .getElementById("bannerUploadInput")
+                              ?.click()
+                          } // The whole box is now clickable
+                        >
+                          {/* Check if bannerPreview (newly selected file) or fetchedbannerUrl exists */}
+                          {bannerPreview || fetchedBannerUrl ? (
+                            <img
+                              src={bannerPreview || fetchedBannerUrl || ""}
+                              alt="Loading banner..."
+                              className="w-full h-28 object-cover"
+                            />
+                          ) : (
+                            <>
+                              <i className="fas fa-image text-4xl text-white/50"></i>
+                              <p className="text-base text-white/60 font-semibold">
+                                Click to upload a file
+                              </p>
+                            </>
+                          )}
+
+                          {/* File input for selecting new banner */}
+                          <input
+                            id="bannerUploadInput"
+                            type="file"
+                            className="hidden"
+                            onChange={handleBannerChange}
+                            accept=".png, .jpg, .jpeg, .gif" // Handle avatar file change
+                          />
                         </div>
+
+                        <div>
+                          <label className="mt-2 flex items-center cursor-pointer">
+                            <span className="mr-2 text-white/60 font-semibold">Enable Banner</span>
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                className="hidden"
+                                checked={isBannerEnabled}
+                                onChange={handleToggleChange}
+                              />
+                              <div
+                                className={`block w-12 h-6 rounded-full ${
+                                  isBannerEnabled ? "bg-green-500" : "bg-gray-300"
+                                }`}
+                              ></div>
+                              <div
+                                className={`dot absolute left-0 top-0 w-6 h-6 rounded-full bg-white transition ${
+                                  isBannerEnabled ? "translate-x-6" : ""
+                                }`}
+                              ></div>
+                            </div>
+                          </label>
+                              
+                          {hasChanges && (
+                            <button
+                              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+                              onClick={updateUseBanner}
+                            >
+                              Save Changes
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Display file name if banner is selected, outside the box */}
+                        {banner && (
+                          <button
+                            className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                            onClick={uploadBanner}
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload Banner"}
+                          </button>
+                        )}
+
+                        {/* Conditionally render success message */}
+                        {uploadBannerSuccess && (
+                          <div className="mt-4 text-green-600">
+                            Banner uploaded successfully!
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col">
                         <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
