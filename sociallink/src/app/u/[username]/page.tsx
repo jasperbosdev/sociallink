@@ -328,7 +328,7 @@ export default function UserProfile() {
                 <div className='relative'>
                   <img
                   src={`${fetchedBannerUrl}`}
-                  className='w-[1000px] h-40 object-cover object-center p-0'
+                  className='w-[1000px] h-40 object-cover object-center'
                   />
                 </div>
               </>
