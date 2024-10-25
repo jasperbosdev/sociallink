@@ -325,11 +325,59 @@ export default function UserProfile() {
         >
             {useBanner === true ? (
               <>
-                <div className='relative'>
+                <div className='relative -mx-6 -mt-6 mb-[4.3em]'
+                style={{
+                  borderBottom: `${borderWidth} solid rgb(${accentColor})`,
+                  boxShadow: cardGlow
+                    ? `0px 0px 10px 4px ${accentColor ? `rgba(${accentColor},1)` : "rgba(239,68,68,1)"}`
+                    : "",
+                }}>
                   <img
                   src={`${fetchedBannerUrl}`}
                   className='w-[1000px] h-40 object-cover object-center'
+                  style={{
+                    borderTopRightRadius: `${borderRadius}`,
+                    borderTopLeftRadius: `${borderRadius}`,
+                  }}
                   />
+                </div>
+                <div className="my-[-3.2rem] translate-y-[3.4rem] absolute flex items-center justify-center">
+                  <div className="relative flex flex-col items-center">
+                  {pfpDecoration ? (
+                    <>
+                      <img
+                        src={`/static/assets/decorations/${decorationValue}.png`} // Dynamic decoration image
+                        className="w-40 h-auto z-10"
+                        alt={`${userData?.username}'s decoration`}
+                        draggable="false"
+                        loading='lazy'
+                      />
+                      <img
+                        src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+                        className={`absolute bottom-[18px] rounded-full w-32 h-32 object-cover border-[3px] mt-[-2rem]`}
+                        alt={`${userData?.username}'s profile`}
+                        draggable="false"
+                        style={{ borderColor: `rgb(${accentColor})`,
+                          boxShadow: cardGlow
+                          ? `0px 0px 10px 4px ${accentColor ? `rgba(${accentColor},1)` : "rgba(239,68,68,1)"}`
+                          : "",
+                        }}
+                      />
+                    </>
+                    ) : (
+                      <img
+                        src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
+                        className={`w-32 h-32 object-cover border-[3px] rounded-full`}
+                        alt={`${userData?.username}'s profile`}
+                        draggable="false"
+                        style={{ borderColor: `rgb(${accentColor})`,
+                          boxShadow: cardGlow
+                          ? `0px 0px 10px 4px ${accentColor ? `rgba(${accentColor},1)` : "rgba(239,68,68,1)"}`
+                          : "",
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
               </>
             ) : (
@@ -341,6 +389,7 @@ export default function UserProfile() {
                       className="w-40 h-auto z-10"
                       alt={`${userData?.username}'s decoration`}
                       draggable="false"
+                      loading='lazy'
                     />
                     <img
                       src={`${fetchedAvatarUrl}?v=${userData?.pfp_vers}`}
@@ -367,7 +416,7 @@ export default function UserProfile() {
               <span className="flex items-center space-x-2 h-full">
                 {badges.map((badge, index) => (
                   <Tooltip key={badge.id || index} content={
-                    <div className='font-bold text-sm'>{badge.badge}</div>
+                    <div className='font-bold text-sm bg-black rounded-lg p-1'>{badge.badge}</div>
                   }>
                     <i
                       className={`${badge.icon_style} fa-${badge.icon}`}
