@@ -48,6 +48,7 @@ export default function Dashboard() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // Moved the fetchAvatar function here
@@ -72,22 +73,43 @@ export default function Dashboard() {
 
   const fetchBackground = async () => {
     if (userData && userData.username) {
-      const fileName = `${userData.username}-bg`; // Assuming the filename format
+      const fileName = `${userData.username}-bg`;
       const { data, error } = await supabase.storage
         .from("backgrounds")
-        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
-
+        .createSignedUrl(fileName, 86400);
+  
       if (error) {
         console.error("Error fetching background:", error);
-        setIsBackgroundLoading(false); // Stop loading on error
+        setIsBackgroundLoading(false);
         return;
       }
-
-      // console.log("Fetched background signed URL:", data.signedUrl); // Log the signed URL
-      setFetchedBackgroundUrl(data.signedUrl); // Set the signed URL
-      setIsBackgroundLoading(false); // Stop loading after fetching
+  
+      const backgroundUrl = data.signedUrl;
+      setFetchedBackgroundUrl(backgroundUrl);
+  
+      // Fetch the MIME type of the file
+      try {
+        const response = await fetch(backgroundUrl, { method: 'HEAD' });
+        const contentType = response.headers.get("Content-Type");
+  
+        if (contentType?.startsWith("video/")) {
+          setFileType("video");
+        } else if (contentType?.startsWith("image/")) {
+          setFileType("image");
+        } else {
+          console.warn("Unknown content type:", contentType);
+          setFileType(null); // Handle unsupported types if needed
+        }
+  
+        // console.log("Detected MIME type:", contentType);
+  
+      } catch (headError) {
+        console.error("Error fetching MIME type:", headError);
+      }
+  
+      setIsBackgroundLoading(false);
     }
-  };
+  };  
 
   const fetchBanner = async () => {
     if (userData && userData.username) {
@@ -175,17 +197,20 @@ export default function Dashboard() {
   const handleBackgroundChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newBackground = event.target.files[0];
-      // console.log("Selected file:", newBackground); // Log the selected file
-      setBackground(newBackground); // Set the Background state
-
+      setBackground(newBackground);
+  
+      // Set the fileType based on the MIME type of the selected file
+      const isVideo = newBackground.type.startsWith("video/");
+      setFileType(isVideo ? "video" : "image");
+  
+      // Generate a preview URL for the selected file
       const reader = new FileReader();
       reader.onloadend = () => {
-        // console.log("Background preview data URL:", reader.result); // Log the preview URL
-        setBackgroundPreview(reader.result as string); // Set the Background preview state
+        setBackgroundPreview(reader.result as string);
       };
-      reader.readAsDataURL(newBackground); // Read the selected file as data URL
+      reader.readAsDataURL(newBackground);
     }
-  };
+  };  
 
   const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -615,31 +640,39 @@ export default function Dashboard() {
                         </h3>
                         <div
                           className={`flex flex-col items-center justify-center rounded-lg ${
-                            backgroundPreview || fetchedBackgroundUrl
-                              ? ""
-                              : "px-10 py-5"
+                            backgroundPreview || fetchedBackgroundUrl ? "" : "px-10 py-5"
                           } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
-                          onClick={() =>
-                            document
-                              .getElementById("backgroundUploadInput")
-                              ?.click()
-                          } // The whole box is now clickable
+                          onClick={() => document.getElementById("backgroundUploadInput")?.click()}
                         >
-                          {/* Check if backgroundPreview (newly selected file) or fetchedBackgroundUrl exists */}
-                          {backgroundPreview || fetchedBackgroundUrl ? (
-                            <img
-                              src={backgroundPreview || fetchedBackgroundUrl || ""}
-                              alt="Loading background..."
+                          {/* Check if backgroundPreview (newly selected file) or fetchedBackgroundUrl exists and fileType is ready */}
+                            {backgroundPreview || (fetchedBackgroundUrl && fileType) ? (
+                            fileType === "video" ? (
+                              <video
+                              src={backgroundPreview || fetchedBackgroundUrl}
                               className="w-full h-28 object-cover"
-                            />
-                          ) : (
+                              autoPlay
+                              lazy="true"
+                              loop
+                              muted
+                              alt="Loading avatar..."
+                              />
+                            ) : (
+                              <img
+                              src={backgroundPreview || fetchedBackgroundUrl}
+                              alt="Background preview"
+                              className="w-full h-28 object-cover"
+                              />
+                            )
+                            ) : isBackgroundLoading ? (
+                            <div className="flex items-center justify-center w-full h-28">
+                              <p className="text-base text-white/60 font-semibold">Loading...</p>
+                            </div>
+                            ) : (
                             <>
                               <i className="fas fa-photo-film text-4xl text-white/50"></i>
-                              <p className="text-base text-white/60 font-semibold">
-                                Click to upload a file
-                              </p>
+                              <p className="text-base text-white/60 font-semibold">Click to upload a file</p>
                             </>
-                          )}
+                            )}
 
                           {/* File input for selecting new background */}
                           <input
