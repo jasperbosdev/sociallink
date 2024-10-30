@@ -24,7 +24,7 @@ export default function CosmeticSettings() {
   const [cardTilt, setCardTilt] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [primaryColor, setPrimaryColor] = useState("255, 255, 255");
-  const [secondaryColor, setSecondaryColor] = useState("0, 0, 0");
+  const [secondaryColor, setSecondaryColor] = useState("255, 0, 255");
   const [accentColor, setAccentColor] = useState("255, 255, 255");
   const [textColor, setTextColor] = useState("255, 255, 255");
   const [backgroundColor, setBackgroundColor] = useState("0, 0, 0");
@@ -34,7 +34,7 @@ export default function CosmeticSettings() {
 
   const [colors, setColors] = useState({
     primaryColor: "255, 255, 255",
-    secondaryColor: "0, 0, 0",
+    secondaryColor: "255, 0, 255",
     accentColor: "255, 255, 255",
     textColor: "255, 255, 255",
     backgroundColor: "0, 0, 0",
