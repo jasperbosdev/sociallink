@@ -109,7 +109,7 @@ export default function Home() {
                 ref={(el) => {
                   if (el) {
                   VanillaTilt.init(el, {
-                    max: 25,
+                    max: 5,
                     speed: 400,
                     glare: false,
                     "max-glare": 0.5,

@@ -3,43 +3,51 @@ import { supabase } from "../../../supabase"; // Adjust the import based on your
 import { useUserData } from "./userDataLogic";
 
 export const useFetchBackground = () => {
-    const { userData } = useUserData(); // Get user data from the custom hook
-    const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
-    const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
+  const { userData } = useUserData(); // Get user data from the custom hook
+  const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
+  const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
+  const [fileType, setFileType] = useState<string | null>(null); // State to store the file type
 
-    // Function to fetch the Background from Supabase
-    const fetchBackground = async (username: string, bgVers: number) => {
-        const fileName = `${username}-bg?v=${bgVers}`; // Add bg_vers to URL query
-        const publicUrl = `https://eineipicfkkhevxbsxii.supabase.co/storage/v1/object/public/backgrounds/${fileName}`;
+  // Function to fetch the Background from Supabase
+  const fetchBackground = async (username: string, bgVers: number) => {
+    const fileName = `${username}-bg?v=${bgVers}`; // Add bg_vers to URL query
+    const publicUrl = `https://eineipicfkkhevxbsxii.supabase.co/storage/v1/object/public/backgrounds/${fileName}`;
+    
+    try {
+      const response = await fetch(publicUrl);
+      if (!response.ok) {
+        throw new Error("File not found");
+      }
 
-        try {
-            const response = await fetch(publicUrl);
-            if (!response.ok) {
-                throw new Error("File not found");
-            }
-            setFetchedBackgroundUrl(publicUrl); // Set URL with bg_vers
-            // console.log("Fetched Background URL:", publicUrl);
-        } catch (error) {
-            console.error("Error fetching Background:", error);
-            // Gracefully handle the error by not setting an empty string
-            setFetchedBackgroundUrl(null); // Return null if there's an error fetching the background
-        } finally {
-            setIsBackgroundLoading(false);
-        }
-    };
+      // Get the content type from the response
+      const contentType = response.headers.get("Content-Type");
+      if (contentType) {
+        setFileType(contentType); // Set the file type
+      }
 
-    // Use the bg_vers value from the userData when fetching the Background
-    useEffect(() => {
-        if (userData && userData.username && userData.bg_vers !== undefined) {
-            setIsBackgroundLoading(true);
-            fetchBackground(userData.username, userData.bg_vers);
-        }
-    }, [userData]);
+      setFetchedBackgroundUrl(publicUrl); // Set URL with bg_vers
+    } catch (error) {
+      console.error("Error fetching Background:", error);
+      setFetchedBackgroundUrl(null); // Return null if there's an error fetching the background
+      setFileType(null); // Reset file type on error
+    } finally {
+      setIsBackgroundLoading(false);
+    }
+  };
 
-    // This function can be called after the profile picture is successfully updated
-    const updateBackgroundImmediately = (newBackgroundUrl: string) => {
-        setFetchedBackgroundUrl(newBackgroundUrl); // Update state immediately with the new Background URL
-    };
+  // Use the bg_vers value from the userData when fetching the Background
+  useEffect(() => {
+    if (userData && userData.username && userData.bg_vers !== undefined) {
+      setIsBackgroundLoading(true);
+      fetchBackground(userData.username, userData.bg_vers);
+    }
+  }, [userData]);
 
-    return { fetchedBackgroundUrl, isBackgroundLoading, updateBackgroundImmediately };
+  // This function can be called after the profile picture is successfully updated
+  const updateBackgroundImmediately = (newBackgroundUrl: string) => {
+    setFetchedBackgroundUrl(newBackgroundUrl); // Update state immediately with the new Background URL
+    // Optionally, reset fileType if you know the new background type
+  };
+
+  return { fetchedBackgroundUrl, isBackgroundLoading, fileType, updateBackgroundImmediately };
 };

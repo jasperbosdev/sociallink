@@ -32,7 +32,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange }) => {
   
   // State for colors, initialized to empty strings or defaults
   const [primaryColor, setPrimaryColor] = useState("255, 255, 255"); // Default RGB value
-  const [secondaryColor, setSecondaryColor] = useState("255, 255, 255");
+  const [secondaryColor, setSecondaryColor] = useState("255, 0, 255");
   const [accentColor, setAccentColor] = useState("255, 255, 255");
   const [textColor, setTextColor] = useState("255, 255, 255");
   const [backgroundColor, setBackgroundColor] = useState("255, 255, 255");
@@ -59,7 +59,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange }) => {
           
           // Set colors directly based on fetched colors
           setPrimaryColor(fetchedColors.primary_color || "255, 255, 255");
-          setSecondaryColor(fetchedColors.secondary_color || "255, 255, 255");
+          setSecondaryColor(fetchedColors.secondary_color || "255, 0, 255");
           setAccentColor(fetchedColors.accent_color || "255, 255, 255");
           setTextColor(fetchedColors.text_color || "255, 255, 255");
           setBackgroundColor(fetchedColors.background_color || "255, 255, 255");
