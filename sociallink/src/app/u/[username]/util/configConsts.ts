@@ -87,8 +87,16 @@ export const configConsts = (config: any) => {
     const useBanner = config?.use_banner !== undefined && config.use_banner !== null
     ? config.use_banner
     : false;
+
+    const useAutoplayFix = config?.use_autoplayfix !== undefined && config.use_autoplayfix !== null
+    ? config.use_autoplayfix
+    : false;
+
+    const useBackgroundAudio  = config?.use_background_audio !== undefined && config.use_background_audio !== null
+    ? config.use_background_audio
+    : false;
   
     return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
-    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont, usernameFxColor, useBanner
+    , fullRoundedSocials, primaryColor, secondaryColor, accentColor, textColor, embedColor, backgroundColor, profileFont, usernameFxColor, useBanner, useAutoplayFix, useBackgroundAudio
      };
 };

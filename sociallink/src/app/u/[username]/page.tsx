@@ -13,6 +13,7 @@ import { useFetchGeneralConfig } from './util/fetchGeneralConfig';
 import { generalConfigConsts } from './util/generalConfigConsts';
 import { useFetchBadges } from './util/fetchBadges';
 import { useFetchSocials } from './util/fetchSocials';
+import { useFetchCursor } from './util/fetchCursor';
 import { useFetchCustomLinks } from './util/fetchCustomLinks';
 import { useFetchMediaEmbeds } from './util/fetchMediaEmbeds';
 import { Tooltip } from "@nextui-org/tooltip";
@@ -60,7 +61,8 @@ export default function UserProfile() {
   const { userData, loading: userLoading, error } = useUserData();
   const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
   const { fetchedBannerUrl, loading: bannerLoading } = useFetchBanner();
-  const { fetchedBackgroundUrl, loading: backgroundLoading } = useFetchBackground();
+  const { fetchedCursorUrl, loading: cursorLoading } = useFetchCursor();
+  const { fetchedBackgroundUrl, loading: backgroundLoading, fileType } = useFetchBackground();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
   const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
   const { badges, isLoadingBadges } = useFetchBadges();
@@ -81,6 +83,7 @@ export default function UserProfile() {
   const hasMediaEmbeds = mediaEmbeds.length > 0;
 
   const [isPageLoaded, setIsPageLoaded] = useState(false);
+  const [showClickToLoad, setShowClickToLoad] = useState(true);
 
   const {
     borderWidth,
@@ -105,6 +108,8 @@ export default function UserProfile() {
     profileFont,
     usernameFxColor,
     useBanner,
+    useAutoplayFix,
+    useBackgroundAudio,
   } = configConsts(config);
 
   const {
@@ -154,6 +159,10 @@ export default function UserProfile() {
     window.addEventListener('load', handleLoad);
     return () => window.removeEventListener('load', handleLoad);
   }, []);
+
+  const handleClick = () => {
+    setShowClickToLoad(false); // Hide the click to load screen
+  };
 
   const username = userData?.username;
 
@@ -251,7 +260,7 @@ export default function UserProfile() {
     }
     
     return url; // Return the original URL if it's not a valid YouTube link
-  };  
+  };
 
   if (isLoading) {
     return (
@@ -272,28 +281,96 @@ export default function UserProfile() {
     );
   }
 
+  // Show the click-to-load screen if the page hasn't been clicked yet
+  if (showClickToLoad && fetchedBackgroundUrl && useAutoplayFix === true) {
+    return (
+      <>
+        <style jsx global>{`
+          body {
+            font-family: var(--font-${profileFont}) !important;
+            font-weight: 500;
+            cursor: url(${fetchedCursorUrl}), auto;
+          }
+        `}</style>
+        <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
+          {fileType?.startsWith('video/') ? (
+            <video
+              muted
+              style={{
+                filter: `blur(10px) brightness(0.5)`, // Adjust these values based on your preferences
+              }}
+              className="object-cover w-full h-full"
+              draggable="false"
+              preload="metadata"
+            >
+              <source src={fetchedBackgroundUrl} type={fileType} />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img
+              src={fetchedBackgroundUrl}
+              style={{
+                filter: `blur(10px) brightness(0.5)`, // Adjust these values based on your preferences
+              }}
+              className="object-cover w-full h-full"
+              draggable="false"
+              alt=""
+            />
+          )}
+        </aside>
+        <main style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }} 
+          className="flex flex-col justify-center w-screen h-screen cursor-pointer duration-500 fixed" 
+          onClick={handleClick}>
+          <p style={{ color: backgroundColor }} className="flex flex-col px-4 break-words text-center font-semibold text-3xl">
+            ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ
+          </p>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <style jsx global>{`
         body {
           font-family: var(--font-${profileFont}) !important;
           font-weight: 500;
+          cursor: url(${fetchedCursorUrl}), auto;
         }
       `}</style>
       {fetchedBackgroundUrl ? (
         <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
-          <img
-            src={fetchedBackgroundUrl}
-            style={{
-              filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`,
-            }}
-            className="object-cover w-full h-full"
-            alt=""
-            draggable="false"
-          />
+          {fileType?.startsWith('video/') ? (
+            <video
+              muted
+              autoPlay
+              loop
+              style={{
+              filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`, // Adjust these values based on your preferences
+              }}
+              className="object-cover w-full h-full"
+              draggable="false"
+            >
+              <source src={fetchedBackgroundUrl} type={fileType} />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img
+              src={fetchedBackgroundUrl}
+              style={{
+                filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`, // Adjust these values based on your preferences
+              }}
+              className="object-cover w-full h-full"
+              draggable="false"
+              alt=""
+            />
+          )}
         </aside>
       ) : (
-        <div className="fixed w-screen h-screen z-[-5]" style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}></div>
+        <div
+          className="fixed w-screen h-screen z-[-5]"
+          style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}
+        ></div>
       )}
       <div className={`transition flex items-center justify-center min-h-screen mx-4 ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <div

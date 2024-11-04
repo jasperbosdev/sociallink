@@ -19,16 +19,22 @@ export default function Dashboard() {
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState<string | null>(null);
   const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
   const [fetchedBannerUrl, setFetchedBannerUrl] = useState<string | null>(null);
+  const [fetchedCursorUrl, setFetchedCursorUrl] = useState<string | null>(null);
   const [isAvatarLoading, setIsAvatarLoading] = useState(true);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
+  const [isCursorLoading, setIsCursorLoading] = useState(true);
   const [uploadAvaSuccess, setUploadAvaSuccess] = useState(false);
   const [uploadBgSuccess, setUploadBgSuccess] = useState(false);
+  const [uploadCursorSuccess, setUploadCursorSuccess] = useState(false);
   const [uploadBannerSuccess, setUploadBannerSuccess] = useState(false);
   const [isAvatarEnabled, setIsAvatarEnabled] = useState(false);
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
   const [isBannerEnabled, setIsBannerEnabled] = useState(false);
+  const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(false);
   const [isCursorEnabled, setIsCursorEnabled] = useState(false);
+  const [useAutoplayFix, setUseAutoplayFix] = useState(false);
+  const [isBackgroundAudioEnabled, setIsBackgroundAudioEnabled] = useState(false);
   // State for form inputs
   const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -45,9 +51,11 @@ export default function Dashboard() {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [background, setBackground] = useState<File | null>(null);
   const [banner, setBanner] = useState<File | null>(null);
+  const [cursor, setCursor] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [cursorPreview, setCursorPreview] = useState<string | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -130,10 +138,30 @@ export default function Dashboard() {
     }
   };  
 
+  const fetchCursor = async () => {
+    if (userData && userData.username) {
+      const fileName = `${userData.username}-cursor`; // Assuming the filename format
+      const { data, error } = await supabase.storage
+        .from("cursors")
+        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
+
+      if (error) {
+        console.error("Error fetching Cursor:", error);
+        setIsCursorLoading(false); // Stop loading on error
+        return;
+      }
+
+      // console.log("Fetched Cursor signed URL:", data.signedUrl); // Log the signed URL
+      setFetchedCursorUrl(data.signedUrl); // Set the signed URL
+      setIsCursorLoading(false); // Stop loading after fetching
+    }
+  };  
+
   useEffect(() => {
     fetchAvatar(); // Fetch avatar when component mounts
     fetchBackground(); // Fetch background when component mounts
     fetchBanner(); // Fetch banner when component mounts
+    fetchCursor(); // Fetch cursor when component mounts
 
     return () => {
       if (fetchedAvatarUrl) {
@@ -224,6 +252,21 @@ export default function Dashboard() {
         setBannerPreview(reader.result as string); // Set the Banner preview state
       };
       reader.readAsDataURL(newBanner); // Read the selected file as data URL
+    }
+  };
+
+  const handleCursorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newCursor = event.target.files[0];
+      // console.log("Selected file:", newCursor); // Log the selected file
+      setCursor(newCursor); // Set the Cursor state
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // console.log("Cursor preview data URL:", reader.result); // Log the preview URL
+        setCursorPreview(reader.result as string); // Set the Cursor preview state
+      };
+      reader.readAsDataURL(newCursor); // Read the selected file as data URL
     }
   };
 
@@ -395,61 +438,128 @@ export default function Dashboard() {
     setBanner(null);
   };
 
-  const [initialBannerState, setInitialBannerState] = useState(false); // Track initial state to detect changes
-  const [hasChanges, setHasChanges] = useState(false); // Track if there are unsaved changes
+  const uploadCursor = async () => {
+    if (!cursor || !userData) return;
+  
+    setUploading(true);
+    const { username } = userData;
+    const fileName = `${username}-cursor`;
+  
+    const { data, error: uploadError } = await supabase.storage
+      .from("cursors")
+      .upload(fileName, cursor, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+  
+    if (uploadError) {
+      console.error("Error uploading Cursor:", uploadError);
+      setUploadCursorSuccess(false);
+    } else {
+      // Optionally add any post-upload logic here
+      setUploadCursorSuccess(true);
+    }
+  
+    setUploading(false);
+    setCursor(null); // Reset cursor file after upload
+  };  
 
+  const [initialBannerState, setInitialBannerState] = useState(false);
+  const [bannerHasChanges, setBannerHasChanges] = useState(false);
+  const [initialAutoplayState, setInitialAutoplayState] = useState(false);
+  const [autoplayHasChanges, setAutoplayHasChanges] = useState(false);
+  const [initialBackgroundAudioState, setInitialBackgroundAudioState] = useState(false);
+  const [backgroundAudioHasChanges, setBackgroundAudioHasChanges] = useState(false);
+
+  // Fetch initial values from database
   useEffect(() => {
     if (userData) {
-      // Fetch the initial state of the banner usage from the database
-      const fetchBannerUsage = async () => {
+      const fetchData = async () => {
         const { data, error } = await supabase
           .from('profileCosmetics')
-          .select('use_banner')
+          .select('use_autoplayfix, use_banner, use_backgroundaudio')
           .eq('uid', userData.uid)
           .single();
 
         if (data) {
+          setIsAutoplayEnabled(data.use_autoplayfix);
+          setInitialAutoplayState(data.use_autoplayfix);
+
           setIsBannerEnabled(data.use_banner);
-          setInitialBannerState(data.use_banner); // Set the initial state
+          setInitialBannerState(data.use_banner);
+
+          setIsBackgroundAudioEnabled(data.use_backgroundaudio);
+          setInitialBackgroundAudioState(data.use_backgroundaudio);
         }
 
         if (error) {
-          console.error("Error fetching banner usage:", error);
+          console.error("Error fetching profile cosmetics:", error);
         }
       };
 
-      fetchBannerUsage();
+      fetchData();
     }
   }, [userData]);
 
-  // Function to handle the toggle change
-  const handleToggleChange = () => {
-    const newState = !isBannerEnabled;
-    setIsBannerEnabled(newState);
-    setHasChanges(newState !== initialBannerState); // Check if the state has changed from the initial value
+  // Toggle change handlers
+  const handleAutoplayToggleChange = () => {
+    const newState = !isAutoplayEnabled;
+    setIsAutoplayEnabled(newState);
+    setAutoplayHasChanges(newState !== initialAutoplayState);
   };
 
-  // Function to update the `use_banner` state in the database
-  const updateUseBanner = async () => {
+  const handleBannerToggleChange = () => {
+    const newState = !isBannerEnabled;
+    setIsBannerEnabled(newState);
+    setBannerHasChanges(newState !== initialBannerState);
+  };
+
+  const handleBackgroundAudioToggleChange = () => {
+    const newState = !isBackgroundAudioEnabled;
+    setIsBackgroundAudioEnabled(newState);
+    setBackgroundAudioHasChanges(newState !== initialBackgroundAudioState);
+  };
+
+  // Save changes function
+  const handleSaveChanges = async () => {
     if (!userData) return;
 
+    const updates = {};
+
+    if (autoplayHasChanges) {
+      updates.use_autoplayfix = isAutoplayEnabled;
+    }
+    if (bannerHasChanges) {
+      updates.use_banner = isBannerEnabled;
+    }
+    if (backgroundAudioHasChanges) {
+      updates.use_backgroundaudio = isBackgroundAudioEnabled;
+    }
+
     try {
-      // Update the `use_banner` field in the profileCosmetics table
       const { error } = await supabase
         .from('profileCosmetics')
-        .update({ use_banner: isBannerEnabled })
-        .eq('uid', userData.uid); // Assuming `uid` is the identifier for the user
+        .update(updates)
+        .eq('uid', userData.uid);
 
       if (error) {
-        console.error("Error updating banner usage:", error);
+        console.error("Error saving profile cosmetics:", error);
         return;
       }
 
-      console.log("Banner usage updated successfully!");
-      setInitialBannerState(isBannerEnabled); // Update initial state after successful save
-      setHasChanges(false); // Reset changes state after saving
+      console.log("Profile cosmetics updated successfully!");
+
+      // Reset initial states and changes tracking after saving
+      setInitialAutoplayState(isAutoplayEnabled);
+      setAutoplayHasChanges(false);
+
+      setInitialBannerState(isBannerEnabled);
+      setBannerHasChanges(false);
+
+      setInitialBackgroundAudioState(isBackgroundAudioEnabled);
+      setBackgroundAudioHasChanges(false);
     } catch (error) {
-      console.error("Error saving use_banner state:", error);
+      console.error("Error saving profile cosmetics:", error);
     }
   };
 
@@ -752,7 +862,7 @@ export default function Dashboard() {
                                 type="checkbox"
                                 className="hidden"
                                 checked={isBannerEnabled}
-                                onChange={handleToggleChange}
+                                onChange={handleBannerToggleChange}
                               />
                               <div
                                 className={`block w-12 h-6 rounded-full ${
@@ -766,15 +876,6 @@ export default function Dashboard() {
                               ></div>
                             </div>
                           </label>
-                              
-                          {hasChanges && (
-                            <button
-                              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
-                              onClick={updateUseBanner}
-                            >
-                              Save Changes
-                            </button>
-                          )}
                         </div>
 
                         {/* Display file name if banner is selected, outside the box */}
@@ -799,38 +900,114 @@ export default function Dashboard() {
                         <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
                           Cursor
                         </h3>
-                        <div className="flex flex-col items-center justify-center px-10 rounded-lg py-5 space-y-2 border border-2 border-white/20 bg-white/10">
-                          <i className="fas fa-arrow-pointer text-white/60 text-4xl"></i>
-                          <p className="text-base text-white/60 font-semibold">
-                            Click to upload a file
-                          </p>
-                        </div>
-                        <label className="mt-2 flex items-center cursor-pointer">
-                          <span className="mr-2 text-white/60 font-semibold">
-                            Center Cursor
-                          </span>
-                          <div className="relative">
-                            <input
-                              type="checkbox"
-                              className="hidden"
-                              checked={isCursorEnabled}
-                              onChange={() =>
-                                setIsCursorEnabled(!isCursorEnabled)
-                              }
+                        <div
+                          className={`flex flex-col items-center justify-center rounded-lg ${
+                            cursorPreview ? "" : "px-10 py-5"
+                          } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
+                          onClick={() =>
+                            document.getElementById("cursorUploadInput")?.click()
+                          } // The whole box is now clickable
+                        >
+                          {/* Display preview if cursorPreview exists */}
+                          {cursorPreview || fetchedCursorUrl ? (
+                            <img
+                              src={cursorPreview || fetchedCursorUrl}
+                              alt="Cursor preview"
+                              className="w-10 h-10 object-contain"
                             />
-                            <div
-                              className={`block w-12 h-6 rounded-full ${
-                                isCursorEnabled ? "bg-green-500" : "bg-gray-300"
-                              }`}
-                            ></div>
-                            <div
-                              className={`dot absolute left-0 top-0 w-6 h-6 rounded-full bg-white transition ${
-                                isCursorEnabled ? "translate-x-6" : ""
-                              }`}
-                            ></div>
+                          ) : (
+                            <>
+                              <i className="fas fa-arrow-pointer text-white/60 text-4xl"></i>
+                              <p className="text-base text-white/60 font-semibold">
+                                Click to upload a file
+                              </p>
+                            </>
+                          )}
+
+                          {/* File input for selecting new cursor */}
+                          <input
+                            id="cursorUploadInput"
+                            type="file"
+                            className="hidden"
+                            onChange={handleCursorChange}
+                            accept=".png, .jpg, .jpeg, .gif, .cur" // Accept common cursor formats
+                          />
+                        </div>
+                        
+                        {/* Display file name if cursor is selected, outside the box */}
+                        {cursor && (
+                          <button
+                            className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                            onClick={uploadCursor}
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload Cursor"}
+                          </button>
+                        )}
+
+                        {/* Conditionally render success message */}
+                        {uploadCursorSuccess && (
+                          <div className="mt-4 text-green-600">
+                            Cursor uploaded successfully!
                           </div>
-                        </label>
+                        )}
                       </div>
+                      {/* Autoplay Fix and Background Audio Toggles */}
+                        <div className="">
+                          <h3 className="text-white/80 text-lg mb-2 text-base font-bold">Miscellaneous</h3>
+                                                    
+                          {/* Autoplay Fix Toggle */}
+                          <div>
+                            <label className="mt-2 flex items-center cursor-pointer">
+                              <span className="mr-2 text-white/60 font-semibold">Autoplay Fix</span>
+                              <div className="relative">
+                                <input
+                                  type="checkbox"
+                                  className="hidden"
+                                  checked={isAutoplayEnabled}
+                                  onChange={handleAutoplayToggleChange}
+                                />
+                                <div
+                                  className={`block w-12 h-6 rounded-full ${isAutoplayEnabled ? "bg-green-500" : "bg-gray-300"}`}
+                                ></div>
+                                <div
+                                  className={`dot absolute left-0 top-0 w-6 h-6 rounded-full bg-white transition ${isAutoplayEnabled ? "translate-x-6" : ""}`}
+                                ></div>
+                              </div>
+                            </label>
+                          </div>
+                                                    
+                          {/* Background Audio Toggle */}
+                          <div>
+                            <label className="mt-2 flex items-center cursor-pointer">
+                              <span className="mr-2 text-white/60 font-semibold">Use Background Audio</span>
+                              <div className="relative">
+                                <input
+                                  type="checkbox"
+                                  className="hidden"
+                                  checked={isBackgroundAudioEnabled}
+                                  onChange={handleBackgroundAudioToggleChange}
+                                />
+                                <div
+                                  className={`block w-12 h-6 rounded-full ${isBackgroundAudioEnabled ? "bg-green-500" : "bg-gray-300"}`}
+                                ></div>
+                                <div
+                                  className={`dot absolute left-0 top-0 w-6 h-6 rounded-full bg-white transition ${isBackgroundAudioEnabled ? "translate-x-6" : ""}`}
+                                ></div>
+                              </div>
+                            </label>
+                          </div>
+                                                    
+                          {/* Save Button */}
+                          {(autoplayHasChanges || bannerHasChanges || backgroundAudioHasChanges) && (
+                            <button
+                              onClick={handleSaveChanges}
+                              className="mt-4 p-2 bg-blue-500 text-white rounded-lg"
+                            >
+                              Save Changes
+                            </button>
+                          )}
+                        </div>
                     </div>
                   )}
                 </div>
