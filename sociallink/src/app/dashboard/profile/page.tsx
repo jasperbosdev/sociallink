@@ -28,6 +28,10 @@ export default function Dashboard() {
   const [uploadBgSuccess, setUploadBgSuccess] = useState(false);
   const [uploadCursorSuccess, setUploadCursorSuccess] = useState(false);
   const [uploadBannerSuccess, setUploadBannerSuccess] = useState(false);
+  const [deleteAvaSuccess, setDeleteAvaSuccess] = useState(false);
+  const [deleteBannerSuccess, setDeleteBannerSuccess] = useState(false);
+  const [deleteBackgroundSuccess, setDeleteBackroundSuccess] = useState(false);
+  const [deleteCursorSuccess, setDeleteCursorSuccess] = useState(false);
   const [isAvatarEnabled, setIsAvatarEnabled] = useState(false);
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
   const [isBannerEnabled, setIsBannerEnabled] = useState(false);
@@ -58,6 +62,7 @@ export default function Dashboard() {
   const [cursorPreview, setCursorPreview] = useState<string | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Moved the fetchAvatar function here
   const fetchAvatar = async () => {
@@ -326,6 +331,34 @@ export default function Dashboard() {
     }
   };
 
+  const incrementCursorVersion = async () => {
+    // Step 1: Fetch the current pfp_vers value
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("cursor_vers")
+      .eq("id", userData.id)
+      .single();
+  
+    if (fetchError || !user) {
+      console.error("Error fetching cursor_vers:", fetchError);
+      return;
+    }
+  
+    const currentCursorVers = user.cursor_vers;
+  
+    // Step 2: Increment the pfp_vers value
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ cursor_vers: currentCursorVers + 1 })
+      .eq("id", userData.id);
+  
+    if (updateError) {
+      console.error("Error updating cursor_vers:", updateError);
+    } else {
+      // console.log("Bg_vers successfully incremented.");
+    }
+  };
+
   const incrementBannerVersion = async () => {
     // Step 1: Fetch the current pfp_vers value
     const { data: user, error: fetchError } = await supabase
@@ -462,7 +495,116 @@ export default function Dashboard() {
   
     setUploading(false);
     setCursor(null); // Reset cursor file after upload
-  };  
+  };
+
+  const deleteAvatar = async () => {
+    if (!userData) return;
+
+    setDeleting(true);
+    const { username } = userData;
+    const fileName = `${username}-pfp`;
+
+    const { error: deleteError } = await supabase.storage
+      .from("avatars")
+      .remove([fileName]);
+
+    if (deleteError) {
+      console.error("Error deleting avatar:", deleteError);
+      setDeleteAvaSuccess(false);
+    } else {
+      await incrementPfpVersion(); // Increment pfp_vers after successful delete
+      setFetchedAvatarUrl(null); // Clear the fetched avatar URL
+      setDeleteAvaSuccess(true);
+    }
+
+    setDeleting(false);
+  };
+
+  const deleteBanner = async () => {
+    if (!userData) return;
+
+    setDeleting(true);
+    const { username } = userData;
+    const fileName = `${username}-banner`;
+
+    const { error: deleteError } = await supabase.storage
+      .from("banners")
+      .remove([fileName]);
+
+    if (deleteError) {
+      console.error("Error deleting Banner:", deleteError);
+      setDeleteBannerSuccess(false);
+    } else {
+      await incrementBannerVersion(); // Increment pfp_vers after successful delete
+      setFetchedBannerUrl(null); // Clear the fetched Banner URL
+      setDeleteBannerSuccess(true);
+      setIsBannerEnabled(false);
+      const { error } = await supabase
+        .from("profileCosmetics")
+        .update({ use_banner: false })
+        .eq("uid", userData.uid);
+
+      if (error) {
+        console.error("Error updating banner state in DB:", error);
+      }
+    }
+
+    setDeleting(false);
+  };
+
+  const deleteBackground = async () => {
+    if (!userData) return;
+
+    setDeleting(true);
+    const { username } = userData;
+    const fileName = `${username}-bg`;
+
+    const { error: deleteError } = await supabase.storage
+      .from("backgrounds")
+      .remove([fileName]);
+
+    if (deleteError) {
+      console.error("Error deleting Backround:", deleteError);
+      setDeleteBackroundSuccess(false);
+    } else {
+      await incrementBgVersion(); // Increment pfp_vers after successful delete
+      setFetchedBackgroundUrl(null); // Clear the fetched Backround URL
+      setDeleteBackroundSuccess(true);
+      const { error } = await supabase
+        .from("profileCosmetics")
+        .update({ use_autoplayfix: false })
+        .eq("uid", userData.uid);
+
+      if (error) {
+        console.error("Error updating banner state in DB:", error);
+      }
+    }
+
+    setDeleting(false);
+  };
+
+  const deleteCursor = async () => {
+    if (!userData) return;
+
+    setDeleting(true);
+    const { username } = userData;
+    const fileName = `${username}-cursor`;
+
+    const { error: deleteError } = await supabase.storage
+      .from("cursors")
+      .remove([fileName]);
+
+    if (deleteError) {
+      console.error("Error deleting Cursor:", deleteError);
+      setDeleteCursorSuccess(false);
+    } else {
+      await incrementCursorVersion(); // Increment pfp_vers after successful delete
+      setFetchedBackgroundUrl(null); // Clear the fetched Cursor URL
+      setDeleteCursorSuccess(true);
+    }
+
+    setDeleting(false);
+  };
 
   const [initialBannerState, setInitialBannerState] = useState(false);
   const [bannerHasChanges, setBannerHasChanges] = useState(false);
@@ -698,6 +840,22 @@ export default function Dashboard() {
                             accept=".png, .jpg, .jpeg, .gif" // Handle avatar file change
                           />
                         </div>
+                        
+                        {fetchedAvatarUrl && (
+                          <>
+                            <button
+                              className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to delete the avatar?")) {
+                                  deleteAvatar();
+                                }
+                              }}
+                              disabled={deleting}
+                            >
+                              {deleting ? "Deleting..." : "Delete Avatar"}
+                            </button>
+                          </>
+                        )}
 
                         {/* Display file name if avatar is selected, outside the box */}
                         {avatar && (
@@ -794,6 +952,22 @@ export default function Dashboard() {
                           />
                         </div>
 
+                        {fetchedBackgroundUrl && (
+                          <>
+                            <button
+                              className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to delete the Background?")) {
+                                  deleteBackground();
+                                }
+                              }}
+                              disabled={deleting}
+                            >
+                              {deleting ? "Deleting..." : "Delete Background"}
+                            </button>
+                          </>
+                        )}
+
                         {/* Display file name if background is selected, outside the box */}
                         {background && (
                           <button
@@ -853,6 +1027,22 @@ export default function Dashboard() {
                             accept=".png, .jpg, .jpeg, .gif" // Handle avatar file change
                           />
                         </div>
+
+                        {fetchedBannerUrl && (
+                          <>
+                            <button
+                              className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to delete the Banner?")) {
+                                  deleteBanner();
+                                }
+                              }}
+                              disabled={deleting}
+                            >
+                              {deleting ? "Deleting..." : "Delete Banner"}
+                            </button>
+                          </>
+                        )}
 
                         <div>
                           <label className="mt-2 flex items-center cursor-pointer">
@@ -933,6 +1123,22 @@ export default function Dashboard() {
                             accept=".png, .jpg, .jpeg, .gif, .cur" // Accept common cursor formats
                           />
                         </div>
+
+                        {fetchedCursorUrl && (
+                          <>
+                            <button
+                              className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to delete the Cursor?")) {
+                                  deleteCursor();
+                                }
+                              }}
+                              disabled={deleting}
+                            >
+                              {deleting ? "Deleting..." : "Delete Cursor"}
+                            </button>
+                          </>
+                        )}
                         
                         {/* Display file name if cursor is selected, outside the box */}
                         {cursor && (
