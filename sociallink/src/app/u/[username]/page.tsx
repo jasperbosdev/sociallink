@@ -152,6 +152,8 @@ export default function UserProfile() {
     };
   }, [cardTilt]);
 
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  
   useEffect(() => {
     const handleLoad = () => {
       setIsPageLoaded(true); // Set page as loaded once the window finishes loading
@@ -160,8 +162,12 @@ export default function UserProfile() {
     return () => window.removeEventListener('load', handleLoad);
   }, []);
 
+  // Function to handle click and start video playback
   const handleClick = () => {
-    setShowClickToLoad(false); // Hide the click to load screen
+    setShowClickToLoad(false); // Hide the click-to-load screen
+    if (videoRef.current) {
+      videoRef.current.play(); // Start video playback
+    }
   };
 
   const username = userData?.username;
@@ -281,54 +287,7 @@ export default function UserProfile() {
     );
   }
 
-  // Show the click-to-load screen if the page hasn't been clicked yet
-  if (showClickToLoad && fetchedBackgroundUrl && useAutoplayFix === true) {
-    return (
-      <>
-        <style jsx global>{`
-          body {
-            font-family: var(--font-${profileFont}) !important;
-            font-weight: 500;
-            cursor: url(${fetchedCursorUrl}), auto;
-          }
-        `}</style>
-        <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
-          {fileType?.startsWith('video/') ? (
-            <video
-              muted
-              style={{
-                filter: `blur(10px) brightness(0.5)`, // Adjust these values based on your preferences
-              }}
-              className="object-cover w-full h-full"
-              draggable="false"
-              preload="metadata"
-            >
-              <source src={fetchedBackgroundUrl} type={fileType} />
-              Your browser does not support the video tag.
-            </video>
-          ) : (
-            <img
-              src={fetchedBackgroundUrl}
-              style={{
-                filter: `blur(10px) brightness(0.5)`, // Adjust these values based on your preferences
-              }}
-              className="object-cover w-full h-full"
-              draggable="false"
-              alt=""
-            />
-          )}
-        </aside>
-        <main style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }} 
-          className="flex flex-col justify-center w-screen h-screen cursor-pointer duration-500 fixed" 
-          onClick={handleClick}>
-          <p style={{ color: backgroundColor }} className="flex flex-col px-4 break-words text-center font-semibold text-3xl">
-            ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ
-          </p>
-        </main>
-      </>
-    );
-  }
-
+  
   return (
     <>
       <style jsx global>{`
@@ -338,18 +297,38 @@ export default function UserProfile() {
           cursor: url(${fetchedCursorUrl}), auto;
         }
       `}</style>
+      
+      {/* Conditional rendering for click-to-load overlay */}
+      {showClickToLoad && fetchedBackgroundUrl && useAutoplayFix === true ? (
+        <main
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
+          className="flex flex-col justify-center w-screen h-screen cursor-pointer duration-500 fixed"
+          onClick={handleClick}
+        >
+          <p
+            style={{ color: backgroundColor }}
+            className="flex flex-col px-4 break-words text-center font-semibold text-3xl"
+          >
+            ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ
+          </p>
+        </main>
+      ) : null}
+
+      {/* Background video layer */}
       {fetchedBackgroundUrl ? (
         <aside className={`fixed w-screen h-screen z-[-5] duration-500`}>
           {fileType?.startsWith('video/') ? (
             <video
+              ref={videoRef}
               muted
-              autoPlay
               loop
               style={{
-              filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`, // Adjust these values based on your preferences
+                filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`,
               }}
               className="object-cover w-full h-full"
               draggable="false"
+              // Only set autoPlay if the overlay has been clicked
+              autoPlay={!showClickToLoad}
             >
               <source src={fetchedBackgroundUrl} type={fileType} />
               Your browser does not support the video tag.
@@ -358,7 +337,7 @@ export default function UserProfile() {
             <img
               src={fetchedBackgroundUrl}
               style={{
-                filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`, // Adjust these values based on your preferences
+                filter: `blur(${bgBlurValue}) brightness(${bgBrightnessValue})`,
               }}
               className="object-cover w-full h-full"
               draggable="false"
@@ -372,7 +351,7 @@ export default function UserProfile() {
           style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}
         ></div>
       )}
-      <div className={`transition flex items-center justify-center min-h-screen mx-4 ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <div className={`transition flex items-center justify-center min-h-screen mx-4 ${showClickToLoad ? 'hidden' : 'block'} ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <div
           ref={(el) => {
             if (el && cardTilt) {
@@ -515,7 +494,7 @@ export default function UserProfile() {
 
           {/* user description */}
           <div className=''>
-            {typingDesc ? (
+            {typingDesc && !showClickToLoad? (
               <TypeAnimation
                 sequence={[
                   description,  // Type the description
