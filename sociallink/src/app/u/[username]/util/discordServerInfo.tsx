@@ -78,7 +78,7 @@ export default function DiscordServerInfo() {
           />
         )}
         <div className="flex-col text-base items-center">
-          <p className='font-black text-lg'>/{serverInfo.name}</p>
+          <p className='font-black text-lg'>{serverInfo.name}</p>
           <div className='flex items-center'>
             <svg height="10" width="10" className='mr-1'>
               <circle cx="5" cy="5" r="5" fill="#32a852" />
