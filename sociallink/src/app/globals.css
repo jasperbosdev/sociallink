@@ -136,3 +136,12 @@ button:hover {
 .customlink-card:hover .customlink-arrow i {
   transform: translateX(5px);
 }
+
+/* profile discord join server button */
+.discord-join .join-arrow {
+  transition: transform 0.15s ease-in-out;
+}
+
+.discord-join:hover .join-arrow {
+  transform: translateX(3px);
+}
