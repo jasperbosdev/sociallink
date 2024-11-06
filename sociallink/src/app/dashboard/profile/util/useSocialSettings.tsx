@@ -355,6 +355,42 @@ export default function SocialSettings() {
     setTimeout(() => setSaveStatus(""), 3000); // Clear the status after 3 seconds
   };
 
+  const clearDiscord = async () => {
+    if (loading || !userData) {
+      console.error("User data not ready or still loading");
+      return;
+    }
+
+    const id = userData.id;
+    const { data: publicUserData, error: publicUserError } = await supabase
+      .from("users")
+      .select("uid")
+      .eq("id", id)
+      .single();
+
+    if (publicUserError) {
+      console.error("Error fetching public user data:", publicUserError.message);
+      setSaveStatus("Error clearing Discord link");
+      return;
+    }
+
+    const uid = publicUserData.uid;
+
+    const { error: updateError } = await supabase
+      .from("profileSocial")
+      .update({ discord_link: null })
+      .eq("uid", uid);
+
+    if (updateError) {
+      console.error("Error clearing Discord link:", updateError.message);
+      setSaveStatus("Error clearing Discord link");
+      return;
+    }
+
+    setSaveStatus("Discord link cleared successfully");
+    setTimeout(() => setSaveStatus(""), 3000); // Clear the status after 3 seconds
+  };
+
   return (
     <>
       {/* Add New Social Section */}
@@ -385,9 +421,6 @@ export default function SocialSettings() {
       >
         Add Social
       </button>
-
-      {/* Save status display */}
-      {saveStatus && <p className="mt-2 text-green-500">{saveStatus}</p>}
 
       {/* Existing Socials Section */}
       <div className="py-2">
@@ -458,6 +491,14 @@ export default function SocialSettings() {
             onChange={(e) => setDiscordLink(e.target.value)} // Update Discord link state
           />
         </div>
+        <div className="mt-4 mr-2">
+          <button
+            className="border border-[2px] border-red-500 bg-red-500 text-white font-bold py-2 px-4 rounded-lg"
+            onClick={clearDiscord} // Save Discord link functionality
+          >
+            Clear Current
+          </button>
+        </div>
         {/* Save Button for Discord link */}
         <div className="mt-4">
           <button
@@ -492,6 +533,9 @@ export default function SocialSettings() {
         >
           Save Social Settings
         </button>
+        
+      {/* Save status display */}
+      {saveStatus && <p className="mt-2 text-green-500">{saveStatus}</p>}
       </div>
     </>
   );
