@@ -13,6 +13,9 @@ import { useFetchGeneralConfig } from './util/fetchGeneralConfig';
 import { generalConfigConsts } from './util/generalConfigConsts';
 import { useFetchBadges } from './util/fetchBadges';
 import { useFetchSocials } from './util/fetchSocials';
+import { useFetchDiscordInv } from './util/fetchDiscordInv';
+import DiscordServerInfo from './util/discordServerInfo';
+import { fetchServerInfo } from './util/fetchServerInfo';
 import { useFetchCursor } from './util/fetchCursor';
 import { useFetchCustomLinks } from './util/fetchCustomLinks';
 import { useFetchMediaEmbeds } from './util/fetchMediaEmbeds';
@@ -67,6 +70,33 @@ export default function UserProfile() {
   const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
   const { badges, isLoadingBadges } = useFetchBadges();
   const { socials, isLoadingSocials } = useFetchSocials();
+  const { discordInv, isLoadingDiscordInv } = useFetchDiscordInv();
+
+  // State for storing the fetched server information
+  const [serverInfo, setServerInfo] = useState<{
+    name: string;
+    memberCount: number;
+    onlineCount: number;
+    iconUrl: string | null;
+  } | null>(null);
+  const [isFetchingServerInfo, setIsFetchingServerInfo] = useState(false);
+
+  // Fetch server information once discordInv data is loaded
+  useEffect(() => {
+    if (!isLoadingDiscordInv && discordInv.length > 0) {
+      const discordLink = discordInv[0]?.discord_link; // Assuming discord_link is part of discordInv data
+      if (discordLink) {
+        setIsFetchingServerInfo(true);
+        fetchServerInfo(discordLink)
+          .then((info) => {
+            setServerInfo(info);
+          })
+          .catch((error) => console.error("Failed to fetch server info:", error))
+          .finally(() => setIsFetchingServerInfo(false));
+      }
+    }
+  }, [isLoadingDiscordInv, discordInv]);
+
   const { customLinks, isLoadingCustomLinks } = useFetchCustomLinks();
   const { mediaEmbeds, isLoadingMediaEmbeds } = useFetchMediaEmbeds();
   const [openStates, setOpenStates] = useState<boolean[]>(Array(mediaEmbeds.length).fill(false));
@@ -294,7 +324,7 @@ export default function UserProfile() {
         body {
           font-family: var(--font-${profileFont}) !important;
           font-weight: 500;
-          cursor: url(${fetchedCursorUrl}), auto;
+          ${fetchedCursorUrl ? `cursor: url(${fetchedCursorUrl}), auto;` : ''}
         }
       `}</style>
       
@@ -656,6 +686,7 @@ export default function UserProfile() {
                           </div>
                         )}
                       </div>
+                      <DiscordServerInfo />
                     </div>
                   );
                 })
