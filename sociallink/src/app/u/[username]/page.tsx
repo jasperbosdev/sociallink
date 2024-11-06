@@ -226,7 +226,7 @@ export default function UserProfile() {
 
   const tiltOptions = {
     reverse: true,
-    max: 10,
+    max: 3,
     perspective: 1500,
     scale: 1,
     transition: true,
@@ -386,7 +386,7 @@ export default function UserProfile() {
           ref={(el) => {
             if (el && cardTilt) {
               VanillaTilt.init(el, {
-                max: 3,
+                max: 2,
                 speed: 2000,
                 glare: false,
                 reverse: true,
@@ -611,7 +611,7 @@ export default function UserProfile() {
                     className={`text-center w-full ${customLinks.length % 2 !== 0 && index === customLinks.length - 1 ? 'col-span-2' : ''}`}
                   >
                     <div
-                      className="customlink-card hover:brightness-[200%] flex border border-[3px] p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90"
+                      className="customlink-card hover:brightness-[200%] border-[3px] flex border p-4 w-full gap-4 items-center transition-all duration-300 hover:bg-opacity-90"
                       style={{
                         borderColor: `rgb(${accentColor})`,
                         borderRadius,
@@ -686,12 +686,24 @@ export default function UserProfile() {
                           </div>
                         )}
                       </div>
-                      <DiscordServerInfo />
                     </div>
                   );
                 })
               )}
             </div>
+            {/* Discord Server Display */}
+            {discordInv.length > 0 && discordInv[0]?.discord_link && (
+              <div
+                className="flex border border-[3px] p-4 w-full transition-all duration-300"
+                style={{
+                  borderColor: `rgb(${accentColor})`,
+                  borderRadius,
+                  backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
+                }}
+              >
+                <DiscordServerInfo />
+              </div>
+            )}
           </div>
       </div>
     </>
