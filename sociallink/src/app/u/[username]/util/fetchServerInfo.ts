@@ -48,6 +48,6 @@ export const fetchServerInfo = async (discordInviteLink: string) => {
 
 // Utility function to extract the invite code from the invite link URL
 const extractInviteCodeFromLink = (discordInviteLink: string) => {
-  const match = discordInviteLink.match(/discord\.gg\/(?:invite\/)?([\w-]+)/);
+  const match = discordInviteLink.match(/(?:discord\.gg|discord\.com)\/(?:invite\/)?([\w-]+)/);
   return match ? match[1] : null;
 };
