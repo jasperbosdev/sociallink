@@ -92,8 +92,8 @@ export const configConsts = (config: any) => {
     ? config.use_autoplayfix
     : false;
 
-    const useBackgroundAudio  = config?.use_background_audio !== undefined && config.use_background_audio !== null
-    ? config.use_background_audio
+    const useBackgroundAudio  = config?.use_backgroundaudio !== undefined && config.use_backgroundaudio !== null
+    ? config.use_backgroundaudio
     : false;
   
     return { borderWidth, borderRadius, cardOpacity, cardBlur, bgBlurValue, bgBrightnessValue, usernameFx, cardGlow, pfpDecoration, decorationValue, cardTilt, showBadges
