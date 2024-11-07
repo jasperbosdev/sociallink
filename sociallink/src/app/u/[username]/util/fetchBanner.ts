@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../../supabase"; // Adjust the import based on your directory structure
 import { useUserData } from "./userDataLogic";
+import { Warning } from "postcss";
 
 export const useFetchBanner = () => {
   const { userData } = useUserData(); // Get user data from the custom hook
@@ -15,11 +16,11 @@ export const useFetchBanner = () => {
     try {
       const response = await fetch(publicUrl);
       if (!response.ok) {
-        throw new Error("File not found");
+        throw new Warning("File not found");
       }
       setFetchedBannerUrl(publicUrl); // Set URL with banner_vers
     } catch (error) {
-      console.error("Error fetching Banner:", error);
+      console.warn("Error fetching Banner:", error);
       setFetchedBannerUrl(
         "https://i.pinimg.com/736x/19/a0/37/19a037177b02fd2a8f1de4b671fff286.jpg"
       );
