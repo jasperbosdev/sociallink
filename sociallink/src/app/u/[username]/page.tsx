@@ -6,6 +6,7 @@ import { useUserData } from './util/userDataLogic';
 import { useFetchAvatar } from './util/fetchAvatar';
 import { useFetchBackground } from './util/fetchBackground';
 import { useFetchBanner } from './util/fetchBanner';
+import { useFetchAudio } from './util/fetchAudio';
 import localFont from "next/font/local";
 import { useFetchConfig } from './util/fetchConfig';
 import { configConsts } from './util/configConsts';
@@ -66,6 +67,7 @@ export default function UserProfile() {
   const { fetchedBannerUrl, loading: bannerLoading } = useFetchBanner();
   const { fetchedCursorUrl, loading: cursorLoading } = useFetchCursor();
   const { fetchedBackgroundUrl, loading: backgroundLoading, fileType } = useFetchBackground();
+  const { fetchedAudioUrl, loading: audioLoading } = useFetchAudio();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
   const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
   const { badges, isLoadingBadges } = useFetchBadges();
@@ -80,6 +82,8 @@ export default function UserProfile() {
     iconUrl: string | null;
   } | null>(null);
   const [isFetchingServerInfo, setIsFetchingServerInfo] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Fetch server information once discordInv data is loaded
   useEffect(() => {
@@ -184,19 +188,34 @@ export default function UserProfile() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   
-  useEffect(() => {
-    const handleLoad = () => {
-      setIsPageLoaded(true); // Set page as loaded once the window finishes loading
-    };
-    window.addEventListener('load', handleLoad);
-    return () => window.removeEventListener('load', handleLoad);
-  }, []);
+  const [isAudioReady, setIsAudioReady] = useState(false);
 
-  // Function to handle click and start video playback
+  useEffect(() => {
+    if (audioRef.current && fetchedAudioUrl) {
+      audioRef.current.src = fetchedAudioUrl; // Update the `src` directly
+      audioRef.current.load(); // Reload to ensure the updated source
+      audioRef.current.volume = 0.1; // Set the volume to 0.1 initially
+      audioRef.current.muted = true; // Mute audio initially
+    }
+  }, [fetchedAudioUrl]);
+  
+  // Function to handle click and start video and audio playback
   const handleClick = () => {
     setShowClickToLoad(false); // Hide the click-to-load screen
+  
+    // Start video playback
     if (videoRef.current) {
-      videoRef.current.play(); // Start video playback
+      videoRef.current.play(); 
+    }
+  
+    // Unmute and play the audio at the correct volume when the user clicks
+    if (audioRef.current && !isAudioReady) {
+      audioRef.current.muted = false; // Unmute the audio
+      audioRef.current.volume = 0.1; // Ensure the volume is 0.1
+      audioRef.current.play().catch(error => {
+        console.error("Audio playback failed:", error);
+      }); // Start audio playback
+      setIsAudioReady(true); // Mark the audio as ready to play
     }
   };
 
@@ -373,6 +392,9 @@ export default function UserProfile() {
               draggable="false"
               alt=""
             />
+          )}
+          {fetchedAudioUrl && (
+            <audio src={fetchedAudioUrl} loop ref={audioRef} />
           )}
         </aside>
       ) : (
