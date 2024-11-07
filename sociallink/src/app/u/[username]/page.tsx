@@ -190,14 +190,19 @@ export default function UserProfile() {
   
   const [isAudioReady, setIsAudioReady] = useState(false);
 
-  useEffect(() => {
-    if (audioRef.current && fetchedAudioUrl) {
-      audioRef.current.src = fetchedAudioUrl; // Update the `src` directly
-      audioRef.current.load(); // Reload to ensure the updated source
-      audioRef.current.volume = 0.1; // Set the volume to 0.1 initially
-      audioRef.current.muted = true; // Mute audio initially
+  let audioHasBeenPlayed = false
+
+  // set audio volume when played
+  const onPlayVolume = () => {
+    if (audioRef.current && !isAudioReady && !audioHasBeenPlayed ) {
+      audioRef.current.volume = 0.05; // Ensure the volume is 0.05
+      audioHasBeenPlayed = true
     }
-  }, [fetchedAudioUrl]);
+  }
+
+  const onVolumeChange = () => {
+    audioHasBeenPlayed = true
+  }
   
   // Function to handle click and start video and audio playback
   const handleClick = () => {
@@ -205,13 +210,13 @@ export default function UserProfile() {
   
     // Start video playback
     if (videoRef.current) {
-      videoRef.current.play(); 
+      videoRef.current.play();
     }
   
     // Unmute and play the audio at the correct volume when the user clicks
     if (audioRef.current && !isAudioReady) {
       audioRef.current.muted = false; // Unmute the audio
-      audioRef.current.volume = 0.1; // Ensure the volume is 0.1
+      audioRef.current.volume = 0.05; // Ensure the volume is 0.05
       audioRef.current.play().catch(error => {
         console.error("Audio playback failed:", error);
       }); // Start audio playback
@@ -392,9 +397,6 @@ export default function UserProfile() {
               draggable="false"
               alt=""
             />
-          )}
-          {fetchedAudioUrl && (
-            <audio src={fetchedAudioUrl} loop ref={audioRef} />
           )}
         </aside>
       ) : (
@@ -725,6 +727,10 @@ export default function UserProfile() {
               >
                 <DiscordServerInfo />
               </div>
+            )}
+            {/* User Audio Controls & Display */}
+            {fetchedAudioUrl && (
+              <audio src={fetchedAudioUrl} controls loop ref={audioRef} onPlay={onPlayVolume} onVolumeChange={onVolumeChange} />
             )}
           </div>
       </div>
