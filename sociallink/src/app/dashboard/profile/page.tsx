@@ -20,18 +20,22 @@ export default function Dashboard() {
   const [fetchedBackgroundUrl, setFetchedBackgroundUrl] = useState<string | null>(null);
   const [fetchedBannerUrl, setFetchedBannerUrl] = useState<string | null>(null);
   const [fetchedCursorUrl, setFetchedCursorUrl] = useState<string | null>(null);
+  const [fetchedSongUrl, setFetchedSongUrl] = useState<string | null>(null);
   const [isAvatarLoading, setIsAvatarLoading] = useState(true);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(true);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [isCursorLoading, setIsCursorLoading] = useState(true);
+  const [isSongLoading, setIsSongLoading] = useState(true);
   const [uploadAvaSuccess, setUploadAvaSuccess] = useState(false);
   const [uploadBgSuccess, setUploadBgSuccess] = useState(false);
   const [uploadCursorSuccess, setUploadCursorSuccess] = useState(false);
+  const [uploadSongSuccess, setUploadSongSuccess] = useState(false);
   const [uploadBannerSuccess, setUploadBannerSuccess] = useState(false);
   const [deleteAvaSuccess, setDeleteAvaSuccess] = useState(false);
   const [deleteBannerSuccess, setDeleteBannerSuccess] = useState(false);
   const [deleteBackgroundSuccess, setDeleteBackroundSuccess] = useState(false);
   const [deleteCursorSuccess, setDeleteCursorSuccess] = useState(false);
+  const [deleteSongSuccess, setDeleteSongSuccess] = useState(false);
   const [isAvatarEnabled, setIsAvatarEnabled] = useState(false);
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(false);
   const [isBannerEnabled, setIsBannerEnabled] = useState(false);
@@ -56,10 +60,12 @@ export default function Dashboard() {
   const [background, setBackground] = useState<File | null>(null);
   const [banner, setBanner] = useState<File | null>(null);
   const [cursor, setCursor] = useState<File | null>(null);
+  const [song, setSong] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [backgroundPreview, setBackgroundPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [cursorPreview, setCursorPreview] = useState<string | null>(null);
+  const [songPreview, setSongPreview] = useState<string | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -160,13 +166,14 @@ export default function Dashboard() {
       setFetchedCursorUrl(data.signedUrl); // Set the signed URL
       setIsCursorLoading(false); // Stop loading after fetching
     }
-  };  
+  };
 
   useEffect(() => {
     fetchAvatar(); // Fetch avatar when component mounts
     fetchBackground(); // Fetch background when component mounts
     fetchBanner(); // Fetch banner when component mounts
     fetchCursor(); // Fetch cursor when component mounts
+    fetchSong(); // Fetch song when component mounts
 
     return () => {
       if (fetchedAvatarUrl) {
@@ -275,6 +282,17 @@ export default function Dashboard() {
     }
   };
 
+  const handleSongChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newSong = event.target.files[0];
+      // console.log("Selected file:", newSong); // Log the selected file
+      setSong(newSong); // Set the Song state
+
+      // Set the song preview to the file name instead of reading the file
+      setSongPreview(newSong.name);
+    }
+  };
+
   const incrementPfpVersion = async () => {
     // Step 1: Fetch the current pfp_vers value
     const { data: user, error: fetchError } = await supabase
@@ -354,6 +372,34 @@ export default function Dashboard() {
   
     if (updateError) {
       console.error("Error updating cursor_vers:", updateError);
+    } else {
+      // console.log("Bg_vers successfully incremented.");
+    }
+  };
+
+  const incrementSongVersion = async () => {
+    // Step 1: Fetch the current pfp_vers value
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("audio_vers")
+      .eq("id", userData.id)
+      .single();
+  
+    if (fetchError || !user) {
+      console.error("Error fetching audio_vers:", fetchError);
+      return;
+    }
+  
+    const currentSongVers = user.audio_vers;
+  
+    // Step 2: Increment the pfp_vers value
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ audio_vers: currentSongVers + 1 })
+      .eq("id", userData.id);
+  
+    if (updateError) {
+      console.error("Error updating song_vers:", updateError);
     } else {
       // console.log("Bg_vers successfully incremented.");
     }
@@ -497,6 +543,52 @@ export default function Dashboard() {
     setCursor(null); // Reset cursor file after upload
   };
 
+  const uploadSong = async () => {
+    if (!song || !userData) return;
+  
+    setUploading(true);
+    const { username } = userData;
+    const fileName = `${username}-audio`;
+  
+    const { data, error: uploadError } = await supabase.storage
+      .from("songs")
+      .upload(fileName, song, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+  
+    if (uploadError) {
+      console.error("Error uploading song:", uploadError);
+      setUploadSongSuccess(false);
+    } else {
+      // Optionally add any post-upload logic here
+      setUploadSongSuccess(true);
+    }
+  
+    setUploading(false);
+    setSong(null); // Reset cursor file after upload
+  };
+
+  const fetchSong = async () => {
+    if (userData && userData.username) {
+      const fileName = `${userData.username}-audio`; // Assuming the filename format
+      const { data, error } = await supabase.storage
+        .from("songs")
+        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
+
+      if (error) {
+        console.error("Error fetching song:", error);
+        setIsSongLoading(false); // Stop loading on error
+        return;
+      }
+
+      // console.log("Fetched song signed URL:", data.signedUrl); // Log the signed URL
+      // console.log("Fetched song file name:", fileName); // Log the file name
+      setFetchedSongUrl('🎵 ' + fileName + ' 🎵'); // Set the signed URL with music note emoji
+      setIsSongLoading(false); // Stop loading after fetching
+    }
+  };
+
   const deleteAvatar = async () => {
     if (!userData) return;
 
@@ -601,6 +693,29 @@ export default function Dashboard() {
       await incrementCursorVersion(); // Increment pfp_vers after successful delete
       setFetchedBackgroundUrl(null); // Clear the fetched Cursor URL
       setDeleteCursorSuccess(true);
+    }
+
+    setDeleting(false);
+  };
+
+  const deleteSong = async () => {
+    if (!userData) return;
+
+    setDeleting(true);
+    const { username } = userData;
+    const fileName = `${username}-audio`;
+
+    const { error: deleteError } = await supabase.storage
+      .from("songs")
+      .remove([fileName]);
+
+    if (deleteError) {
+      console.error("Error deleting song:", deleteError);
+      setDeleteSongSuccess(false);
+    } else {
+      await incrementSongVersion(); // Increment pfp_vers after successful delete
+      setFetchedSongUrl(null); // Clear the fetched Song URL
+      setDeleteSongSuccess(true);
     }
 
     setDeleting(false);
@@ -1158,6 +1273,76 @@ export default function Dashboard() {
                           </div>
                         )}
                       </div>
+                      
+                      <div className="flex flex-col">
+                        <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
+                          Songs
+                        </h3>
+                        <div
+                          className={`flex flex-col items-center justify-center rounded-lg ${
+                            songPreview ? "" : "px-10 py-5"
+                          } space-y-2 border border-2 border-white/20 bg-white/10 cursor-pointer`}
+                          onClick={() =>
+                            document.getElementById("songUploadInput")?.click()
+                          } // The whole box is now clickable
+                        >
+                          {/* Display preview if songPreview exists */}
+                          {songPreview || fetchedSongUrl ? (
+                            <p className="text-center p-1">{ songPreview || fetchedSongUrl }</p>
+                          ) : (
+                            <>
+                              <i className="fas fa-music text-white/60 text-4xl"></i>
+                              <p className="text-base text-white/60 font-semibold">
+                                Click to upload a file
+                              </p>
+                            </>
+                          )}
+
+                          {/* File input for selecting new song */}
+                          <input
+                            id="songUploadInput"
+                            type="file"
+                            className="hidden"
+                            onChange={handleSongChange}
+                            accept=".mp3"
+                          />
+                        </div>
+
+                        {fetchedSongUrl && (
+                          <>
+                            <button
+                              className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to delete the Song?")) {
+                                  deleteSong();
+                                }
+                              }}
+                              disabled={deleting}
+                            >
+                              {deleting ? "Deleting..." : "Delete Song"}
+                            </button>
+                          </>
+                        )}
+                        
+                        {/* Display file name if cursor is selected, outside the box */}
+                        {song && (
+                          <button
+                            className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                            onClick={uploadSong}
+                            disabled={uploading}
+                          >
+                            {uploading ? "Uploading..." : "Upload Song"}
+                          </button>
+                        )}
+
+                        {/* Conditionally render success message */}
+                        {uploadSongSuccess && (
+                          <div className="mt-4 text-green-600">
+                            Song uploaded successfully!
+                          </div>
+                        )}
+                      </div>
+                      <div></div>
                       {/* Autoplay Fix and Background Audio Toggles */}
                         <div className="">
                           <h3 className="text-white/80 text-lg mb-2 text-base font-bold">Miscellaneous</h3>
@@ -1186,7 +1371,7 @@ export default function Dashboard() {
                           {/* Background Audio Toggle */}
                           <div>
                             <label className="mt-2 flex items-center cursor-pointer">
-                              <span className="mr-2 text-white/60 font-semibold">Use Background Audio</span>
+                              <span className="mr-2 text-white/60 font-semibold">Use Uploaded Audio</span>
                               <div className="relative">
                                 <input
                                   type="checkbox"
