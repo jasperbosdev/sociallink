@@ -1453,7 +1453,7 @@ export default function Dashboard() {
                       setMediaEmbedSettingsOpen(!isMediaEmbedSettingsOpen)
                     }
                   >
-                    <sp an className="select-none">
+                    <span className="select-none">
                       <i className="fas fa-video mr-2"></i> Media Embed Settings
                     </span>
                     <i
