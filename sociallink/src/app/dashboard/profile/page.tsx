@@ -49,7 +49,6 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState("");
   // State for collapsible sections
   const [isGeneralSettingsOpen, setGeneralSettingsOpen] = useState(false);
-  const [isAccountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const [isFileSettingsOpen, setFileSettingsOpen] = useState(false);
   const [isCosmeticSettingsOpen, setCosmeticSettingsOpen] = useState(false);
   const [isSocialSettingsOpen, setSocialSettingsOpen] = useState(false);
@@ -880,29 +879,6 @@ export default function Dashboard() {
                 <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 w-full rounded-md p-4">
                   <h2
                     className="text-white font-bold text-xl cursor-pointer flex justify-between items-center"
-                    onClick={() =>
-                      setAccountSettingsOpen(!isAccountSettingsOpen)
-                    }
-                  >
-                    <span className="select-none">
-                      <i className="fas fa-cog mr-2"></i> Account Settings
-                    </span>
-                    <i
-                      className={`fas fa-chevron-${
-                        isAccountSettingsOpen ? "down" : "right"
-                      } text-white`}
-                    ></i>
-                  </h2>
-                  {isAccountSettingsOpen && (
-                    <div className="mt-2">
-                      <p>Account details go here.</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 w-full rounded-md p-4">
-                  <h2
-                    className="text-white font-bold text-xl cursor-pointer flex justify-between items-center"
                     onClick={() => setFileSettingsOpen(!isFileSettingsOpen)}
                   >
                     <span className="select-none">
@@ -1477,7 +1453,7 @@ export default function Dashboard() {
                       setMediaEmbedSettingsOpen(!isMediaEmbedSettingsOpen)
                     }
                   >
-                    <span className="select-none">
+                    <sp an className="select-none">
                       <i className="fas fa-video mr-2"></i> Media Embed Settings
                     </span>
                     <i
