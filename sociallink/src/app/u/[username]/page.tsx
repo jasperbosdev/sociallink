@@ -24,6 +24,9 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { TypeAnimation } from 'react-type-animation';
 import { profile } from 'console';
 import Head from 'next/head';
+import AudioPlayer from 'react-h5-audio-player';
+// import 'react-h5-audio-player/lib/styles.css';
+import H5AudioPlayer from 'react-h5-audio-player';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -83,7 +86,7 @@ export default function UserProfile() {
   } | null>(null);
   const [isFetchingServerInfo, setIsFetchingServerInfo] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<H5AudioPlayer | null>(null);
 
   // Fetch server information once discordInv data is loaded
   useEffect(() => {
@@ -155,6 +158,44 @@ export default function UserProfile() {
   } = generalConfigConsts(generalConfig);
 
   useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .rhap_volume-indicator {
+        background: rgb(${primaryColor});
+      }
+
+      .rhap_volume-filled {
+        background: rgb(${primaryColor});
+      }
+
+      .rhap_progress-filled {
+        background: rgb(${primaryColor});
+      }
+
+      .rhap_progress-indicator {
+        background: rgb(${primaryColor});
+      }
+
+      .rhap_repeat-button {
+        background: rgb(${primaryColor});
+      }
+
+      .rhap_main-controls-button {
+        color: rgb(${primaryColor});
+      }
+
+      .rhap_volume-button {
+        color: rgb(${primaryColor});
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, [primaryColor]);
+
+  useEffect(() => {
     if (pageTitle) {
       const originalTitle = document.title;
       if (animatedTitle) {
@@ -192,37 +233,44 @@ export default function UserProfile() {
 
   let audioHasBeenPlayed = false
 
-  // set audio volume when played
   const onPlayVolume = () => {
-    if (audioRef.current && !isAudioReady && !audioHasBeenPlayed ) {
-      audioRef.current.volume = 0.05; // Ensure the volume is 0.05
-      audioHasBeenPlayed = true
+    if (audioRef.current && !isAudioReady && !audioHasBeenPlayed) {
+      audioRef.current.volume = 0.05;
+      audioHasBeenPlayed = true;
     }
-  }
+  };
 
   const onVolumeChange = () => {
-    audioHasBeenPlayed = true
-  }
-  
-  // Function to handle click and start video and audio playback
+    audioHasBeenPlayed = true;
+  };
+
   const handleClick = () => {
-    setShowClickToLoad(false); // Hide the click-to-load screen
-  
-    // Start video playback
+    setShowClickToLoad(false);
+
     if (videoRef.current) {
       videoRef.current.play();
     }
-  
-    // Unmute and play the audio at the correct volume when the user clicks
+
     if (audioRef.current && !isAudioReady) {
-      audioRef.current.muted = false; // Unmute the audio
-      audioRef.current.volume = 0.05; // Ensure the volume is 0.05
-      audioRef.current.play().catch(error => {
-        console.error("Audio playback failed:", error);
-      }); // Start audio playback
-      setIsAudioReady(true); // Mark the audio as ready to play
+      const audioElement = audioRef.current.audio.current;
+      audioElement.muted = false; // Unmute the audio
+      audioElement.volume = 0.05; // Set the volume to 0.05
+      audioElement.play().catch((error) => {
+        console.error('Audio playback failed:', error);
+      });
+      setIsAudioReady(true);
     }
   };
+
+  const [title, setTitle] = useState("loading.."); // Initial title
+
+  useEffect(() => {
+    // Update the title whenever the audio URL changes
+    if (fetchedAudioUrl) {
+      setTitle("Sqwore - pixie new year"); // Set title based on current audio
+      // later set with a variable allowing users to name their audio
+    }
+  }, [fetchedAudioUrl]);
 
   const username = userData?.username;
 
@@ -598,7 +646,7 @@ export default function UserProfile() {
                           <i
                             className={`fab fa-${social.platform} fa-2xl`}
                             style={{
-                              filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 3.5px)',
+                              filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 1px)',
                             }}
                           ></i>
                         </div>
@@ -654,7 +702,7 @@ export default function UserProfile() {
                       </div>
                       <div className="text-start w-full">
                         <p className="font-bold" style={{ color: `rgb(${textColor})` }}>{link.title}</p>
-                        <p className="font-normal text-gray-400 text-sm">{link.value}</p>
+                        <p className="font-normal text-gray-300 text-sm">{link.value}</p>
                       </div>
                       <div className="customlink-arrow flex items-center justify-end transition-transform duration-300 transform">
                         <i className={`fas fa-arrow-right fa-xl`} />
@@ -730,7 +778,21 @@ export default function UserProfile() {
             )}
             {/* User Audio Controls & Display */}
             {fetchedAudioUrl && (
-              <audio src={fetchedAudioUrl} controls loop ref={audioRef} onPlay={onPlayVolume} onVolumeChange={onVolumeChange} />
+              <div className="w-full rounded-xl border border-[3px] p-2 w-full gap-2 items-center transition-all duration-300"
+              style={{
+                borderColor: `rgb(${accentColor})`,
+                borderRadius,
+                backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
+              }}>
+                {/* <h3 className='text-center text-lg mt-2'>{title}</h3> */}
+                <AudioPlayer
+                  ref={audioRef}
+                  src={fetchedAudioUrl}
+                  onPlay={onPlayVolume}
+                  onVolumeChange={onVolumeChange}
+                  loop
+                />
+              </div>
             )}
           </div>
       </div>
