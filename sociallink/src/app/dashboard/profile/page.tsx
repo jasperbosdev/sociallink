@@ -1251,9 +1251,10 @@ export default function Dashboard() {
                       </div>
                       
                       <div className="flex flex-col">
-                        <h3 className="text-white/80 text-lg mb-2 text-base font-bold">
+                        <h3 className="text-white/80 text-lg text-base font-bold">
                           Songs
                         </h3>
+                        <p className="mb-2 text-sm">(song title feature coming soon..)</p>
                         <div
                           className={`flex flex-col items-center justify-center rounded-lg ${
                             songPreview ? "" : "px-10 py-5"
