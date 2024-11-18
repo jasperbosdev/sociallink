@@ -18,27 +18,35 @@ const DailyLoginsChart = ({ dailyLogins }) => {
         fill: true, // Fill the area under the line
         borderWidth: 4, // Increase line thickness (change this value as needed)
         tension: 0.5, // Adjust the curve of the line (0 = straight line, 1 = very smooth)
+        pointRadius: 5, // Increase the point size for better visibility
+        pointHoverRadius: 8, // Make the hover area around the dot larger
       },
     ],
   };
 
-  // Get the current date and calculate the start of the week (Monday)
+  // Get the current date and calculate the start and end of the week
   const today = new Date();
   const day = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   const distanceToMonday = day === 0 ? 6 : day - 1; // Calculate distance to Monday
-  const startOfWeek = new Date(today.setDate(today.getDate() - distanceToMonday));
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - distanceToMonday);
+  startOfWeek.setHours(0, 0, 0, 0); // Normalize to midnight
+
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6); // End of the week (Sunday)
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday of the same week
+  endOfWeek.setHours(23, 59, 59, 999); // End of day
 
   // Initialize an array for the weekly logins data
   const weeklyLogins = Array(7).fill(0); // 7 days in a week
 
   // Map daily logins to the current week
-  dailyLogins.forEach(login => {
-    const loginDate = new Date(login.date);
+  dailyLogins.forEach((login) => {
+    const loginDate = new Date(login.date); // Parse the login date
+    loginDate.setHours(0, 0, 0, 0); // Normalize to midnight
+
     if (loginDate >= startOfWeek && loginDate <= endOfWeek) {
-      const dayIndex = (loginDate.getDay() + 6) % 7; // Shift Sunday to the end of the week (6)
-      weeklyLogins[dayIndex] += login.count; // Aggregate count for each day
+      const dayIndex = (loginDate.getDay() + 6) % 7; // Adjust Sunday (0) to the last index (6)
+      weeklyLogins[dayIndex] += login.count;
     }
   });
 
@@ -65,6 +73,15 @@ const DailyLoginsChart = ({ dailyLogins }) => {
       legend: {
         position: 'top', // Position of the legend
       },
+      tooltip: {
+        mode: 'nearest', // Show the tooltip for the nearest point
+        intersect: false, // Allow hovering near a dot, not just directly on it
+      },
+    },
+    interaction: {
+      mode: 'nearest', // Interactions are triggered by the nearest point
+      axis: 'xy', // Consider both x and y axes
+      intersect: false, // No need to directly intersect the dot
     },
   };
 

@@ -41,7 +41,7 @@ export default function Dashboard() {
         .order('login_time', { ascending: false });
   
       // Log the raw data from Supabase
-      console.log('Fetched data from logins:', data);
+      // console.log('Fetched data from logins:', data);
       
       if (error) {
         console.error('Error fetching daily unique logins:', error);
@@ -66,7 +66,7 @@ export default function Dashboard() {
         count: groupedLogins[date],
       }));
   
-      console.log('Grouped Daily Logins:', dailyLogins); // Log the grouped data
+      // console.log('Grouped Daily Logins:', dailyLogins); // Log the grouped data
   
       // Update state with the daily logins data
       setDailyLogins(dailyLogins);
