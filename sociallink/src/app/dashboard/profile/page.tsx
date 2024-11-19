@@ -72,98 +72,187 @@ export default function Dashboard() {
   // Moved the fetchAvatar function here
   const fetchAvatar = async () => {
     if (userData && userData.username) {
-      const fileName = `${userData.username}-pfp`; // Assuming the filename format
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours (86400 seconds)
-
-      if (error) {
-        console.error("Error fetching avatar:", error);
-        setIsAvatarLoading(false); // Stop loading on error
-        return;
+      const fileName = `${userData.username}-pfp`;
+  
+      try {
+        // Check if the avatar file exists
+        const { data: files, error: listError } = await supabase.storage
+          .from("avatars")
+          .list("", { search: fileName });
+  
+        if (listError) {
+          console.error("Error checking for avatar file:", listError);
+          setIsAvatarLoading(false);
+          return;
+        }
+  
+        if (!files || files.length === 0) {
+          // console.log("No avatar file found for the user.");
+          setIsAvatarLoading(false);
+          return;
+        }
+  
+        // Create a signed URL for the avatar
+        const { data, error } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(fileName, 86400);
+  
+        if (error) {
+          console.error("Error fetching avatar:", error);
+          setIsAvatarLoading(false);
+          return;
+        }
+  
+        setFetchedAvatarUrl(data.signedUrl);
+      } catch (error) {
+        console.error("Unexpected error in fetchAvatar:", error);
+      } finally {
+        setIsAvatarLoading(false);
       }
-
-      // console.log("Fetched avatar signed URL:", data.signedUrl); // Log the signed URL
-      setFetchedAvatarUrl(data.signedUrl); // Set the signed URL
-      setIsAvatarLoading(false); // Stop loading after fetching
     }
   };
 
   const fetchBackground = async () => {
     if (userData && userData.username) {
       const fileName = `${userData.username}-bg`;
-      const { data, error } = await supabase.storage
-        .from("backgrounds")
-        .createSignedUrl(fileName, 86400);
   
-      if (error) {
-        console.error("Error fetching background:", error);
-        setIsBackgroundLoading(false);
-        return;
-      }
-  
-      const backgroundUrl = data.signedUrl;
-      setFetchedBackgroundUrl(backgroundUrl);
-  
-      // Fetch the MIME type of the file
       try {
-        const response = await fetch(backgroundUrl, { method: 'HEAD' });
-        const contentType = response.headers.get("Content-Type");
+        // Check if the file exists in the "backgrounds" bucket
+        const { data: files, error: listError } = await supabase.storage
+          .from("backgrounds")
+          .list("", { search: fileName });
   
-        if (contentType?.startsWith("video/")) {
-          setFileType("video");
-        } else if (contentType?.startsWith("image/")) {
-          setFileType("image");
-        } else {
-          console.warn("Unknown content type:", contentType);
-          setFileType(null); // Handle unsupported types if needed
+        if (listError) {
+          console.error("Error checking for background file:", listError);
+          setIsBackgroundLoading(false);
+          return;
         }
   
-        // console.log("Detected MIME type:", contentType);
+        if (!files || files.length === 0) {
+          // console.log("No background file found for the user.");
+          setIsBackgroundLoading(false);
+          return;
+        }
   
-      } catch (headError) {
-        console.error("Error fetching MIME type:", headError);
+        // Create a signed URL for the file
+        const { data, error } = await supabase.storage
+          .from("backgrounds")
+          .createSignedUrl(fileName, 86400);
+  
+        if (error) {
+          console.error("Error fetching background:", error);
+          setIsBackgroundLoading(false);
+          return;
+        }
+  
+        const backgroundUrl = data.signedUrl;
+        setFetchedBackgroundUrl(backgroundUrl);
+  
+        // Fetch the MIME type of the file
+        try {
+          const response = await fetch(backgroundUrl, { method: "HEAD" });
+          const contentType = response.headers.get("Content-Type");
+  
+          if (contentType?.startsWith("video/")) {
+            setFileType("video");
+          } else if (contentType?.startsWith("image/")) {
+            setFileType("image");
+          } else {
+            console.warn("Unknown content type:", contentType);
+            setFileType(null); // Handle unsupported types if needed
+          }
+        } catch (headError) {
+          console.error("Error fetching MIME type:", headError);
+        }
+      } catch (error) {
+        console.error("Unexpected error in fetchBackground:", error);
+      } finally {
+        setIsBackgroundLoading(false);
       }
-  
-      setIsBackgroundLoading(false);
     }
-  };  
+  };
 
   const fetchBanner = async () => {
     if (userData && userData.username) {
-      const fileName = `${userData.username}-banner`; // Assuming the filename format
-      const { data, error } = await supabase.storage
-        .from("banners")
-        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
-
-      if (error) {
-        console.error("Error fetching banner:", error);
-        setIsBannerLoading(false); // Stop loading on error
-        return;
+      const fileName = `${userData.username}-banner`;
+  
+      try {
+        // Check if the banner file exists
+        const { data: files, error: listError } = await supabase.storage
+          .from("banners")
+          .list("", { search: fileName });
+  
+        if (listError) {
+          console.error("Error checking for banner file:", listError);
+          setIsBannerLoading(false);
+          return;
+        }
+  
+        if (!files || files.length === 0) {
+          // console.log("No banner file found for the user.");
+          setIsBannerLoading(false);
+          return;
+        }
+  
+        // Create a signed URL for the banner
+        const { data, error } = await supabase.storage
+          .from("banners")
+          .createSignedUrl(fileName, 86400);
+  
+        if (error) {
+          console.error("Error fetching banner:", error);
+          setIsBannerLoading(false);
+          return;
+        }
+  
+        setFetchedBannerUrl(data.signedUrl);
+      } catch (error) {
+        console.error("Unexpected error in fetchBanner:", error);
+      } finally {
+        setIsBannerLoading(false);
       }
-
-      // console.log("Fetched Banner signed URL:", data.signedUrl); // Log the signed URL
-      setFetchedBannerUrl(data.signedUrl); // Set the signed URL
-      setIsBannerLoading(false); // Stop loading after fetching
     }
-  };  
+  };
 
   const fetchCursor = async () => {
     if (userData && userData.username) {
-      const fileName = `${userData.username}-cursor`; // Assuming the filename format
-      const { data, error } = await supabase.storage
-        .from("cursors")
-        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
-
-      if (error) {
-        console.error("Error fetching Cursor:", error);
-        setIsCursorLoading(false); // Stop loading on error
-        return;
+      const fileName = `${userData.username}-cursor`;
+  
+      try {
+        // Check if the cursor file exists
+        const { data: files, error: listError } = await supabase.storage
+          .from("cursors")
+          .list("", { search: fileName });
+  
+        if (listError) {
+          console.error("Error checking for cursor file:", listError);
+          setIsCursorLoading(false);
+          return;
+        }
+  
+        if (!files || files.length === 0) {
+          // console.log("No cursor file found for the user.");
+          setIsCursorLoading(false);
+          return;
+        }
+  
+        // Create a signed URL for the cursor
+        const { data, error } = await supabase.storage
+          .from("cursors")
+          .createSignedUrl(fileName, 86400);
+  
+        if (error) {
+          console.error("Error fetching cursor:", error);
+          setIsCursorLoading(false);
+          return;
+        }
+  
+        setFetchedCursorUrl(data.signedUrl);
+      } catch (error) {
+        console.error("Unexpected error in fetchCursor:", error);
+      } finally {
+        setIsCursorLoading(false);
       }
-
-      // console.log("Fetched Cursor signed URL:", data.signedUrl); // Log the signed URL
-      setFetchedCursorUrl(data.signedUrl); // Set the signed URL
-      setIsCursorLoading(false); // Stop loading after fetching
     }
   };
 
@@ -570,21 +659,44 @@ export default function Dashboard() {
 
   const fetchSong = async () => {
     if (userData && userData.username) {
-      const fileName = `${userData.username}-audio`; // Assuming the filename format
-      const { data, error } = await supabase.storage
-        .from("songs")
-        .createSignedUrl(fileName, 86400); // The URL will be valid for 24 hours
-
-      if (error) {
-        console.error("Error fetching song:", error);
-        setIsSongLoading(false); // Stop loading on error
-        return;
+      const fileName = `${userData.username}-audio`;
+  
+      try {
+        // Check if the song file exists
+        const { data: files, error: listError } = await supabase.storage
+          .from("songs")
+          .list("", { search: fileName });
+  
+        if (listError) {
+          console.error("Error checking for song file:", listError);
+          setIsSongLoading(false);
+          return;
+        }
+  
+        if (!files || files.length === 0) {
+          // console.log("No song file found for the user.");
+          setIsSongLoading(false);
+          return;
+        }
+  
+        // Create a signed URL for the song
+        const { data, error } = await supabase.storage
+          .from("songs")
+          .createSignedUrl(fileName, 86400);
+  
+        if (error) {
+          console.error("Error fetching song:", error);
+          setIsSongLoading(false);
+          return;
+        }
+  
+        // Set the signed URL with music note emojis
+        setFetchedSongUrl(`🎵 ${fileName} 🎵`);
+      } catch (error) {
+        console.error("Unexpected error in fetchSong:", error);
+      } finally {
+        setIsSongLoading(false);
       }
-
-      // console.log("Fetched song signed URL:", data.signedUrl); // Log the signed URL
-      // console.log("Fetched song file name:", fileName); // Log the file name
-      setFetchedSongUrl('🎵 ' + fileName + ' 🎵'); // Set the signed URL with music note emoji
-      setIsSongLoading(false); // Stop loading after fetching
     }
   };
 
