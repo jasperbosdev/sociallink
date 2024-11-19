@@ -41,15 +41,15 @@ export default function SignIn() {
   
     // Check for existing login today
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Start of today (local time)
+    today.setUTCHours(0, 0, 0, 0); // Start of today in UTC
     const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1); // Start of tomorrow (local time)
+    tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of tomorrow in UTC
       
     const { data: existingLogins, error: loginFetchError } = await supabase
       .from('logins')
       .select('*')
       .eq('user_id', user.uid)
-      .gte('login_time', today.toISOString())  // Check logins from today
+      .gte('login_time', today.toISOString())
       .lt('login_time', tomorrow.toISOString());
 
     if (loginFetchError) {
