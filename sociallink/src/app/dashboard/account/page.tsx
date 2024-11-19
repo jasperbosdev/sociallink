@@ -43,36 +43,71 @@ export default function Dashboard() {
         setMessage('Current password is incorrect.');
         return;
       }
-
+  
       // Fetch public user data
       const { data: publicUserData, error: publicUserError } = await supabase
         .from("users")
-        .select("uid")
+        .select("uid, username")
         .eq("id", user.id)
         .single();
-
+  
       if (publicUserError) {
         setMessage(`Failed to fetch user data: ${publicUserError.message}`);
         return;
       }
-
-      const uid = publicUserData.uid;
-
+  
+      const { uid, username: currentUsername } = publicUserData;
+  
       // Update the username in the users table
       const { error: updateError } = await supabase
         .from('users')
         .update({ username })
         .eq('uid', uid);
-
+  
       if (updateError) {
         setMessage(`Username change failed: ${updateError.message}`);
-      } else {
-        setMessage('Username updated successfully.');
+        return;
       }
+  
+      // Buckets and file naming logic
+      const buckets = [
+        { bucket: 'avatars', oldFile: `${currentUsername}-pfp`, newFile: `${username}-pfp` },
+        { bucket: 'backgrounds', oldFile: `${currentUsername}-bg`, newFile: `${username}-bg` },
+        { bucket: 'banners', oldFile: `${currentUsername}-banner`, newFile: `${username}-banner` },
+        { bucket: 'cursors', oldFile: `${currentUsername}-cursor`, newFile: `${username}-cursor` },
+        { bucket: 'songs', oldFile: `${currentUsername}-audio`, newFile: `${username}-audio` },
+      ];
+  
+      for (const { bucket, oldFile, newFile } of buckets) {
+        // Check if the old file exists
+        const { data: fileExists, error: fileError } = await supabase.storage
+          .from(bucket)
+          .list('', { search: oldFile });
+  
+        if (fileError) {
+          console.error(`Error checking file in bucket ${bucket}:`, fileError.message);
+          continue; // Skip to the next bucket
+        }
+  
+        if (fileExists && fileExists.length > 0) {
+          // Copy the file to the new name
+          const { error: copyError } = await supabase.storage
+            .from(bucket)
+            .move(oldFile, newFile);
+  
+          if (copyError) {
+            console.error(`Error renaming file in bucket ${bucket}:`, copyError.message);
+          } else {
+            console.log(`File renamed in ${bucket}: ${oldFile} -> ${newFile}`);
+          }
+        }
+      }
+  
+      setMessage('Username and files updated successfully.');
     } catch (nameError) {
       setMessage(`Error: ${nameError.message}`);
     }
-  };  
+  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
