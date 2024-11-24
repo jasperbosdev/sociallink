@@ -97,6 +97,29 @@ export default function Dashboard() {
     }
   };
 
+  const fetchProfileHiddenStatus = async () => {
+    if (!userData) return;
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("hidden")
+      .eq("id", userData.id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user hidden status:", error);
+      return;
+    }
+
+    setProfileHidden(user.hidden);
+  };
+
+  useEffect(() => {
+    if (userData) {
+      fetchProfileHiddenStatus();
+    }
+  }, [userData]);
+
   const profileState = {
     hidden: userData?.hidden || false,
   };
@@ -107,7 +130,7 @@ export default function Dashboard() {
       const fileName = `${userData.username}-pfp`;
   
       try {
-        // Check if the avatar file exists
+        // Check if the avatar file as
         const { data: files, error: listError } = await supabase.storage
           .from("avatars")
           .list("", { search: fileName });
@@ -995,7 +1018,7 @@ export default function Dashboard() {
                       setProfileHidden(!profileHidden);
                       }
                     }}>
-                      {!profileHidden ? "Show Profile" : "Hide Profile"}
+                        {profileHidden ? "Show Profile" : "Hide Profile"}
                     </div>
                     {/* make this function reset all the values and delete all files */}
                     <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
