@@ -26,6 +26,7 @@ export default function Navbar() {
             </div>
             <div className=""><a className="hover:text-white transition duration-300" href="/#">Store</a></div>
             <div className=""><a className="hover:text-white transition duration-300" href="/#">Discord</a></div>
+            <div className=""><a className="hover:text-white transition duration-300" target='_blank' href="https://ko-fi.com/leeuwz">Support</a></div>
             <SpotlightEffect>
               {session ? (
                 <a href="/dashboard">
