@@ -68,6 +68,10 @@ export default function Dashboard() {
   const [songPreview, setSongPreview] = useState<string | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingCursor, setUploadingCursor] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   // Reset all settings for the user and delete all user files
@@ -741,7 +745,7 @@ export default function Dashboard() {
   const uploadBackground = async () => {
     if (!background || !userData) return;
 
-    setUploading(true);
+    setUploadingBg(true);
     const { username } = userData;
     const fileName = `${username}-bg`;
 
@@ -762,14 +766,14 @@ export default function Dashboard() {
       setUploadBgSuccess(true);
     }
 
-    setUploading(false);
+    setUploadingBg(false);
     setBackground(null);
   };
 
   const uploadBanner = async () => {
     if (!banner || !userData) return;
 
-    setUploading(true);
+    setUploadingBanner(true);
     const { username } = userData;
     const fileName = `${username}-banner`;
 
@@ -787,17 +791,17 @@ export default function Dashboard() {
       // Increment pfp_vers after successful upload
       await incrementBannerVersion();
       await fetchBanner(); // Refetch the Banner to update the UI
-      setUploadBgSuccess(true);
+      setUploadBannerSuccess(true);
     }
 
-    setUploading(false);
+    setUploadingBanner(false);
     setBanner(null);
   };
 
   const uploadCursor = async () => {
     if (!cursor || !userData) return;
   
-    setUploading(true);
+    setUploadingCursor(true);
     const { username } = userData;
     const fileName = `${username}-cursor`;
   
@@ -816,14 +820,14 @@ export default function Dashboard() {
       setUploadCursorSuccess(true);
     }
   
-    setUploading(false);
+    setUploadingCursor(false);
     setCursor(null); // Reset cursor file after upload
   };
 
   const uploadSong = async () => {
     if (!song || !userData) return;
   
-    setUploading(true);
+    setUploadingAudio(true);
     const { username } = userData;
     const fileName = `${username}-audio`;
   
@@ -842,7 +846,7 @@ export default function Dashboard() {
       setUploadSongSuccess(true);
     }
   
-    setUploading(false);
+    setUploadingAudio(false);
     setSong(null); // Reset cursor file after upload
   };
 
@@ -1416,9 +1420,9 @@ export default function Dashboard() {
                           <button
                             className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
                             onClick={uploadBackground}
-                            disabled={uploading}
+                            disabled={uploadingBg}
                           >
-                            {uploading ? "Uploading..." : "Upload Background"}
+                            {uploadingBg ? "Uploading..." : "Upload Background"}
                           </button>
                         )}
 
@@ -1516,9 +1520,9 @@ export default function Dashboard() {
                           <button
                             className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
                             onClick={uploadBanner}
-                            disabled={uploading}
+                            disabled={uploadingBanner}
                           >
-                            {uploading ? "Uploading..." : "Upload Banner"}
+                            {uploadingBanner ? "Uploading..." : "Upload Banner"}
                           </button>
                         )}
 
@@ -1588,9 +1592,9 @@ export default function Dashboard() {
                           <button
                             className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
                             onClick={uploadCursor}
-                            disabled={uploading}
+                            disabled={uploadingCursor}
                           >
-                            {uploading ? "Uploading..." : "Upload Cursor"}
+                            {uploadingCursor ? "Uploading..." : "Upload Cursor"}
                           </button>
                         )}
 
@@ -1658,9 +1662,9 @@ export default function Dashboard() {
                           <button
                             className="mt-4 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700"
                             onClick={uploadSong}
-                            disabled={uploading}
+                            disabled={uploadingCursor}
                           >
-                            {uploading ? "Uploading..." : "Upload Song"}
+                            {uploadingCursor ? "Uploading..." : "Upload Song"}
                           </button>
                         )}
 
