@@ -478,7 +478,7 @@ export default function UserProfile() {
           style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}
         ></div>
       )}
-      <div id='userCard' className={`transition flex items-center justify-center min-h-screen mx-4 ${showClickToLoad && useAutoplayFix === true ? 'hidden' : 'block'} ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <div id='userCard' className={`animate-delay-150 animate-fade-down animate-duration-[400ms] animate-ease-linear animate-normal transition flex items-center justify-center min-h-screen mx-4 ${showClickToLoad && useAutoplayFix === true ? 'hidden' : 'block'} ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <div
           ref={(el) => {
             if (el && cardTilt) {
