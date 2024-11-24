@@ -27,6 +27,7 @@ import Head from 'next/head';
 import AudioPlayer from 'react-h5-audio-player';
 // import 'react-h5-audio-player/lib/styles.css';
 import H5AudioPlayer from 'react-h5-audio-player';
+import { useSupabase } from '@/app/components/utils/SupabaseProvider';
 
 const geistSans = localFont({
   src: "../../fonts/GeistVF.woff",
@@ -370,6 +371,18 @@ export default function UserProfile() {
     return url; // Return the original URL if it's not a valid YouTube link
   };
 
+  const { session, user } = useSupabase();
+  // console.log(session, user);
+  // console.log("User ID:", user?.id);
+
+  // hide profile stuff
+  const sessionUserId = user?.id;
+
+  const isProfileHidden = userData?.hidden;
+  const isOwnerViewing = sessionUserId === userData?.id;
+
+  // console.log("Is visiter the profile owner?", isOwnerViewing)
+
   if (isLoading) {
     return (
       <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
@@ -385,6 +398,18 @@ export default function UserProfile() {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black z-50 text-white">
         <h2 className="text-3xl font-bold">User not found :(</h2>
+      </div>
+    );
+  }
+
+  // handle profile hidden
+  if (isProfileHidden && !isOwnerViewing) {
+    return (
+      <div className={`transition flex flex-col fixed inset-0 flex items-center justify-center bg-black z-50 text-white ${geistSans.variable} ${geistMono.variable}`}>
+        <div className="border border-4 border-white/20 bg-[#101013] py-2 px-10 rounded-lg text-center">
+          <img className='max-w-64 rounded-lg mt-4 mb-4' src='https://c.tenor.com/qP7idh2tg00AAAAd/tenor.gif' />
+          <h2 className="text-2xl font-bold">User not found :(</h2>
+        </div>
       </div>
     );
   }
@@ -453,7 +478,7 @@ export default function UserProfile() {
           style={{ backgroundColor: `rgba(${backgroundColor}, ${bgBrightnessValue})` }}
         ></div>
       )}
-      <div className={`transition flex items-center justify-center min-h-screen mx-4 ${showClickToLoad && useAutoplayFix === true ? 'hidden' : 'block'} ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <div id='userCard' className={`transition flex items-center justify-center min-h-screen mx-4 ${showClickToLoad && useAutoplayFix === true ? 'hidden' : 'block'} ${Minecraftia.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <div
           ref={(el) => {
             if (el && cardTilt) {
@@ -481,6 +506,25 @@ export default function UserProfile() {
               : "",
           }}
         >
+
+          {/* display this message when owner visiting and profile is hidden to notify user their profile is hidden/disabled */}
+          {isProfileHidden && isOwnerViewing && (
+            <div className='absolute top-[-5.5em] left-1/2 transform -translate-x-1/2 max-w-[45em] w-full'>
+              <div className="p-4"
+              style={{
+                borderWidth,
+                borderColor: `rgb(${accentColor})`,
+                borderRadius,
+                backgroundColor: `rgba(${primaryColor}, ${cardOpacity})`,
+                boxShadow: cardGlow
+                  ? `0px 0px 10px 1px ${accentColor ? `rgba(${accentColor},1)` : "rgba(239,68,68,1)"}`
+                  : "",
+              }}>
+                <h2 className="text-xl font-bold">Your profile is currently hidden. Only you can see this message.</h2>
+              </div>
+            </div>
+          )}
+
             {useBanner === true ? (
               <>
                 <div className='relative -mx-6 -mt-6 mb-[4.3em]'

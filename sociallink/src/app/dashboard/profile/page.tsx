@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [isCursorEnabled, setIsCursorEnabled] = useState(false);
   const [useAutoplayFix, setUseAutoplayFix] = useState(false);
   const [isBackgroundAudioEnabled, setIsBackgroundAudioEnabled] = useState(false);
+  const [profileHidden, setProfileHidden] = useState(false);
   // State for form inputs
   const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -68,6 +69,37 @@ export default function Dashboard() {
   const [fileType, setFileType] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Manage bio functions
+  const hideProfile = async () => {
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("hidden")
+      .eq("id", userData.id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user hidden status:", error);
+      return;
+    }
+
+    const newHiddenStatus = !user.hidden;
+
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ hidden: newHiddenStatus })
+      .eq("id", userData.id);
+
+    if (updateError) {
+      console.error("Error updating user hidden status:", updateError);
+    } else {
+      console.log("User hidden status updated successfully!");
+    }
+  };
+
+  const profileState = {
+    hidden: userData?.hidden || false,
+  };
 
   // Moved the fetchAvatar function here
   const fetchAvatar = async () => {
@@ -955,13 +987,19 @@ export default function Dashboard() {
                     >
                       View Profile
                     </div>
-                    {/* make this function set the profile back to a default template with all settings reset */}
+                    {/* make this function set the profile hidden */}
+                    <div className="select-none bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
+                    onClick={async () => {
+                      if (window.confirm("Are you sure you want to (un)hide your profile?")) {
+                      await hideProfile();
+                      setProfileHidden(!profileHidden);
+                      }
+                    }}>
+                      {!profileHidden ? "Show Profile" : "Hide Profile"}
+                    </div>
+                    {/* make this function reset all the values and delete all files */}
                     <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
                       Reset Profile
-                    </div>
-                    {/* make this set the profile to a hidden state */}
-                    <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
-                      Disable Profile
                     </div>
                   </div>
                 </div>
