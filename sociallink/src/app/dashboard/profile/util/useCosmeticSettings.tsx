@@ -487,7 +487,7 @@ export default function CosmeticSettings() {
           )}
         </div>
         
-        <div className="flex items-center space-x-2 h-fit">
+        <div className="flex items-center space-x-2 h-fit opacity-50">
           <label className="text-white">Cursor Effect</label>
           <div
             className={`${
