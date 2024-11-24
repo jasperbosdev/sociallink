@@ -82,7 +82,7 @@ export default function Dashboard() {
       card_glow: false,
       show_views: false,
       border_radius: 0.5,
-      card_opacity: 0.9,
+      card_opacity: 90,
       card_blur: 0,
       background_blur: 0,
       background_brightness: 100,
@@ -161,7 +161,47 @@ export default function Dashboard() {
       }
     }
 
+    // Increment version columns
+    await incrementVersionColumns();
+
     alert("Profile reset successfully!");
+  };
+
+  const incrementVersionColumns = async () => {
+    try {
+      // Step 1: Fetch the current values of the version columns
+      const { data: user, error: fetchError } = await supabase
+        .from("users")
+        .select("pfp_vers, bg_vers, banner_vers, cursor_vers, audio_vers")
+        .eq("id", userData.id)
+        .single();
+  
+      if (fetchError || !user) {
+        console.error("Error fetching version columns:", fetchError);
+        return;
+      }
+  
+      // Step 2: Increment each version column
+      const { pfp_vers, bg_vers, banner_vers, cursor_vers, audio_vers } = user;
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({
+          pfp_vers: pfp_vers + 1,
+          bg_vers: bg_vers + 1,
+          banner_vers: banner_vers + 1,
+          cursor_vers: cursor_vers + 1,
+          audio_vers: audio_vers + 1,
+        })
+        .eq("id", userData.id);
+  
+      if (updateError) {
+        console.error("Error updating version columns:", updateError);
+      } else {
+        console.log("Version columns successfully incremented.");
+      }
+    } catch (error) {
+      console.error("Unexpected error incrementing version columns:", error);
+    }
   };
 
   // Manage bio functions
@@ -1080,6 +1120,9 @@ export default function Dashboard() {
     }
   };
 
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetConfirmation, setResetConfirmation] = useState("");
+
   return (
     <>
       <div className="flex">
@@ -1115,14 +1158,51 @@ export default function Dashboard() {
                         {profileHidden ? "Show Profile" : "Hide Profile"}
                     </div>
                     {/* make this function reset all the values and delete all files */}
-                    <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
-                    onClick={async () => {
-                      if (window.confirm("Are you sure you want to RESET your profile? This was reset all your settings and delete all your files.")) {
-                      await resetProfile();
-                      }
-                    }}>
+                    <div
+                      className="select-none bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
+                      onClick={() => setShowResetModal(true)}
+                    >
                       Reset Profile
                     </div>
+
+                    {showResetModal && (
+                      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-[#101013] border-4 border-white/20 text-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                          <h2 className="text-xl font-bold mb-4">Reset Profile</h2>
+                          <p className="mb-4">
+                          Are you sure you want to RESET your profile? This will reset all your settings and delete all your files.
+                          </p>
+                          <p>Please type "Reset my profile" to confirm.</p>
+                          <input
+                          type="text"
+                          className="w-full p-2 border border-gray-300 rounded mb-4 text-black"
+                          value={resetConfirmation}
+                          onChange={(e) => setResetConfirmation(e.target.value)}
+                          spellCheck="false"
+                          />
+                          <div className="flex justify-end items-center">
+                            <button
+                              className="bg-red-600 shadow-none text-white rounded px-4 py-2"
+                              onClick={async () => {
+                              if (resetConfirmation === "Reset my profile") {
+                              await resetProfile();
+                              setShowResetModal(false);
+                              }
+                              }}
+                              disabled={resetConfirmation !== "Reset my profile"}
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              className="shadow-none bg-gray-500 border-white text-white rounded px-4 py-2 ml-2"
+                              onClick={() => setShowResetModal(false)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
