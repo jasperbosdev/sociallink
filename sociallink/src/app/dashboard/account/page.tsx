@@ -44,6 +44,23 @@ export default function Dashboard() {
         return;
       }
   
+      // Check if the new username is already taken
+      const { data: existingUser, error: existingUserError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', username)
+        .single();
+  
+      if (existingUserError && existingUserError.code !== 'PGRST116') {
+        setMessage(`Failed to check username availability: ${existingUserError.message}`);
+        return;
+      }
+  
+      if (existingUser) {
+        setMessage('Username is already taken.');
+        return;
+      }
+  
       // Fetch public user data
       const { data: publicUserData, error: publicUserError } = await supabase
         .from("users")
@@ -210,8 +227,8 @@ export default function Dashboard() {
                     <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
                       Link osu!
                     </div>
-                    <div className="bg-zinc-800 py-[7px] text-white rounded-md my-1 border-[3px] border-white/20 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
-                      Disable Profile (?)
+                    <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
+                      Disable Account
                     </div>
                   </div>
                 </div>
