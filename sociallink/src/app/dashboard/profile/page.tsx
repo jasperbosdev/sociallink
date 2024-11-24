@@ -70,6 +70,100 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Reset all settings for the user and delete all user files
+  const resetProfile = async () => {
+    // Reset all columns to default values
+    const { error: updateError } = await supabase
+      .from("profileCosmetics")
+      .update({
+      border_width: 3,
+      bg_color: null,
+      username_fx: false,
+      card_glow: false,
+      show_views: false,
+      border_radius: 0.5,
+      card_opacity: 0.9,
+      card_blur: 0,
+      background_blur: 0,
+      background_brightness: 100,
+      pfp_decoration: false,
+      decoration_value: "",
+      card_tilt: false,
+      show_badges: false,
+      rounded_socials: false,
+      primary_color: "0,0,0",
+      secondary_color: "101013",
+      accent_color: "FFFFFF",
+      text_color: "FFFFFF",
+      background_color: "10,10,13",
+      embed_color: "09090B",
+      profile_font: "geistSans",
+      usernamefx_color: "",
+      use_banner: false,
+      use_autoplayfix: false,
+      use_backgroundaudio: false,
+      })
+      .eq("uid", userData.uid);
+
+    if (updateError) {
+      console.error("Error updating user settings:", updateError);
+      return;
+    }
+    
+    const tablesToDeleteFrom = [
+      "profileCustom",
+      "profileEmbed",
+      "profileSocial",
+      "profileGeneral",
+      "profile_views",
+      "socials",
+    ];
+
+    for (const table of tablesToDeleteFrom) {
+      const { error: deleteError } = await supabase
+      .from(table)
+      .delete()
+      .eq("uid", userData.uid);
+
+      if (deleteError) {
+      console.error(`Error deleting rows from ${table}:`, deleteError);
+      }
+    }
+
+    const buckets = [
+      { bucket: "avatars", fileName: `${userData.username}-pfp` },
+      { bucket: "backgrounds", fileName: `${userData.username}-bg` },
+      { bucket: "banners", fileName: `${userData.username}-banner` },
+      { bucket: "cursors", fileName: `${userData.username}-cursor` },
+      { bucket: "songs", fileName: `${userData.username}-audio` },
+    ];
+
+    for (const { bucket, fileName } of buckets) {
+      const { data: files, error: listError } = await supabase.storage
+        .from(bucket)
+        .list("", { search: fileName });
+
+      if (listError) {
+        console.error(`Error checking for file in ${bucket}:`, listError);
+        continue;
+      }
+
+      if (files && files.length > 0) {
+        const { error: deleteError } = await supabase.storage
+          .from(bucket)
+          .remove([fileName]);
+
+        if (deleteError) {
+          console.error(`Error deleting file from ${bucket}:`, deleteError);
+        } else {
+          // console.log(`File ${fileName} deleted from ${bucket}`);
+        }
+      }
+    }
+
+    alert("Profile reset successfully!");
+  };
+
   // Manage bio functions
   const hideProfile = async () => {
     const { data: user, error } = await supabase
@@ -1021,7 +1115,12 @@ export default function Dashboard() {
                         {profileHidden ? "Show Profile" : "Hide Profile"}
                     </div>
                     {/* make this function reset all the values and delete all files */}
-                    <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit">
+                    <div className="bg-red-700 py-[7px] text-white rounded-md my-1 border-[3px] border-red-400 font-bold rounded-lg text-start p-2 text-center cursor-pointer hover:scale-[1.02] transition w-fit"
+                    onClick={async () => {
+                      if (window.confirm("Are you sure you want to RESET your profile? This was reset all your settings and delete all your files.")) {
+                      await resetProfile();
+                      }
+                    }}>
                       Reset Profile
                     </div>
                   </div>
