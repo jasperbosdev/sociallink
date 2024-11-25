@@ -158,6 +158,11 @@ export default function Home() {
                     <p className="select-none absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
                       {item.label}
                     </p>
+                    {item.label === 'Discord Activity' && (
+                      <p className="select-none absolute bottom-2 right-2 text-base text-white/60">
+                      (coming soon)
+                      </p>
+                    )}
                   </SpotlightEffect>
                 </div>
               </div>
@@ -166,6 +171,7 @@ export default function Home() {
         </div>
 
         {/* Featured Slider Section */}
+        {/* hardcoded until its populated */}
         <div className="w-full mt-20 overflow-hidden relative flex flex-col items-center">
           <p className="text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
             Wondering what we got in store?
