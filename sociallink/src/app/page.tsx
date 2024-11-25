@@ -8,7 +8,7 @@ import { users } from './components/utils/usersData';
 export default function Home() {
   return (
     <>
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
+      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 max-w-[1280px] mx-auto overflow-hidden">
         {/* Header Section */}
         <div className="flex flex-col text-center items-center">
           <p className="text-6xl font-bold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]">
@@ -41,25 +41,25 @@ export default function Home() {
             <ellipse cx="50%" cy="50%" ry="50%" rx="50%" fill="currentColor"></ellipse>
           </svg>
 
-            <div
-            className="w-[24em] z-20"
+          <div
+            className="w-[24em] z-20 opacity-[0.8]"
             ref={(el) => {
               if (el) {
-              VanillaTilt.init(el, {
-                max: 25,
-                speed: 400,
-                glare: false,
-                "max-glare": 0.5,
-                reverse: false,
-              });
+                VanillaTilt.init(el, {
+                  max: 5,
+                  speed: 400,
+                  glare: false,
+                  "max-glare": 0.5,
+                  reverse: false,
+                });
               }
             }}
-            >
+          >
             <img
-              src="./static/images/placeholderc.png"
-              className="w-full animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
+              src="./static/images/profiledemo.png"
+              className="select-none w-full animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
             />
-            </div>
+          </div>
         </div>
 
         {/* Description Section */}
@@ -90,7 +90,7 @@ export default function Home() {
         </div>
 
         {/* What Do We Do Section */}
-        <div className="mb-10 w-3/4">
+        <div className="mb-10">
           <div className="flex md:flex-row flex-col justify-between space-x-20">
             <div className="text-start md:w-full">
               <p className="text-4xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
@@ -103,29 +103,29 @@ export default function Home() {
               </p>
             </div>
             <div className="relative w-full">
-              <img src="/static/assets/square.png" className="absolute top-[-28%] z-0" />
-                <div
+              <img src="/static/assets/square.png" className="select-none absolute top-[-28%] z-0" />
+              <div
                 className="relative z-10 border border-white/60 border-4 rounded-lg"
                 ref={(el) => {
                   if (el) {
-                  VanillaTilt.init(el, {
-                    max: 5,
-                    speed: 400,
-                    glare: false,
-                    "max-glare": 0.5,
-                    reverse: false,
-                  });
+                    VanillaTilt.init(el, {
+                      max: 5,
+                      speed: 400,
+                      glare: false,
+                      "max-glare": 0.5,
+                      reverse: false,
+                    });
                   }
                 }}
-                >
-                <img src="/static/assets/whatdowedo.png" className="rounded" />
-                </div>
+              >
+                <img src="/static/assets/whatdowedo.png" className="select-none rounded" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Level Up Your Profile Section */}
-        <div className="mt-20 w-3/4 relative flex flex-col items-center">
+        <div className="mt-20 w-full relative flex flex-col items-center">
           <p className="text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
             Level up your profile
           </p>
@@ -144,18 +144,18 @@ export default function Home() {
             {/* Card 1 */}
             {[
               { src: '/static/assets/activity.png', label: 'Discord Activity' },
-              { src: '/static/assets/bg.gif', label: 'Video Background' },
+              { src: '/static/assets/bgvid.gif', label: 'Video Background' },
               { src: '/static/assets/song.png', label: 'Play Music' },
             ].map((item, index) => (
               <div key={index} className="flex flex-col w-1/3 group">
                 <div className="border border-4 border-white/60 rounded-lg relative overflow-hidden">
                   <SpotlightEffect>
                     <img
-                      className="transition-transform transform scale-100 group-hover:scale-110 rounded brightness-[60%] blur-[2px] group-hover:blur-0 group-hover:brightness-100 transition duration-300"
+                      className="select-none transition-transform transform scale-100 group-hover:scale-110 rounded brightness-[60%] blur-[2px] group-hover:blur-0 group-hover:brightness-100 transition duration-300"
                       src={item.src}
                       alt={item.label}
                     />
-                    <p className="absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
+                    <p className="select-none absolute inset-0 flex mt-4 justify-center font-bold text-lg text-white/80 transition-opacity duration-300 group-hover:opacity-100">
                       {item.label}
                     </p>
                   </SpotlightEffect>
@@ -166,7 +166,7 @@ export default function Home() {
         </div>
 
         {/* Featured Slider Section */}
-        <div className="mt-20 w-3/4 relative flex flex-col items-center">
+        <div className="w-full mt-20 overflow-hidden relative flex flex-col items-center">
           <p className="text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
             Wondering what we got in store?
           </p>
@@ -183,7 +183,7 @@ export default function Home() {
                 <a href={user.profileLink} key={user.profileLink}>
                   <div className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
                     <div className="flex items-center space-x-2">
-                      <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
+                      <img src={user.imgSrc} className="select-none w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover select-none" alt={user.username} />
                       <p className="font-bold truncate">{user.username}</p>
                     </div>
                   </div>
@@ -196,7 +196,7 @@ export default function Home() {
                 <a href={user.profileLink} key={user.profileLink}>
                   <div className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
                     <div className="flex items-center space-x-2">
-                      <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
+                      <img src={user.imgSrc} className="select-none w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover select-none" alt={user.username} />
                       <p className="font-bold truncate">{user.username}</p>
                     </div>
                   </div>
@@ -212,7 +212,7 @@ export default function Home() {
                   <a href={user.profileLink}>
                     <div key={index} className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
                       <div className="flex items-center space-x-2">
-                        <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
+                        <img src={user.imgSrc} className="select-none w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
                         <p className="font-bold truncate">{user.username}</p>
                       </div>
                     </div>
@@ -225,7 +225,7 @@ export default function Home() {
                   <a href={user.profileLink}>
                     <div key={index} className="hover:cursor-pointer hover:border-white hover:translate-y-[-0.25rem] transition duration-300 bg-white/20 border border-4 rounded-lg border-white/60 px-4 py-2 font-bold w-fit overflow-hidden">
                       <div className="flex items-center space-x-2">
-                        <img src={user.imgSrc} className="w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
+                        <img src={user.imgSrc} className="select-none w-[40px] h-[40px] rounded-full max-w-[50px] max-h-[50px] object-cover" alt={user.username} />
                         <p className="font-bold truncate">{user.username}</p>
                       </div>
                     </div>
