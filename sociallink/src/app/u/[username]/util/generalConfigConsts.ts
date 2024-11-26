@@ -36,5 +36,9 @@ export const generalConfigConsts = (config: any) => {
     ? config.typing_desc
     : false;
 
-  return { pageTitle, displayName, description, animatedTitle, typingDesc };
+  const clickText = (config?.click_text !== undefined && config.click_text !== null)
+    ? config.click_text
+    : 'ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ';
+
+  return { pageTitle, displayName, description, animatedTitle, typingDesc, clickText };
 };

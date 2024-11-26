@@ -74,10 +74,46 @@ export default function Dashboard() {
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [clickAnywhereText, setClickAnywhereText] = useState("");
+  const [clickSaveStatus, setClickSaveStatus] = useState("");
 
   const handleAddClickAnywhere = async () => {
-    // function to store in profileGeneral table click_anywhere column
-  }
+    if (!clickAnywhereText.trim()) {
+      alert("Please enter a valid custom text.");
+      return;
+    }
+
+    try {
+      const id = userData.id; // UUID from auth.users
+      const { data: publicUserData, error: publicUserError } = await supabase
+        .from("users")
+        .select("uid")
+        .eq("id", id) // Adjust `id` to match your context
+        .single();
+
+      if (publicUserError || !publicUserData) {
+        console.error("Error fetching public user data:", publicUserError?.message || "No data returned");
+        setClickSaveStatus("error");
+        return;
+      }
+
+      const uid = publicUserData.uid;
+
+      const { error: updateError } = await supabase
+        .from("profileGeneral")
+        .update({ click_text: clickAnywhereText })
+        .eq("uid", uid);
+
+      if (updateError) {
+        console.error("Error updating click_text text:", updateError.message);
+        setClickSaveStatus("error");
+      } else {
+        setClickSaveStatus("success");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setClickSaveStatus("error");
+    }
+  };
 
   // Reset all settings for the user and delete all user files
   const resetProfile = async () => {
@@ -1707,19 +1743,29 @@ export default function Dashboard() {
                             {/* if autoplay enabled show input for custom click anywhere text (sanitised) */}
                             {isAutoplayEnabled && (
                               <>
-                              <div className="mt-3">
-                                <input className="bg-[#101013] border-2 text-white border-white/20 rounded-lg"
-                                placeholder="ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ"
-                                value={clickAnywhereText}
-                                onChange={(e) => setClickAnywhereText(e.target.value)}
-                                />
-                              </div>
-                              <div
-                                className="select-none border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4"
-                                onClick={handleAddClickAnywhere}
-                              >
-                                Save changes
-                              </div>
+                                <div className="mt-1">
+                                  <span className="text-white/60 font-bold text-sm">Custom Text</span>
+                                </div>
+                                <div className="mt-1">
+                                  <input
+                                    className="bg-[#101013] border-2 text-white border-white/20 rounded-lg"
+                                    placeholder="ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ"
+                                    value={clickAnywhereText}
+                                    onChange={(e) => setClickAnywhereText(e.target.value)}
+                                  />
+                                </div>
+                                <div
+                                  className="bg-white/10 select-none border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4"
+                                  onClick={handleAddClickAnywhere}
+                                >
+                                  Save changes
+                                </div>
+                                {clickSaveStatus === "success" && (
+                                  <div className="text-green-500 font-bold mt-2 text-sm">Changes saved successfully!</div>
+                                )}
+                                {clickSaveStatus === "error" && (
+                                  <div className="text-red-500 font-bold mt-2 text-sm">Failed to save changes. Please try again.</div>
+                                )}
                               </>
                             )}
                           </div>

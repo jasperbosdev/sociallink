@@ -155,7 +155,8 @@ export default function UserProfile() {
     displayName,
     description,
     animatedTitle,
-    typingDesc
+    typingDesc,
+    clickText,
   } = generalConfigConsts(generalConfig);
 
   useEffect(() => {
@@ -436,7 +437,7 @@ export default function UserProfile() {
             style={{ color: backgroundColor }}
             className="flex flex-col px-4 break-words text-center font-semibold text-3xl"
           >
-            ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ
+            {clickText}
           </p>
         </main>
       ) : null}
