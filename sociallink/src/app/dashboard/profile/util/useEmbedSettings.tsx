@@ -7,6 +7,8 @@ export default function EmbedSettings() {
   const [mediaValue, setMediaValue] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
   const [existingSettings, setExistingSettings] = useState([]);
+  const [openByDefault, setOpenByDefault] = useState(false);
+  const [isModified, setIsModified] = useState(false);
 
   // Fetch user data
   const { loading, userData } = useUserData();
@@ -43,17 +45,55 @@ export default function EmbedSettings() {
         return;
       }
 
-      // Sort custom links alphabetically
-      const sortedEmbeds = mediaEmbeds.sort((a, b) => 
-        a.title.localeCompare(b.title)
-      );
-
       // Update state with existing settings
-      setExistingSettings(sortedEmbeds);
+      setExistingSettings(mediaEmbeds);
+      if (mediaEmbeds.length > 0) {
+        setOpenByDefault(mediaEmbeds[0].default_open || false);
+      }
     };
 
     fetchEmbedSettings();
   }, [loading, userData]);
+
+  const handleToggle = () => {
+    setOpenByDefault(!openByDefault);
+    setIsModified(true);
+  };
+
+  const handleSaveToggle = async () => {
+    if (!userData || !existingSettings.length) return;
+
+    const { id } = userData;
+
+    const { data: publicUserData, error: publicUserError } = await supabase
+      .from("users")
+      .select("uid")
+      .eq("id", id)
+      .single();
+
+    if (publicUserError) {
+      console.error("Error fetching public user data:", publicUserError.message);
+      return;
+    }
+
+    const uid = publicUserData.uid;
+
+    const { error } = await supabase
+      .from("profileEmbed")
+      .update({ default_open: openByDefault })
+      .eq("uid", uid);
+
+    if (error) {
+      console.error("Error updating default_open:", error.message);
+      setSaveStatus("Error saving changes");
+      return;
+    }
+
+    setSaveStatus("Changes saved successfully");
+    setIsModified(false);
+
+    setTimeout(() => setSaveStatus(""), 3000);
+  };
 
   const handleAddMediaEmbed = async () => {
     if (loading || !userData || !mediaTitle || !mediaValue) {
@@ -161,6 +201,41 @@ export default function EmbedSettings() {
           />
         </div>
       </div>
+      {/* Open by Default Toggle */}
+      <div className="flex items-center space-x-2 mt-2">
+        <label className="text-white">Open by default</label>
+        <div
+          className={`${
+            openByDefault ? "bg-blue-500" : "bg-gray-500"
+          } cursor-pointer p-1 w-12 h-6 flex items-center rounded-full transition`}
+          onClick={handleToggle}
+        >
+          <div
+            className={`${
+              openByDefault ? "translate-x-6" : "translate-x-0"
+            } w-5 h-5 bg-white rounded-full transform transition`}
+          ></div>
+        </div>
+      </div>
+
+      {isModified && (
+        <div
+          className="border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4 bg-white/10 text-white"
+          onClick={handleSaveToggle}
+        >
+          Save Changes
+        </div>
+      )}
+
+      {saveStatus && (
+        <p
+          className={`mt-2 ${
+            saveStatus.includes("Error") ? "text-red-500" : "text-green-500"
+          }`}
+        >
+          {/* {saveStatus} */}
+        </p>
+      )}
       <div
         className={`border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4 ${existingSettings.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={existingSettings.length === 0 ? handleAddMediaEmbed : null}
@@ -168,7 +243,7 @@ export default function EmbedSettings() {
         Save Embed Settings
       </div>
       {saveStatus && (
-        <p className={saveStatus.includes("Error") ? "text-red-500" : "text-green-500"}>
+        <p className={`mt-2 ${saveStatus.includes("Error") ? "text-red-500" : "text-green-500"}`}>
           {saveStatus}
         </p>
       )}

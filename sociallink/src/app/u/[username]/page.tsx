@@ -109,6 +109,11 @@ export default function UserProfile() {
   const { mediaEmbeds, isLoadingMediaEmbeds } = useFetchMediaEmbeds();
   const [openStates, setOpenStates] = useState<boolean[]>(Array(mediaEmbeds.length).fill(false));
 
+  useEffect(() => {
+    // Set the initial open states based on media.default_open
+    setOpenStates(mediaEmbeds.map((media) => media.default_open || false));
+  }, [mediaEmbeds]);
+
   const toggleOpen = (index: number) => {
     setOpenStates((prev) => {
       const newState = [...prev];
@@ -119,7 +124,7 @@ export default function UserProfile() {
 
   const hasCustomLinks = customLinks.length > 0;
   const hasMediaEmbeds = mediaEmbeds.length > 0;
-
+  
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [showClickToLoad, setShowClickToLoad] = useState(true);
 
