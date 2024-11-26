@@ -1755,7 +1755,7 @@ export default function Dashboard() {
                                   />
                                 </div>
                                 <div
-                                  className="bg-white/10 select-none border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4"
+                                  className="bg-white/10 select-none border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-2"
                                   onClick={handleAddClickAnywhere}
                                 >
                                   Save changes
