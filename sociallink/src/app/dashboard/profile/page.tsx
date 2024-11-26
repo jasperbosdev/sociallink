@@ -73,6 +73,11 @@ export default function Dashboard() {
   const [uploadingCursor, setUploadingCursor] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [clickAnywhereText, setClickAnywhereText] = useState("");
+
+  const handleAddClickAnywhere = async () => {
+    // function to store in profileGeneral table click_anywhere column
+  }
 
   // Reset all settings for the user and delete all user files
   const resetProfile = async () => {
@@ -1699,6 +1704,24 @@ export default function Dashboard() {
                                 ></div>
                               </div>
                             </label>
+                            {/* if autoplay enabled show input for custom click anywhere text (sanitised) */}
+                            {isAutoplayEnabled && (
+                              <>
+                              <div className="mt-3">
+                                <input className="bg-[#101013] border-2 text-white border-white/20 rounded-lg"
+                                placeholder="ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ"
+                                value={clickAnywhereText}
+                                onChange={(e) => setClickAnywhereText(e.target.value)}
+                                />
+                              </div>
+                              <div
+                                className="select-none border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4"
+                                onClick={handleAddClickAnywhere}
+                              >
+                                Save changes
+                              </div>
+                              </>
+                            )}
                           </div>
                                                     
                           {/* Background Audio Toggle */}
