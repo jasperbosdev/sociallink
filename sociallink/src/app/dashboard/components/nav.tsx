@@ -85,6 +85,9 @@ export default function Nav() {
                         <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/motd')}>
                           <i className="far fa-message text-white fa-2xl"></i>
                         </div>
+                        <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/manage')}>
+                          <i className="fa fa-people-roof text-white fa-2xl"></i>
+                        </div>
                         <div className="border border-2 border-white/20"></div> {/* divider */}
                       </div>
                     )}
