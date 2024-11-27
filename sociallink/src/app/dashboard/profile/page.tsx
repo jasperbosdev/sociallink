@@ -75,6 +75,47 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
   const [clickAnywhereText, setClickAnywhereText] = useState("");
   const [clickSaveStatus, setClickSaveStatus] = useState("");
+  const [audioTitle, setAudioTitle] = useState("");
+  const [audioTitleSaveStatus, setAudioTitleSaveStatus] = useState("");
+
+  const handleAddAudioTitle = async () => {
+    if (!audioTitle.trim()) {
+      alert("Please enter a valid audio title.");
+      return;
+    }
+
+    try {
+      const id = userData.id; // UUID from auth.users
+      const { data: publicUserData, error: publicUserError } = await supabase
+        .from("users")
+        .select("uid")
+        .eq("id", id) // Adjust `id` to match your context
+        .single();
+
+      if (publicUserError || !publicUserData) {
+        console.error("Error fetching public user data:", publicUserError?.message || "No data returned");
+        setAudioTitleSaveStatus("error");
+        return;
+      }
+
+      const uid = publicUserData.uid;
+
+      const { error: updateError } = await supabase
+        .from("profileGeneral")
+        .update({ audio_title: audioTitle })
+        .eq("uid", uid);
+
+      if (updateError) {
+        console.error("Error updating audio_title text:", updateError.message);
+        setAudioTitleSaveStatus("error");
+      } else {
+        setAudioTitleSaveStatus("success");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setAudioTitleSaveStatus("error");
+    }
+  };
 
   const handleAddClickAnywhere = async () => {
     if (!clickAnywhereText.trim()) {
@@ -1714,6 +1755,34 @@ export default function Dashboard() {
                           <div className="mt-4 text-green-600">
                             Song uploaded successfully!
                           </div>
+                        )}
+
+                        {fetchedSongUrl && (
+                          <>
+                            <div className="mt-1">
+                              <span className="text-white/60 font-bold text-sm">Song Title</span>
+                            </div>
+                            <div className="mt-1">
+                              <input
+                                className="bg-[#101013] border-2 text-white border-white/20 rounded-lg"
+                                placeholder="Sqwore - Завтра"
+                                value={audioTitle}
+                                onChange={(e) => setAudioTitle(e.target.value)}
+                              />
+                            </div>
+                            <div
+                              className="bg-white/10 select-none border border-[3px] border-white/60 py-1 px-2 text-sm font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-2"
+                              onClick={handleAddAudioTitle}
+                            >
+                              Save changes
+                            </div>
+                            {audioTitleSaveStatus === "success" && (
+                              <div className="text-green-500 font-bold mt-2 text-sm">Changes saved successfully!</div>
+                            )}
+                            {audioTitleSaveStatus === "error" && (
+                              <div className="text-red-500 font-bold mt-2 text-sm">Failed to save changes. Please try again.</div>
+                            )}
+                          </>
                         )}
                       </div>
                       <div></div>

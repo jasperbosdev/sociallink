@@ -162,6 +162,7 @@ export default function UserProfile() {
     animatedTitle,
     typingDesc,
     clickText,
+    audioTitle,
   } = generalConfigConsts(generalConfig);
 
   useEffect(() => {
@@ -834,7 +835,7 @@ export default function UserProfile() {
                 borderRadius,
                 backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
               }}>
-                {/* <h3 className='text-center text-lg mt-2'>{title}</h3> */}
+                <h3 className='text-center text-lg mt-2 mb-[-8px]'>{audioTitle}</h3>
                 <AudioPlayer
                   ref={audioRef}
                   src={fetchedAudioUrl}

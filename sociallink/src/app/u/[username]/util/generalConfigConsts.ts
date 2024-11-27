@@ -40,5 +40,9 @@ export const generalConfigConsts = (config: any) => {
     ? config.click_text
     : 'ᴄʟɪᴄᴋ ᴀɴʏᴡʜᴇʀᴇ';
 
-  return { pageTitle, displayName, description, animatedTitle, typingDesc, clickText };
+  const audioTitle = (config?.audio_title !== undefined && config.audio_title !== null)
+    ? config.audio_title
+    : null;
+
+  return { pageTitle, displayName, description, animatedTitle, typingDesc, clickText, audioTitle };
 };
