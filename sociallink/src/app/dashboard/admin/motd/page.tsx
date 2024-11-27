@@ -11,6 +11,8 @@ export default function SetMOTDPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
+  const [motdData, setMOTDMessage] = useState<string | null>(null);
+  const [motdDate, setMOTDDate] = useState<string | null>(null);
 
   const hideFooter = () => {
     const footer = document.getElementById('footer');
@@ -45,7 +47,23 @@ export default function SetMOTDPage() {
       setLoading(false); // Stop the loading state if admin check passes
     };
 
+    const fetchCurrentMOTD = async () => {
+      const { data: motdData, error: motdError } = await supabase
+        .from('motd')
+        .select('*')
+        .single();
+
+      if (motdError) {
+        setError('Error fetching MOTD');
+        return;
+      }
+
+      setMOTDMessage(motdData.message);
+      setMOTDDate(new Date(motdData.created_at).toLocaleString());
+    }
+
     checkAdmin();
+    fetchCurrentMOTD();
   }, [router]);
 
   const handleSave = async () => {
@@ -113,6 +131,13 @@ export default function SetMOTDPage() {
           >
             {loading ? 'Saving...' : 'Save MOTD'}
           </button>
+          <div className="mt-2">
+            <p className='font-bold'>Current MOTD: </p>
+            <div className="border-4 border-white/20 p-2 bg-black rounded-lg mt-2">
+              {motdData || 'Error fetching the current MOTD'}
+            </div>
+            <p className='font-bold text-sm mt-1'>Set on: {motdDate}</p>
+          </div>
         </div>
       </div>
     </>
