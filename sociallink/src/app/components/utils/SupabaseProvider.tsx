@@ -42,14 +42,32 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const handleLogout = async () => {
     try {
       console.log('Token refreshed, forcing logout...');
+  
+      // List of paths where logout should redirect to /login
+      const restrictedPaths = ['/dashboard', '/u'];
+  
+      // Check the current path
+      const currentPath = window.location.pathname;
+  
+      // Only redirect to /login if the current path starts with a restricted path
+      const shouldRedirect =
+        restrictedPaths.some((path) => currentPath.startsWith(path));
+  
+      // Perform logout
       await supabase.auth.signOut();
       setSession(null);
       setUser(null);
-      window.location.href = '/login'; // Redirect to /login after logout
+  
+      // Redirect to /login if necessary
+      if (shouldRedirect) {
+        window.location.href = '/login';
+      } else {
+        // console.log('Token refreshed, but staying on the current page.');
+      }
     } catch (error) {
       console.error('Error during forced logout:', error);
     }
-  };
+  };  
 
   const logout = async () => {
     try {
