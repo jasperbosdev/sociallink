@@ -8,8 +8,6 @@ import Nav from '../../components/nav';
 export default function InvitePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false); // Track if the user is an admin
   const router = useRouter();
   const [highPrivUsers, setHighPrivUsers] = useState<[]>([]);
@@ -20,6 +18,30 @@ export default function InvitePage() {
   const [isResetModalOpen, setResetModalOpen] = useState(false);
   const [confirmationResetText, setConfirmationResetText] = useState('');
   const [currentResetUser, setResetCurrentUser] = useState<{ id: string; username: string } | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(allUsers.length / usersPerPage);
+
+  // Slice users for current page
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const currentUsers = allUsers.slice(startIndex, startIndex + usersPerPage);
+
+  // Handle previous page click
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Handle next page click
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   const hideFooter = () => {
     const footer = document.getElementById('footer');
@@ -428,30 +450,34 @@ export default function InvitePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {!loading && allUsers.length > 0 ? (
-                      allUsers.map((allUser) => (
+                    {!loading && currentUsers.length > 0 ? (
+                      currentUsers.map((allUser) => (
                         <tr key={allUser.id} className="border-b border-white/20">
                           <td className="p-2 border-r border-white/20 text-center">{allUser.uid}</td>
                           <td className="p-2 border-r border-white/20 text-center font-bold">{allUser.role}</td>
                           <td className="p-2 border-r border-white/20 text-center">{allUser.email}</td>
-                          <td className="p-2 border-r border-white/20 text-center"><a className='font-bold text-blue-600' href={`/u/${allUser.username}`} target='_blank'>{allUser.username}</a></td>
+                          <td className="p-2 border-r border-white/20 text-center">
+                            <a className="font-bold text-blue-600" href={`/u/${allUser.username}`} target="_blank">
+                              {allUser.username}
+                            </a>
+                          </td>
                           <td className="p-2 border-r border-white/20 text-center">{new Date(allUser.created_at).toLocaleString()}</td>
                           <td className="p-2 border-r border-white/20 text-center">
                             <div
                               className="select-none flex justify-center items-center cursor-pointer p-1 bg-green-600 border-2 border-green-900 rounded-xl"
                               onClick={() => {
                                 const confirmAction = window.confirm(
-                                  `Are you sure you want to ${allUser.hidden ? 'unhide' : 'hide'} ${allUser.username}'s profile?`
+                                  `Are you sure you want to ${allUser.hidden ? "unhide" : "hide"} ${allUser.username}'s profile?`
                                 );
                                 if (confirmAction) {
                                   toggleUserHidden(allUser.id, allUser.hidden);
                                 }
                               }}
                             >
-                              {allUser.hidden ? 'Unhide 👨‍🦯' : 'Hide 👁️'}
+                              {allUser.hidden ? "Unhide 👨‍🦯" : "Hide 👁️"}
                             </div>
                           </td>
-                          <td className="select-none p-2 border-r border-white/20 text-center">
+                          <td className="p-2 border-r border-white/20 text-center">
                             <div
                               className="flex justify-center items-center cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl"
                               onClick={() => {
@@ -462,7 +488,7 @@ export default function InvitePage() {
                               Delete 🗑️
                             </div>
                           </td>
-                          <td className="select-none p-2 border-r border-white/20 text-center">
+                          <td className="p-2 border-r border-white/20 text-center">
                             <div
                               className="flex justify-center items-center cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl"
                               onClick={() => {
@@ -478,12 +504,32 @@ export default function InvitePage() {
                     ) : (
                       <tr>
                         <td colSpan={8} className="p-2 text-white">
-                          {loading ? 'Loading users...' : 'No users found'}
+                          {loading ? "Loading users..." : "No users found"}
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+              </div>
+              {/* Pagination Controls */}
+              <div className="flex justify-between items-center mt-2 max-w-64">
+                <button
+                  className="p-2 bg-gray-500 text-white rounded"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span className="text-white">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  className="p-2 bg-gray-500 text-white rounded"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
               </div>
             </div>
 
