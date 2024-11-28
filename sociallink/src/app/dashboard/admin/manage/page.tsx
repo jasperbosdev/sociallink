@@ -14,6 +14,9 @@ export default function InvitePage() {
   const router = useRouter();
   const [highPrivUsers, setHighPrivUsers] = useState<[]>([]);
   const [allUsers, setAllUsers] = useState('');
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [confirmationDelText, setConfirmationDelText] = useState('');
+  const [currentDelUser, setDelCurrentUser] = useState<{ id: string; username: string } | null>(null);
 
   const hideFooter = () => {
     const footer = document.getElementById('footer');
@@ -122,6 +125,112 @@ export default function InvitePage() {
       setLoading(false);
     }
   };
+
+  const deleteUserUploads = async (userId: string, username: string) => {
+    setLoading(true); // Indicate loading state
+    setError(null); // Reset error state
+  
+    const buckets = [
+      { bucket: "avatars", fileName: `${username}-pfp`, versionColumn: "pfp_vers" },
+      { bucket: "backgrounds", fileName: `${username}-bg`, versionColumn: "bg_vers" },
+      { bucket: "banners", fileName: `${username}-banner`, versionColumn: "banner_vers" },
+      { bucket: "cursors", fileName: `${username}-cursor`, versionColumn: "cursor_vers" },
+      { bucket: "songs", fileName: `${username}-audio`, versionColumn: "audio_vers" },
+    ];
+  
+    let versionsToUpdate: Record<string, number> = {}; // Tracks version increments
+  
+    try {
+      for (const { bucket, fileName, versionColumn } of buckets) {
+        // Check if the file exists in the bucket
+        const { data: files, error: listError } = await supabase.storage
+          .from(bucket)
+          .list("", { search: fileName });
+  
+        if (listError) {
+          console.error(`Error checking for file in ${bucket}:`, listError);
+          continue;
+        }
+  
+        if (files && files.length > 0) {
+          // Attempt to delete the file
+          const { error: deleteError } = await supabase.storage
+            .from(bucket)
+            .remove([fileName]);
+  
+          if (deleteError) {
+            console.error(`Error deleting file from ${bucket}:`, deleteError);
+          } else {
+            // Increment the corresponding version column
+            versionsToUpdate[versionColumn] = (versionsToUpdate[versionColumn] || 0) + 1;
+          }
+        }
+      }
+  
+      // Increment version columns in the database if any files were successfully deleted
+      if (Object.keys(versionsToUpdate).length > 0) {
+        const { data: user, error: fetchError } = await supabase
+          .from("users")
+          .select("pfp_vers, bg_vers, banner_vers, cursor_vers, audio_vers")
+          .eq("id", userId)
+          .single();
+  
+        if (fetchError || !user) {
+          throw new Error("Error fetching user version columns.");
+        }
+  
+        // Construct update payload
+        const updatedVersions = Object.fromEntries(
+          Object.entries(versionsToUpdate).map(([key, increment]) => [key, user[key] + increment])
+        );
+  
+        const { error: updateError } = await supabase
+          .from("users")
+          .update(updatedVersions)
+          .eq("id", userId);
+  
+        if (updateError) {
+          throw new Error("Error updating version columns.");
+        }
+      }
+  
+      const { data: userUid, error: uidError } = await supabase
+        .from('users')
+        .select('uid')
+        .eq('id', userId)
+        .single();
+
+      if (uidError || !userUid) {
+        throw new Error('Error fetching user UID.');
+      }
+
+      const uid = userUid.uid;
+
+      // Update `profileCosmetics` table and set `use_autoplayfix` to FALSE
+      const { error: cosmeticsError } = await supabase
+        .from("profileCosmetics")
+        .update({ use_autoplayfix: false })
+        .eq("uid", uid);
+  
+      if (cosmeticsError) {
+        throw new Error("Error updating profileCosmetics use_autoplayfix column.");
+      }
+  
+      // Optionally update state to reflect the deletion
+      setAllUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId
+            ? { ...user, uploadsDeleted: true } // Mark uploads as deleted
+            : user
+        )
+      );
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred while deleting uploads.");
+      console.error(err);
+    } finally {
+      setLoading(false); // Indicate loading state completion
+    }
+  };  
 
   // Fetch the session's user role
   const checkUserRole = async () => {
@@ -235,13 +344,13 @@ export default function InvitePage() {
                       allUsers.map((allUser) => (
                         <tr key={allUser.id} className="border-b border-white/20">
                           <td className="p-2 border-r border-white/20 text-center">{allUser.uid}</td>
-                          <td className="p-2 border-r border-white/20 text-center">{allUser.role}</td>
+                          <td className="p-2 border-r border-white/20 text-center font-bold">{allUser.role}</td>
                           <td className="p-2 border-r border-white/20 text-center">{allUser.email}</td>
-                          <td className="p-2 border-r border-white/20 text-center">{allUser.username}</td>
+                          <td className="p-2 border-r border-white/20 text-center"><a className='font-bold text-blue-600' href={`/u/${allUser.username}`} target='_blank'>{allUser.username}</a></td>
                           <td className="p-2 border-r border-white/20 text-center">{new Date(allUser.created_at).toLocaleString()}</td>
                           <td className="p-2 border-r border-white/20 text-center">
                             <div
-                              className="flex justify-center items-center cursor-pointer p-1 bg-green-600 border-2 border-green-900 rounded-xl"
+                              className="select-none flex justify-center items-center cursor-pointer p-1 bg-green-600 border-2 border-green-900 rounded-xl"
                               onClick={() => {
                                 const confirmAction = window.confirm(
                                   `Are you sure you want to ${allUser.hidden ? 'unhide' : 'hide'} ${allUser.username}'s profile?`
@@ -254,7 +363,17 @@ export default function InvitePage() {
                               {allUser.hidden ? 'Unhide 👨‍🦯' : 'Hide 👁️'}
                             </div>
                           </td>
-                          <td className="p-2 border-r border-white/20 text-center"><div className='cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl'>Delete 🗑️</div></td>
+                          <td className="select-none p-2 border-r border-white/20 text-center">
+                            <div
+                              className="flex justify-center items-center cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl"
+                              onClick={() => {
+                                setDelCurrentUser({ id: allUser.id, username: allUser.username });
+                                setDeleteModalOpen(true);
+                              }}
+                            >
+                              Delete 🗑️
+                            </div>
+                          </td>
                           <td className="p-2 text-center"><div className='cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl'>Reset 🔄</div></td>
                         </tr>
                       ))
@@ -273,6 +392,48 @@ export default function InvitePage() {
           </div>
         </div>
       </div>
+      {/* POP-UP MODALS */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#101013] border-4 border-white/20 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+            <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
+            <p className="text-sm mb-4">
+              Type <strong>"Confirm upload deletion for {currentDelUser?.username}"</strong> to proceed.
+            </p>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded-md p-2 mb-4 text-black"
+              value={confirmationDelText}
+              onChange={(e) => setConfirmationDelText(e.target.value)}
+              placeholder={`Confirm upload deletion for ${currentDelUser?.username}`}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                className="bg-red-600 shadow-none text-white px-4 py-2 rounded-md"
+                disabled={confirmationDelText !== `Confirm upload deletion for ${currentDelUser?.username}`}
+                onClick={() => {
+                  if (currentDelUser) {
+                    deleteUserUploads(currentDelUser.id, currentDelUser.username);
+                  }
+                  setDeleteModalOpen(false);
+                  setConfirmationDelText('');
+                }}
+              >
+                Confirm
+              </button>
+              <button
+                className="bg-gray-600 shadow-none text-white px-4 py-2 rounded-md"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  setConfirmationDelText('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
