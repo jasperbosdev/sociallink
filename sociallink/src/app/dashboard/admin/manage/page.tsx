@@ -17,6 +17,9 @@ export default function InvitePage() {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmationDelText, setConfirmationDelText] = useState('');
   const [currentDelUser, setDelCurrentUser] = useState<{ id: string; username: string } | null>(null);
+  const [isResetModalOpen, setResetModalOpen] = useState(false);
+  const [confirmationResetText, setConfirmationResetText] = useState('');
+  const [currentResetUser, setResetCurrentUser] = useState<{ id: string; username: string } | null>(null);
 
   const hideFooter = () => {
     const footer = document.getElementById('footer');
@@ -232,6 +235,91 @@ export default function InvitePage() {
     }
   };  
 
+  const resetUserProfile = async (userId: string) => {
+    setLoading(true); // Indicate loading state
+    setError(null); // Reset error state
+  
+    try {
+      // Fetch UID for the user
+      const { data: userUid, error: uidError } = await supabase
+        .from("users")
+        .select("uid")
+        .eq("id", userId)
+        .single();
+  
+      if (uidError || !userUid) {
+        throw new Error("Error fetching user UID.");
+      }
+  
+      const uid = userUid.uid;
+  
+      // Reset all columns in the "profileCosmetics" table to their default values
+      const { error: updateError } = await supabase
+        .from("profileCosmetics")
+        .update({
+          border_width: 3,
+          bg_color: null,
+          username_fx: false,
+          card_glow: false,
+          show_views: false,
+          border_radius: 0.5,
+          card_opacity: 90,
+          card_blur: 0,
+          background_blur: 0,
+          background_brightness: 100,
+          pfp_decoration: false,
+          decoration_value: "",
+          card_tilt: false,
+          show_badges: false,
+          rounded_socials: false,
+          primary_color: "0,0,0",
+          secondary_color: "101013",
+          accent_color: "FFFFFF",
+          text_color: "FFFFFF",
+          background_color: "10,10,13",
+          embed_color: "09090B",
+          profile_font: "geistSans",
+          usernamefx_color: "",
+          use_banner: false,
+          use_autoplayfix: false,
+          use_backgroundaudio: false,
+        })
+        .eq("uid", uid);
+  
+      if (updateError) {
+        throw new Error("Error updating user settings in profileCosmetics.");
+      }
+  
+      // Tables to reset by deleting rows associated with the user
+      const tablesToReset = [
+        "profileCustom",
+        "profileEmbed",
+        "profileSocial",
+        "profileGeneral",
+        "profile_views",
+        "socials",
+      ];
+  
+      for (const table of tablesToReset) {
+        const { error: deleteError } = await supabase
+          .from(table)
+          .delete()
+          .eq("uid", uid);
+  
+        if (deleteError) {
+          console.error(`Error deleting rows from ${table}:`, deleteError);
+        }
+      }
+  
+      alert("Profile reset successfully without deleting uploads!");
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred while resetting the profile.");
+      console.error(err);
+    } finally {
+      setLoading(false); // Indicate loading state completion
+    }
+  };
+
   // Fetch the session's user role
   const checkUserRole = async () => {
     const { data: sessionData, error } = await supabase.auth.getSession();
@@ -374,7 +462,17 @@ export default function InvitePage() {
                               Delete 🗑️
                             </div>
                           </td>
-                          <td className="p-2 text-center"><div className='cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl'>Reset 🔄</div></td>
+                          <td className="select-none p-2 border-r border-white/20 text-center">
+                            <div
+                              className="flex justify-center items-center cursor-pointer p-1 bg-red-600 border-2 border-red-900 rounded-xl"
+                              onClick={() => {
+                                setResetCurrentUser({ id: allUser.id, username: allUser.username });
+                                setResetModalOpen(true);
+                              }}
+                            >
+                              Reset 🔄
+                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -426,6 +524,47 @@ export default function InvitePage() {
                 onClick={() => {
                   setDeleteModalOpen(false);
                   setConfirmationDelText('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#101013] border-4 border-white/20 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+            <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
+            <p className="text-sm mb-4">
+              Type <strong>"Confirm profile reset for {currentResetUser?.username}"</strong> to proceed.
+            </p>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded-md p-2 mb-4 text-black"
+              value={confirmationResetText}
+              onChange={(e) => setConfirmationResetText(e.target.value)}
+              placeholder={`Confirm profile reset for ${currentResetUser?.username}`}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                className="bg-red-600 shadow-none text-white px-4 py-2 rounded-md"
+                disabled={confirmationResetText !== `Confirm profile reset for ${currentResetUser?.username}`}
+                onClick={() => {
+                  if (currentResetUser) {
+                    resetUserProfile(currentResetUser.id);
+                  }
+                  setResetModalOpen(false);
+                  setConfirmationResetText('');
+                }}
+              >
+                Confirm
+              </button>
+              <button
+                className="bg-gray-600 shadow-none text-white px-4 py-2 rounded-md"
+                onClick={() => {
+                  setResetModalOpen(false);
+                  setConfirmationResetText('');
                 }}
               >
                 Cancel
