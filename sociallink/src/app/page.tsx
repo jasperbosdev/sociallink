@@ -8,10 +8,11 @@ import { users } from './components/utils/usersData';
 export default function Home() {
   return (
     <>
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 max-w-[1280px] mx-auto overflow-hidden">
+      <div className="mt-12 md:mt-0 grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 max-w-[1280px] mx-auto overflow-hidden">
         {/* Header Section */}
         <div className="flex flex-col text-center items-center">
-          <p className="text-6xl font-bold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]">
+          <p className="text-6xl font-bold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]
+          ">
             Komako &gt;w&lt;
           </p>
           <p className="mt-1 font-bold text-white/60 animate-fade-up animate-once animate-duration-[1800ms] animate-delay-[600ms]">
@@ -20,7 +21,7 @@ export default function Home() {
         </div>
 
         {/* Spotlight and Particle Effect Section */}
-        <div className="relative flex justify-center w-2/3">
+        <div className="relative flex justify-center w-full mb-4 md:mb-0">
           <svg
             height="90%"
             width="60%"
@@ -82,7 +83,7 @@ export default function Home() {
         </div>
 
         {/* Learn More Section */}
-        <div className="flex flex-col text-center space-y-6 animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[1700ms]">
+        <div className="mt-4 md:mt-0 flex flex-col text-center space-y-6 animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[1700ms]">
           <p className="font-bold text-white/60">Learn More</p>
           <div className="animate-bounce animate-infinite">
             <i className="fas fa-arrow-down fa-2xl text-white/60"></i>
@@ -91,18 +92,18 @@ export default function Home() {
 
         {/* What Do We Do Section */}
         <div className="mb-10">
-          <div className="flex md:flex-row flex-col justify-between space-x-20">
+          <div className="flex flex-col md:flex-row justify-between space-x-0 md:space-x-20">
             <div className="text-start md:w-full">
-              <p className="text-4xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
+              <p className="md:text-start text-center text-4xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
                 What do we do and why?
               </p>
-              <p className="text-white/60 font-bold mt-2">
+              <p className="text-center md:text-start text-white/60 font-bold mt-2">
                 We offer a wide range of features to help you connect with others, and share your online presence.
                 Using our endless customizability you can really tweak everything the way you like it.
                 This projected started as an idea abandoned months ago, but revived to be used as school project.
               </p>
             </div>
-            <div className="relative w-full">
+            <div className="relative w-full mt-8 md:mt-0">
               <img src="/static/assets/square.png" className="select-none absolute top-[-28%] z-0" />
               <div
                 className="relative z-10 border border-white/60 border-4 rounded-lg"
@@ -126,7 +127,7 @@ export default function Home() {
 
         {/* Level Up Your Profile Section */}
         <div className="mt-20 w-full relative flex flex-col items-center">
-          <p className="text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
+          <p className="text-center text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
             Level up your profile
           </p>
           <p className="text-white/60 font-bold mt-2 text-center">
@@ -140,15 +141,15 @@ export default function Home() {
           </div>
 
           {/* Image Cards */}
-          <div className="relative flex flex-row justify-center mt-5 space-x-12 z-10">
+          <div className="relative flex flex-col md:flex-row justify-center mt-5 space-x-0 md:space-x-12 z-10 items-center">
             {/* Card 1 */}
             {[
               { src: '/static/assets/activity.png', label: 'Discord Activity' },
               { src: '/static/assets/bgvid.gif', label: 'Video Background' },
               { src: '/static/assets/song.png', label: 'Play Music' },
             ].map((item, index) => (
-              <div key={index} className="flex flex-col w-1/3 group">
-                <div className="border border-4 border-white/60 rounded-lg relative overflow-hidden">
+              <div key={index} className="flex w-4/5 md:w-1/3 group">
+                <div className="mt-4 md:mt-0 border border-4 border-white/60 rounded-lg relative overflow-hidden">
                   <SpotlightEffect>
                     <img
                       className="select-none transition-transform transform scale-100 group-hover:scale-110 rounded brightness-[60%] blur-[2px] group-hover:blur-0 group-hover:brightness-100 transition duration-300"
@@ -173,7 +174,7 @@ export default function Home() {
         {/* Featured Slider Section */}
         {/* hardcoded until its populated */}
         <div className="w-full mt-20 overflow-hidden relative flex flex-col items-center">
-          <p className="text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
+          <p className="text-center text-5xl font-extrabold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent">
             Wondering what we got in store?
           </p>
           <p className="text-white/60 font-bold mt-2 text-center">
