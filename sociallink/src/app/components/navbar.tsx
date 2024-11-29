@@ -15,7 +15,7 @@ export default function Navbar() {
 
   return (
     <div id='nav'>
-      <nav className="border-b-2 border-zinc-800 sticky top-0 backdrop-blur-lg bg-opacity-70 z-50 animate-fade-down animate-once animate-duration-1000 animate-delay-0">
+      <nav className="px-8 border-b-2 border-zinc-800 sticky top-0 backdrop-blur-lg bg-opacity-70 z-50 animate-fade-down animate-once animate-duration-1000 animate-delay-0">
         <div className="flex mx-auto justify-between max-w-[1000px] py-4 items-center">
           <div className="">
             <a href="/"><img src="/static/logo.png" className='w-32 h-auto'></img></a>
