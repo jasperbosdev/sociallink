@@ -84,20 +84,20 @@ export default function SignUp() {
   };
 
   return (
-    <div className="my-14">
-      <div className="flex min-h-full flex-1 flex-col justify-center py-6 lg:px-8 border border-[0.35em] border-white/60 w-1/4 mx-auto rounded-2xl bg-white/15">
+    <div className="my-14 px-8">
+      <div className="flex min-h-full flex-1 flex-col justify-center py-6 px-8 w-full border border-[0.35em] border-white/60 max-w-[400px] mx-auto rounded-2xl bg-white/15">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
-              className="mx-auto h-20 w-auto"
+              className="mx-auto h-16 w-auto"
               src="/static/logo.png"
               alt="Your Company"
           />
-          <h2 className="mt-8 text-center text-2xl font-bold leading-9 tracking-tight text-white">
+          <h2 className="mt-[1em] md:mt-8 text-center text-2xl font-bold leading-9 tracking-tight text-white">
             Register
           </h2>
         </div>
 
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="mt-[1em] md:mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
           <div className="space-y-4">
             {/* Username field */}
             <div>
