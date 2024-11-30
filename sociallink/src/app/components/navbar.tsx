@@ -1,32 +1,54 @@
 'use client';
 
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
-import logo from '/static/logo.png';
 import SpotlightEffect from './utils/spotlight';
-
-// Supabase context
 import { useSupabase } from './utils/SupabaseProvider';
 
 export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isActive = (path: string): boolean => pathname === path;
   const { session } = useSupabase();
 
+  const isActive = (path: string): boolean => pathname === path;
+
   return (
-    <div id='nav'>
+    <div id="nav">
       <nav className="px-8 border-b-2 border-zinc-800 sticky top-0 backdrop-blur-lg bg-opacity-70 z-50 animate-fade-down animate-once animate-duration-1000 animate-delay-0">
-        <div className="flex mx-auto justify-between max-w-[1000px] py-4 items-center">
-          <div className="">
-            <a href="/"><img src="/static/logo.png" className='w-32 h-auto'></img></a>
+        <div className="flex flex-col md:flex-row mx-auto justify-between max-w-[1000px] py-4 items-center">
+          {/* Top Row: Logo and Hamburger */}
+          <div className="flex justify-between w-full md:w-auto items-center">
+            <a href="/">
+              <img src="/static/logo.png" className="w-24 md:w-32 h-auto" alt="Logo" />
+            </a>
+            <button
+              className="block md:hidden text-zinc-300 hover:text-white transition duration-300"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'} fa-lg`}></i>
+            </button>
           </div>
-          <div className="flex font-bold space-x-8 text-l text-zinc-300 items-center">
+
+          {/* Navigation Links */}
+          <div
+            className={`${
+              isMenuOpen ? 'flex' : 'hidden'
+            } flex-col md:flex-row md:flex md:space-x-8 space-y-4 mt-4 md:mt-0 font-bold text-l text-zinc-300 items-center w-full md:w-auto`}
+          >
             <div className={isActive("/") ? "text-white/60" : "hover:text-white transition duration-300"}>
-              <a className="hover:text-white transition duration-300" href="/#">Home</a>
+              <a href="/#">Home</a>
             </div>
-            <div className=""><a className="hover:text-white transition duration-300" href="/#">Store</a></div>
-            <div className=""><a className="hover:text-white transition duration-300" href="/#">Discord</a></div>
-            <div className=""><a className="hover:text-white transition duration-300" target='_blank' href="https://ko-fi.com/leeuwz">Support</a></div>
+            <div>
+              <a className="hover:text-white transition duration-300" href="/#">Store</a>
+            </div>
+            <div>
+              <a className="hover:text-white transition duration-300" href="/#">Discord</a>
+            </div>
+            <div>
+              <a className="hover:text-white transition duration-300" target="_blank" href="https://ko-fi.com/leeuwz">
+                Support
+              </a>
+            </div>
             <SpotlightEffect>
               {session ? (
                 <a href="/dashboard">
