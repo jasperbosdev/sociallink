@@ -11,7 +11,7 @@ export default function Home() {
       <div className="mt-12 md:mt-0 grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 max-w-[1280px] mx-auto overflow-hidden">
         {/* Header Section */}
         <div className="flex flex-col text-center items-center">
-          <p className="text-6xl font-bold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]
+          <p className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-zinc-200/60 via-zinc-200 to-zinc-200/60 bg-clip-text text-transparent animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]
           ">
             Komako &gt;w&lt;
           </p>
@@ -43,7 +43,7 @@ export default function Home() {
           </svg>
 
           <div
-            className="w-[24em] z-20 opacity-[0.8]"
+            className="w-full z-20 mb-4 md:mb-0 opacity-[0.8]"
             ref={(el) => {
               if (el) {
                 VanillaTilt.init(el, {
@@ -72,7 +72,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center space-x-10 mt-4">
             <a href="#/">
-              <div className="relative bg-neutral-950 rounded-xl p-0.5 transition-all duration-[300ms] ease-in-out hover:bg-white/60">
+              <div className="mt-1 md:mt-0 relative bg-neutral-950 rounded-xl p-0.5 transition-all duration-[300ms] ease-in-out hover:bg-white/60">
                 <div className="flex items-center bg-neutral-950 py-1 px-4 rounded-xl transition duration-300">
                   <i className="fas fa-tags mr-2 text-white fa-lg"></i>
                   <p className="text-white font-bold text-sm uppercase">Store</p>
@@ -83,7 +83,7 @@ export default function Home() {
         </div>
 
         {/* Learn More Section */}
-        <div className="mt-4 md:mt-0 flex flex-col text-center space-y-6 animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[1700ms]">
+        <div className="mt-6 md:mt-0 flex flex-col text-center space-y-6 animate-fade-up animate-once animate-duration-[1500ms] animate-delay-[1700ms]">
           <p className="font-bold text-white/60">Learn More</p>
           <div className="animate-bounce animate-infinite">
             <i className="fas fa-arrow-down fa-2xl text-white/60"></i>
