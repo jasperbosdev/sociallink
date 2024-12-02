@@ -58,7 +58,7 @@ export default function Home() {
           >
             <img
               src="./static/images/profiledemo.png"
-              className="select-none w-full animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
+              className="select-none w-full lg:w-1/3 md:w-2/3 mx-auto animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
             />
           </div>
         </div>

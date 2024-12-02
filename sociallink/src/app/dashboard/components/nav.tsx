@@ -56,8 +56,8 @@ export default function Nav() {
     return (
         <>
             {/* vertical nav container */}
-            <div className="flex w-[6em] justify-center border-r-2 border-b-2 border-white/20 h-full">
-                <div className="flex flex-col space-y-5 mt-4 mb-4">
+            <div className="flex lg:w-[6em] border-r-2 border-b-2 border-white/20 h-full w-full">
+                <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-5 lg:mt-4 lg:mb-4 items-center">
                     {/* dashboard home */}
                     <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard')}>
                         <i className="fas fa-home text-white fa-2xl"></i>
@@ -76,8 +76,8 @@ export default function Nav() {
                     <div className="border border-2 border-white/20"></div> {/* divider */}
                     {/* Conditionally render the admin settings button */}
                     {userRole === 'admin' && (
-                      <div className="flex flex-col space-y-5 mt-4 mb-4">
-                        <div className="">
+                      <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-5 lg:mt-4 lg:mb-4 items-center">
+                        <div className="hidden lg:block">
                           <p className='text-center font-bold'>Admin</p>
                         </div><div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/badge')}>
                           <i className="far fa-id-badge text-white fa-2xl"></i>

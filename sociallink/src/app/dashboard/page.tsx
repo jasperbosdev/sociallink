@@ -219,9 +219,9 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="flex">
+      <div className="flex flex-col lg:flex-row">
         <Nav />
-        <div className="flex flex-col justify-center items-center w-full px-4 mt-8">
+        <div className="flex flex-row lg:flex-col justify-center items-center w-full px-4 mt-8">
           {/* dashboard card */}
           <div className="bg-[#101013] rounded-lg w-full relative sm:p-4 p-2 mb-4 max-w-6xl border border-4 rounded-xl border-white/20">
             <h1 className="font-bold text-center md:text-3xl text-xl pt-2 pb-4">
