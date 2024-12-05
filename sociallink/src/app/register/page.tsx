@@ -12,6 +12,7 @@ export default function SignUp() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
+  const [tosAccepted, setTosAccepted] = useState(false); // State for TOS checkbox
 
   const signup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,7 +137,7 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* Password field */}
+            {/* Password fields */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium leading-6 text-white">
                 Password
@@ -146,7 +147,6 @@ export default function SignUp() {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -154,8 +154,6 @@ export default function SignUp() {
                 />
               </div>
             </div>
-
-            {/* Confirm Password field */}
             <div>
               <label htmlFor="passwordAgain" className="block text-sm font-medium leading-6 text-white">
                 Confirm Password
@@ -165,7 +163,6 @@ export default function SignUp() {
                   id="passwordAgain"
                   name="passwordAgain"
                   type="password"
-                  autoComplete="current-password"
                   value={passwordAgain}
                   onChange={(e) => setPasswordAgain(e.target.value)}
                   required
@@ -192,11 +189,37 @@ export default function SignUp() {
               </div>
             </div>
 
+            {/* Terms of Service Checkbox */}
+            <div className="flex items-center justify-center mt-4">
+              <input
+                id="tosCheckbox"
+                name="tosCheckbox"
+                type="checkbox"
+                checked={tosAccepted}
+                onChange={(e) => setTosAccepted(e.target.checked)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 bg-[#101013] border-2 border-white/40"
+                required
+              />
+              <label htmlFor="tosCheckbox" className="ml-2 block text-sm text-white">
+                I have read and agree with the{' '}
+                <a href="/tos" target="_blank" className="text-indigo-400 font-bold">
+                  TOS
+                </a>
+              </label>
+            </div>
+
             {/* Signup Button */}
             <div>
               <button
                 onClick={signup}
-                disabled={!username || !email || !password || !passwordAgain || password !== passwordAgain}
+                disabled={
+                  !username ||
+                  !email ||
+                  !password ||
+                  !passwordAgain ||
+                  password !== passwordAgain ||
+                  !tosAccepted
+                }
                 className="border border-[2.75px] border-white/60 disabled:opacity-40 flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               >
                 Sign Up
@@ -209,7 +232,10 @@ export default function SignUp() {
           {success && <p className="text-green-500 text-center mt-4">{success}</p>}
 
           {/* Link to login page */}
-          <p className="mt-1 text-center font-semibold text-indigo-400 hover:text-indigo-300 text-sm hover:cursor-pointer" onClick={() => router.push('/login')}>
+          <p
+            className="mt-1 text-center font-semibold text-indigo-400 hover:text-indigo-300 text-sm hover:cursor-pointer"
+            onClick={() => router.push('/login')}
+          >
             Already have an account?{' Sign In'}
           </p>
         </div>
