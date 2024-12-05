@@ -36,9 +36,9 @@ export default function Footer() {
                         </div>
                         <div className="flex flex-col">
                             <p className="font-bold text-white/60 border-b-4 border-white/60">Contact</p>
-                            <p className="font-bold text-white/60 mt-2">FAQ</p>
-                            <p className="font-bold text-white/60">Terms of Service</p>
-                            <p className="font-bold text-white/60 mb-3">Privacy Policy</p>
+                            <a href="/faq"><p className="font-bold text-white/60 mt-2">FAQ</p></a>
+                            <a href="/tos"><p className="font-bold text-white/60">Terms of Service</p></a>
+                            <a href="/privacy"><p className="font-bold text-white/60 mb-3">Privacy Policy</p></a>
                         </div>
                     </div>
                 </div>
