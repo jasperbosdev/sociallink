@@ -33,7 +33,7 @@ export default function Navbar() {
           <div
             className={`${
               isMenuOpen ? 'flex' : 'hidden'
-            } flex-col md:flex-row md:flex md:space-x-8 space-y-4 mt-4 md:mt-0 font-bold text-l text-zinc-300 items-center w-full md:w-auto`}
+            } flex-col md:flex-row md:flex md:space-x-8 space-y-4 md:space-y-0 mt-4 md:mt-0 font-bold text-l text-zinc-300 items-center w-full md:w-auto`}
           >
             <div className={isActive("/") ? "text-white/60" : "hover:text-white transition duration-300"}>
               <a href="/#">Home</a>
