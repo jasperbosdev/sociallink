@@ -201,12 +201,12 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="flex">
+      <div className="flex flex-col lg:flex-row">
         <Nav />
         <div className="flex flex-col justify-center items-center w-full px-4 mt-8">
           <div className="bg-[#101013] rounded-lg w-full relative sm:p-4 p-2 mb-4 max-w-6xl border border-4 rounded-xl border-white/20">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-row gap-4">
+              <div className="flex flex-col lg:flex-row gap-4">
                 <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 w-full rounded-md p-4">
                   <h2 className="text-white font-bold text-xl pb-2">Account Information</h2>
                     <p className="text-white">
@@ -235,7 +235,7 @@ export default function Dashboard() {
               </div>
 
               <div className="flex flex-row gap-4">
-                <div className="flex gap-4 w-full">
+                <div className="flex flex-col lg:flex-row gap-4 w-full">
                   <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-100 w-full rounded-md p-4">
                     <h2 className="text-white font-bold text-xl pb-2">Change Username</h2>
                     <form onSubmit={handleUsernameChange} className="flex flex-col gap-[0.7em]" autoComplete='off'>
