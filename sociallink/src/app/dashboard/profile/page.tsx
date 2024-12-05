@@ -1211,7 +1211,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="flex">
+      <div className="flex flex-col lg:flex-row">
         <Nav />
         <div className="flex flex-col justify-center items-center w-full px-4 mt-8">
           <div className="bg-[#101013] rounded-lg w-full relative sm:p-4 p-2 mb-4 max-w-6xl border border-4 rounded-xl border-white/20">
