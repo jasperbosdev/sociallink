@@ -53,50 +53,68 @@ export default function Nav() {
 
   if (loading) return <div>Loading...</div>;
 
-    return (
-        <>
-            {/* vertical nav container */}
-            <div className="flex lg:w-[6em] border-r-2 border-b-2 border-white/20 h-full w-full">
-                <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-5 lg:mt-4 lg:mb-4 items-center">
-                    {/* dashboard home */}
-                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard')}>
-                        <i className="fas fa-home text-white fa-2xl"></i>
-                    </div>
-                    <div className="border border-2 border-white/20"></div> {/* divider */}
-                    {/* dashboard user edit */}
-                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
-                    onClick={() => router.push('/dashboard/profile')}>
-                        <i className="fas fa-user-edit text-white fa-2xl"></i>
-                    </div>
-                    {/* dashboard account settings */}
-                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
-                    onClick={() => router.push('/dashboard/account')}>
-                        <i className="fas fa-user-cog text-white fa-2xl"></i>
-                    </div>
-                    <div className="border border-2 border-white/20"></div> {/* divider */}
-                    {/* Conditionally render the admin settings button */}
-                    {userRole === 'admin' && (
-                      <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-5 lg:mt-4 lg:mb-4 items-center">
-                        <div className="hidden lg:block">
-                          <p className='text-center font-bold'>Admin</p>
-                        </div><div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/badge')}>
-                          <i className="far fa-id-badge text-white fa-2xl"></i>
-                        </div>
-                        <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/motd')}>
-                          <i className="far fa-message text-white fa-2xl"></i>
-                        </div>
-                        <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={() => router.push('/dashboard/admin/manage')}>
-                          <i className="fa fa-people-roof text-white fa-2xl"></i>
-                        </div>
-                        <div className="border border-2 border-white/20"></div> {/* divider */}
-                      </div>
-                    )}
-                    {/* dashboard logout */}
-                    <div className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer" onClick={handleLogout}>
-                        <i className="fas fa-arrow-right-from-bracket text-white fa-2xl"></i>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+  return (
+    <>
+      {/* vertical nav container */}
+      <div className="flex flex-col lg:w-[6em] border-r-2 lg:border-b-2 border-white/20 h-full w-full lg:space-y-5">
+        <div className="flex flex-wrap mt-4 lg:flex-col space-x-3 lg:space-x-0 lg:space-y-5 lg:mt-4 lg:mb-4 items-center justify-center">
+          {/* dashboard home */}
+          <div
+            className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+            onClick={() => router.push('/dashboard')}
+          >
+            <i className="fas fa-home text-white fa-2xl"></i>
+          </div>
+          <div className="hidden lg:block border border-2 min-w-[56px] border-white/20"></div> {/* divider */}
+          {/* dashboard user edit */}
+          <div
+            className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+            onClick={() => router.push('/dashboard/profile')}
+          >
+            <i className="fas fa-user-edit text-white fa-2xl"></i>
+          </div>
+          {/* dashboard account settings */}
+          <div
+            className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+            onClick={() => router.push('/dashboard/account')}
+          >
+            <i className="fas fa-user-cog text-white fa-2xl"></i>
+          </div>
+          <div className="hidden lg:block border border-2 min-w-[56px] border-white/20"></div> {/* divider */}
+          {/* Conditionally render the admin settings button */}
+          {userRole === 'admin' && (
+            <>
+              <div className="text-center font-bold lg:hidden">Admin</div>
+              <div
+                className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+                onClick={() => router.push('/dashboard/admin/badge')}
+              >
+                <i className="far fa-id-badge text-white fa-2xl"></i>
+              </div>
+              <div
+                className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+                onClick={() => router.push('/dashboard/admin/motd')}
+              >
+                <i className="far fa-message text-white fa-2xl"></i>
+              </div>
+              <div
+                className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+                onClick={() => router.push('/dashboard/admin/manage')}
+              >
+                <i className="fa fa-people-roof text-white fa-2xl"></i>
+              </div>
+              <div className="hidden lg:block border border-2 min-w-[56px] border-white/20"></div> {/* divider */}
+            </>
+          )}
+          {/* dashboard logout */}
+          <div
+            className="bg-white/20 border border-[3px] border-white/20 rounded-xl flex justify-center items-center w-14 h-14 hover:scale-[1.075] transition cursor-pointer"
+            onClick={handleLogout}
+          >
+            <i className="fas fa-arrow-right-from-bracket text-white fa-2xl"></i>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
