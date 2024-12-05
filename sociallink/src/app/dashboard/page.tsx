@@ -282,7 +282,7 @@ export default function Dashboard() {
                 <DailyLoginsChart dailyLogins={dailyLogins} />
               </div>
               {/* dupe of above, to fill empty space */}
-              <div className="bg-zinc-900 shadow-sm hover:shadow-md duration-300 lg:w-1/2 w-full rounded-md p-4">
+              <div className="hidden lg:block bg-zinc-900 shadow-sm hover:shadow-md duration-300 lg:w-1/2 w-full rounded-md p-4">
                 <h2 className="font-bold text-center md:text-2xl text-xl pt-2 pb-4">Daily Logins</h2>
                 <DailyLoginsChart dailyLogins={dailyLogins} />
               </div>
