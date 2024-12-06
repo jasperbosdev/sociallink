@@ -20,7 +20,8 @@ export default function FAQ() {
                             <h2 className="text-2xl text-indigo-400 font-bold">How do I get access:</h2>
                             <div className="py-2 font-semibold">
                                 <p>
-                                    For €3, you gain access, or be invited by another user. You can make the purchase on our Shop <a href="/shop" className="text-indigo-400">here</a>.
+                                    For €3, you gain access, or be invited by another user. You can make the purchase on our Shop <a href="https://komako.mysellix.io" target="_blank"
+                                    className="text-indigo-400">here</a>.
                                 </p>
                             </div>
                         </div>
