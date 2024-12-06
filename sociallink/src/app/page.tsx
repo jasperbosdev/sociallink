@@ -71,7 +71,7 @@ export default function Home() {
             Offering a wide range of customizability, and features to help you stand out.
           </p>
           <div className="flex justify-center space-x-10 mt-4">
-            <a href="#/">
+            <a href="https://komako.mysellix.io" target='_blank'>
               <div className="mt-1 md:mt-0 relative bg-neutral-950 rounded-xl p-0.5 transition-all duration-[300ms] ease-in-out hover:bg-white/60">
                 <div className="flex items-center bg-neutral-950 py-1 px-4 rounded-xl transition duration-300">
                   <i className="fas fa-tags mr-2 text-white fa-lg"></i>
