@@ -43,7 +43,7 @@ export default function Nav() {
   }, [router]);
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.refreshSession();
     if (error) {
       setError('Failed to log out');
     } else {
