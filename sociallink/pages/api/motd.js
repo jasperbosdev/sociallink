@@ -1,5 +1,3 @@
-import { supabase } from '../../supabase';  // adjust your import path if needed
-
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     // Fetch the current MOTD from the database
