@@ -39,10 +39,10 @@ export default function Navbar() {
               <a href="/#">Home</a>
             </div>
             <div>
-              <a className="hover:text-white transition duration-300" href="/#">Store</a>
+              <a className="hover:text-white transition duration-300" href="https://komako.mysellix.io" target='_blank'>Store</a>
             </div>
             <div>
-              <a className="hover:text-white transition duration-300" href="/#">Discord</a>
+              <a className="hover:text-white transition duration-300" href="/#" onClick={() => alert('soon TM')}>Discord</a>
             </div>
             <div>
               <a className="hover:text-white transition duration-300" target="_blank" href="https://ko-fi.com/leeuwz">
