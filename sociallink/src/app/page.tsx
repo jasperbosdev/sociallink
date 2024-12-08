@@ -25,7 +25,7 @@ export default function Home() {
           <svg
             height="90%"
             width="60%"
-            className="absolute left-0 top-[50%] z-10 translate-y-[-50%] rotate-6 text-indigo-600/50 opacity-100 blur-[60px] animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
+            className="absolute left-12 top-[50%] z-10 translate-y-[-40%] rotate-6 text-indigo-600/50 opacity-100 blur-[60px] animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
           >
             <ellipse cx="50%" cy="50%" ry="50%" rx="50%" fill="currentColor"></ellipse>
           </svg>
@@ -37,7 +37,7 @@ export default function Home() {
           <svg
             height="90%"
             width="70%"
-            className="absolute right-0 top-[50%] z-10 translate-y-[-50%] text-[hsla(0_80%_51%_/_20%)] opacity-100 blur-[60px] animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
+            className="absolute right-12 top-[50%] z-10 translate-y-[-50%] text-[hsla(0_80%_51%_/_20%)] opacity-100 blur-[60px] animate-fade animate-once animate-duration-[2800ms] animate-delay-[600ms]"
           >
             <ellipse cx="50%" cy="50%" ry="50%" rx="50%" fill="currentColor"></ellipse>
           </svg>
