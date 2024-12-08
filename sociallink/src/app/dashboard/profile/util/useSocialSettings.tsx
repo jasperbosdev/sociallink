@@ -5,13 +5,51 @@ import { useUserData } from "./useUserData";
 export default function SocialSettings() {
   const [richPresence, setRichPresence] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
-  const [existingSocials, setExistingSocials] = useState([]); // State to store existing socials
-  const [newPlatform, setNewPlatform] = useState(""); // State for selected platform
+  const [existingSocials, setExistingSocials] = useState<any[]>([]); // State to store existing socials
+  // Map platforms to their base URLs
+  const platformLinkMapping = {
+    youtube: `https://www.youtube.com/`,
+    twitch: `https://www.twitch.tv/`,
+    kick: `https://www.kick.com/`,
+    twitter: `https://twitter.com/`,
+    instagram: `https://www.instagram.com/`,
+    threads: `https://www.threads.net/`,
+    github: `https://github.com/`,
+    reddit: `https://www.reddit.com/user/`,
+    namemc: `https://namemc.com/profile/`,
+    telegram: `https://t.me/`,
+    soundcloud: `https://soundcloud.com/`,
+    spotify: `https://open.spotify.com/user/`,
+    discord: `https://discord.com/users/`, // Assuming user has the Discord user ID
+    snapchat: `https://www.snapchat.com/add/`,
+    steam: `https://steamcommunity.com/id/`,
+    email: `mailto:`,
+    tiktok: `https://www.tiktok.com/@`,
+    paypal: `https://paypal.me/`,
+    cashapp: `https://cash.app/$`,
+    bitcoin: `bitcoin:`, // Assuming this is a wallet address
+    ethereum: `ethereum:`,
+    litecoin: `litecoin:`,
+    'battle net': `https://battle.net/`,
+    valorant: `https://playvalorant.com/`,
+    'osu!': `https://osu.ppy.sh/users/`,
+    'last.fm': `https://www.last.fm/user/`,
+    myanimelist: `https://myanimelist.net/profile/`,
+    deezer: `https://www.deezer.com/user/`,
+    pinterest: `https://www.pinterest.com/`,
+    xbox: `https://account.xbox.com/en-us/profile/`,
+    playstation: `https://psnprofiles.com/`,
+    patreon: `https://www.patreon.com/`,
+    roblox: `https://www.roblox.com/users/`,
+    vk: `https://vk.com/`,
+  };
+
+  const [newPlatform, setNewPlatform] = useState<keyof typeof platformLinkMapping | "">(""); // State for selected platform
   const [newUsername, setNewUsername] = useState(""); // State for input username
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
-  const [selectedSocial, setSelectedSocial] = useState(null); // State for selected social to edit
+  const [selectedSocial, setSelectedSocial] = useState<any>(null); // State for selected social to edit
   const [discordLink, setDiscordLink] = useState("");
-  const modalRef = useRef(null); // Ref for the modal
+  const modalRef = useRef<HTMLDivElement>(null); // Ref for the modal
 
   const { loading, error, userData } = useUserData();
 
@@ -63,8 +101,8 @@ export default function SocialSettings() {
 
   // Close modal when clicking outside of it
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         closeModal();
       }
     };
@@ -223,7 +261,7 @@ export default function SocialSettings() {
   };
 
   // Function to handle when a social item is clicked to open the modal
-  const handleSocialClick = (social) => {
+  const handleSocialClick = (social: any) => {
     setSelectedSocial(social);
     setIsModalOpen(true);
   };
@@ -236,6 +274,10 @@ export default function SocialSettings() {
 
   // Function to handle updating the selected social
   const handleUpdateSocial = async () => {
+    if (!selectedSocial) {
+      console.error("No social selected");
+      return;
+    }
     const { id, platform_value } = selectedSocial;
 
     const { error } = await supabase
@@ -261,6 +303,10 @@ export default function SocialSettings() {
 
   // Function to handle deleting the selected social
   const handleDeleteSocial = async () => {
+    if (!selectedSocial) {
+      console.error("No social selected");
+      return;
+    }
     const { id } = selectedSocial;
 
     const { error } = await supabase
@@ -400,7 +446,7 @@ export default function SocialSettings() {
           <select
             className="w-full p-2 mt-2 bg-[#101013] text-white rounded-lg border-[3px] border-white/20"
             value={newPlatform}
-            onChange={(e) => setNewPlatform(e.target.value)} // Set platform value
+            onChange={(e) => setNewPlatform(e.target.value as keyof typeof platformLinkMapping)} // Set platform value
           >
             <PlatformList />
           </select>

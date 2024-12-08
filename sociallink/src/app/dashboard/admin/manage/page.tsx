@@ -10,8 +10,8 @@ export default function InvitePage() {
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false); // Track if the user is an admin
   const router = useRouter();
-  const [highPrivUsers, setHighPrivUsers] = useState<[]>([]);
-  const [allUsers, setAllUsers] = useState('');
+  const [highPrivUsers, setHighPrivUsers] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmationDelText, setConfirmationDelText] = useState('');
   const [currentDelUser, setDelCurrentUser] = useState<{ id: string; username: string } | null>(null);
@@ -145,7 +145,11 @@ export default function InvitePage() {
         )
       );
     } catch (err) {
-      setError(err.message || 'An unexpected error occurred');
+      if (err instanceof Error) {
+        setError(err.message || 'An unexpected error occurred');
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -206,7 +210,7 @@ export default function InvitePage() {
   
         // Construct update payload
         const updatedVersions = Object.fromEntries(
-          Object.entries(versionsToUpdate).map(([key, increment]) => [key, user[key] + increment])
+          Object.entries(versionsToUpdate).map(([key, increment]) => [key, (user as Record<string, any>)[key] + increment])
         );
   
         const { error: updateError } = await supabase
@@ -250,7 +254,11 @@ export default function InvitePage() {
         )
       );
     } catch (err) {
-      setError(err.message || "An unexpected error occurred while deleting uploads.");
+      if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred while deleting uploads.");
+      } else {
+        setError("An unexpected error occurred while deleting uploads.");
+      }
       console.error(err);
     } finally {
       setLoading(false); // Indicate loading state completion
@@ -335,7 +343,11 @@ export default function InvitePage() {
   
       alert("Profile reset successfully without deleting uploads!");
     } catch (err) {
-      setError(err.message || "An unexpected error occurred while resetting the profile.");
+      if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred while resetting the profile.");
+      } else {
+        setError("An unexpected error occurred while resetting the profile.");
+      }
       console.error(err);
     } finally {
       setLoading(false); // Indicate loading state completion

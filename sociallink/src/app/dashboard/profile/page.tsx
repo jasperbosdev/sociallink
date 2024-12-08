@@ -1167,7 +1167,11 @@ export default function Dashboard() {
   const handleSaveChanges = async () => {
     if (!userData) return;
 
-    const updates = {};
+    const updates: {
+      use_autoplayfix?: boolean;
+      use_banner?: boolean;
+      use_backgroundaudio?: boolean;
+    } = {};
 
     if (autoplayHasChanges) {
       updates.use_autoplayfix = isAutoplayEnabled;
@@ -1348,7 +1352,6 @@ export default function Dashboard() {
                           {avatarPreview || fetchedAvatarUrl ? (
                             <img
                               src={avatarPreview || fetchedAvatarUrl || ""}
-                              alt="Loading avatar..."
                               className="w-full h-28 object-cover"
                             />
                           ) : (
@@ -1445,17 +1448,15 @@ export default function Dashboard() {
                             {backgroundPreview || (fetchedBackgroundUrl && fileType) ? (
                             fileType === "video" ? (
                               <video
-                              src={backgroundPreview || fetchedBackgroundUrl}
+                              src={backgroundPreview || fetchedBackgroundUrl || undefined}
                               className="w-full h-28 object-cover"
                               autoPlay
-                              lazy="true"
                               loop
                               muted
-                              alt="Loading avatar..."
                               />
                             ) : (
                               <img
-                              src={backgroundPreview || fetchedBackgroundUrl}
+                              src={backgroundPreview || fetchedBackgroundUrl || undefined}
                               alt="Background preview"
                               className="w-full h-28 object-cover"
                               />
@@ -1630,7 +1631,7 @@ export default function Dashboard() {
                           {/* Display preview if cursorPreview exists */}
                           {cursorPreview || fetchedCursorUrl ? (
                             <img
-                              src={cursorPreview || fetchedCursorUrl}
+                              src={cursorPreview ?? fetchedCursorUrl ?? undefined}
                               alt="Cursor preview"
                               className="w-10 h-10 object-contain"
                             />

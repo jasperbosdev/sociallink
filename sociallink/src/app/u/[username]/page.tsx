@@ -67,11 +67,11 @@ export default function UserProfile() {
   const tiltRef = useRef<HTMLDivElement | null>(null);
 
   const { userData, loading: userLoading, error } = useUserData();
-  const { fetchedAvatarUrl, loading: avatarLoading } = useFetchAvatar();
-  const { fetchedBannerUrl, loading: bannerLoading } = useFetchBanner();
-  const { fetchedCursorUrl, loading: cursorLoading } = useFetchCursor();
-  const { fetchedBackgroundUrl, loading: backgroundLoading, fileType } = useFetchBackground();
-  const { fetchedAudioUrl, loading: audioLoading } = useFetchAudio();
+  const { fetchedAvatarUrl, isAvatarLoading: avatarLoading } = useFetchAvatar();
+  const { fetchedBannerUrl, isBannerLoading: bannerLoading } = useFetchBanner();
+  const { fetchedCursorUrl, isCursorLoading: cursorLoading } = useFetchCursor();
+  const { fetchedBackgroundUrl, isBackgroundLoading: backgroundLoading, fileType } = useFetchBackground();
+  const { fetchedAudioUrl, isAudioLoading: audioLoading } = useFetchAudio();
   const { config, loading: configLoading, error: configError } = useFetchConfig(userData?.uid);
   const { generalConfig, loading: generalConfigLoading, error: generalConfigError } = useFetchGeneralConfig(userData?.uid);
   const { badges, isLoadingBadges } = useFetchBadges();
@@ -230,7 +230,7 @@ export default function UserProfile() {
     }
     return () => {
       if (tiltRef.current && cardTilt) {
-        tiltRef.current.vanillaTilt?.destroy();
+        (tiltRef.current as any).vanillaTilt?.destroy();
       }
     };
   }, [cardTilt]);
@@ -243,7 +243,10 @@ export default function UserProfile() {
 
   const onPlayVolume = () => {
     if (audioRef.current && !isAudioReady && !audioHasBeenPlayed) {
-      audioRef.current.volume = 0.05;
+      const audioElement = audioRef.current.audio.current;
+      if (audioElement) {
+        audioElement.volume = 0.05;
+      }
       audioHasBeenPlayed = true;
     }
   };
@@ -261,11 +264,13 @@ export default function UserProfile() {
 
     if (audioRef.current && !isAudioReady) {
       const audioElement = audioRef.current.audio.current;
-      audioElement.muted = false; // Unmute the audio
-      audioElement.volume = 0.05; // Set the volume to 0.05
-      audioElement.play().catch((error) => {
-        console.error('Audio playback failed:', error);
-      });
+      if (audioElement) {
+        audioElement.muted = false; // Unmute the audio
+        audioElement.volume = 0.05; // Set the volume to 0.05
+        audioElement.play().catch((error) => {
+          console.error('Audio playback failed:', error);
+        });
+      }
       setIsAudioReady(true);
     }
   };
@@ -341,7 +346,7 @@ export default function UserProfile() {
   }, [mediaEmbeds, isLoadingMediaEmbeds]);
   
   // Convert any Spotify link (track or playlist) to use as embed src for the iframe
-  const convertSpotifyToEmbedUrl = (url) => {
+  const convertSpotifyToEmbedUrl = (url: string) => {
     const spotifyRegex = /^(https?:\/\/)?(www\.)?(open\.spotify\.com)/;
   
     if (spotifyRegex.test(url)) {
@@ -364,7 +369,7 @@ export default function UserProfile() {
   };  
 
   // convert any youtube link to use as embed src for the iframe
-  const convertToEmbedUrl = (url) => {
+  const convertToEmbedUrl = (url: string) => {
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)/;
   
     if (youtubeRegex.test(url)) {
@@ -498,8 +503,8 @@ export default function UserProfile() {
                 easing: "cubic-bezier(.03,.98,.52,.99)",
                 reset: true,
               });
-            } else if (el && !cardTilt && el.vanillaTilt) {
-              el.vanillaTilt.destroy();
+            } else if (el && !cardTilt && (el as any).vanillaTilt) {
+              (el as any).vanillaTilt.destroy();
             }
           }}
           className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-[rgb(${accentColor})] shadow-lg ${cardBlur}`}
@@ -787,8 +792,7 @@ export default function UserProfile() {
                             {actualPlatform === "spotify" && (
                               <iframe style={{ borderRadius: borderRadius, marginTop: '0', marginBottom: '8px' }}
                                 src={`${embedUrlSpotify}`}
-                                style={{ borderRadius: borderRadius}} 
-                                width={560} height={175} frameBorder="0" allowfullscreen="" 
+                                width={560} height={175} frameBorder="0" allowFullScreen
                                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"
                               />
                             )}

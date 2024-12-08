@@ -4,8 +4,24 @@ import { useUserData } from "./useUserData";
 import { supabase } from "../../../supabase";
 
 interface ColorPickerProps {
-  onColorChange: (colors: { primary: string; secondary: string; accent: string; text: string; background: string; embed: string; }) => void;
+  onColorChange: (colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    background: string;
+    embed: string;
+  }) => void;
+  initialColors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    background: string;
+    embed: string;
+  };
 }
+
 
 // Convert hex to RGB
 const hexToRgb = (hex: string): string => {

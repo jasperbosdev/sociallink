@@ -6,7 +6,7 @@ export default function EmbedSettings() {
   const [mediaTitle, setMediaTitle] = useState("");
   const [mediaValue, setMediaValue] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
-  const [existingSettings, setExistingSettings] = useState([]);
+  const [existingSettings, setExistingSettings] = useState<any[]>([]);
   const [openByDefault, setOpenByDefault] = useState(false);
   const [isModified, setIsModified] = useState(false);
 
@@ -154,7 +154,7 @@ export default function EmbedSettings() {
     setTimeout(() => setSaveStatus(""), 3000);
   };
 
-  const handleDeleteMediaEmbed = async (mediaId) => {
+  const handleDeleteMediaEmbed = async (mediaId: string | number) => {
     const { error } = await supabase
       .from("profileEmbed")
       .delete()
@@ -238,7 +238,7 @@ export default function EmbedSettings() {
       )}
       <div
         className={`border border-[3px] border-white/60 p-2 font-bold cursor-pointer rounded-lg hover:scale-[1.05] transition w-fit mt-4 ${existingSettings.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onClick={existingSettings.length === 0 ? handleAddMediaEmbed : null}
+        onClick={existingSettings.length === 0 ? handleAddMediaEmbed : undefined}
       >
         Save Embed Settings
       </div>

@@ -216,15 +216,17 @@ export default function CosmeticSettings() {
     <>
       <div className="mt-2">
         <div className="gap-4">
-          <ColorPicker 
-            onColorChange={(colors) => setColors({
-              primaryColor: colors.primary,
-              secondaryColor: colors.secondary,
-              accentColor: colors.accent,
-              textColor: colors.text,
-              backgroundColor: colors.background,
-              embedColor: colors.embed,
-            })}
+          <ColorPicker
+            onColorChange={(colors) => {
+              setColors({
+                primaryColor: colors.primary,
+                secondaryColor: colors.secondary,
+                accentColor: colors.accent,
+                textColor: colors.text,
+                backgroundColor: colors.background,
+                embedColor: colors.embed,
+              });
+            }}
             initialColors={{
               primary: primaryColor,
               secondary: secondaryColor,

@@ -7,7 +7,7 @@ export default function CustomSettings() {
   const [linkValue, setLinkValue] = useState("");
   const [linkIcon, setLinkIcon] = useState("fa-link");
   const [saveStatus, setSaveStatus] = useState("");
-  const [existingSettings, setExistingSettings] = useState([]);
+  const [existingSettings, setExistingSettings] = useState<any[]>([]);
   const [selectedLink, setSelectedLink] = useState(null); // for delete
 
   // Fetch user data
@@ -118,7 +118,7 @@ export default function CustomSettings() {
     setTimeout(() => setSaveStatus(""), 3000);
   };
 
-  const handleDeleteCustomLink = async (linkId) => {
+  const handleDeleteCustomLink = async (linkId: string | number) => {
     const { error } = await supabase
       .from("profileCustom")
       .delete()

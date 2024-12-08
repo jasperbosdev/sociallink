@@ -9,7 +9,7 @@ export default function SignIn() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSignIn = async (e) => {
+  const handleSignIn = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
   
     // Fetch the user's email based on the username

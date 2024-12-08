@@ -19,7 +19,7 @@ export default function Dashboard() {
   const [message, setMessage] = useState(''); // For success/error messages
 
   // Handle form submissions
-  const handleUsernameChange = async (e) => {
+  const handleUsernameChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(''); // Reset message before processing
   
@@ -35,7 +35,7 @@ export default function Dashboard() {
   
       // Re-authenticate the user with the current password for security
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
+        email: user.email || '',
         password: usernameCurrentPassword, // Use usernameCurrentPassword here
       });
   
@@ -122,11 +122,15 @@ export default function Dashboard() {
   
       setMessage('Username and files updated successfully.');
     } catch (nameError) {
-      setMessage(`Error: ${nameError.message}`);
+      if (nameError instanceof Error) {
+        setMessage(`Error: ${nameError.message}`);
+      } else {
+        setMessage('An unknown error occurred.');
+      }
     }
   };
 
-  const handlePasswordChange = async (e) => {
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(''); // Reset message before processing
   
@@ -141,7 +145,7 @@ export default function Dashboard() {
   
       // Re-authenticate the user with the current password
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
+        email: user.email || '',
         password: currentPassword,
       });
   
@@ -159,7 +163,11 @@ export default function Dashboard() {
         setMessage('Password updated successfully.');
       }
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      if (error instanceof Error) {
+        setMessage(`Error: ${error.message}`);
+      } else {
+        setMessage('An unknown error occurred.');
+      }
     }
   };
 

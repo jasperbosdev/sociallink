@@ -11,6 +11,7 @@ type BadgeUser = {
   icon: string;
   icon_style: string;
   username: string;
+  badge: string;
   assigned_by: string;
   assigned_on: string;
 };
@@ -84,8 +85,8 @@ export default function InvitePage() {
   const fetchBadgeUsers = async () => {
     setLoading(true);
     const { data: badgeUsersData, error } = await supabase
-      .from('badges')
-      .select('*')
+      .from('badge_users')
+      .select('id, uid, icon, icon_style, username, badge, assigned_by, assigned_on')
       .range((currentPage - 1) * badgeUsersPerPage, currentPage * badgeUsersPerPage - 1)
       .order('id', { ascending: true });
 
