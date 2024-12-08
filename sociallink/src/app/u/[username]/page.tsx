@@ -507,7 +507,7 @@ export default function UserProfile() {
               (el as any).vanillaTilt.destroy();
             }
           }}
-          className={`relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-[rgb(${accentColor})] shadow-lg ${cardBlur}`}
+          className={`pb-6 relative flex w-full max-w-[45em] flex-col items-center space-y-2 p-6 border-[rgb(${accentColor})] shadow-lg ${cardBlur}`}
           style={{
             borderWidth,
             borderColor: `rgb(${accentColor})`,
