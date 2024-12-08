@@ -133,7 +133,7 @@ export default function InvitePage() {
       const result = await response.json();
 
       if (response.ok) {
-        console.log('Invite Token:', result.inviteToken);
+        // console.log('Invite Token:', result.inviteToken);
         setInviteToken(result.inviteToken); // Set the invite token state here
         fetchInvites(currentPage); // After generating the invite, re-fetch the invites to update the UI
       } else {
@@ -150,7 +150,7 @@ export default function InvitePage() {
 
   return (
     <>
-      <div className="flex">
+      <div className="flex flex-col lg:flex-row">
         <Nav />
         <div className="flex flex-col justify-center items-center w-full px-4 mt-8">
           <div className="container mx-auto max-w-6xl p-6 border border-4 border-white/20 rounded-lg bg-[#101013]">
