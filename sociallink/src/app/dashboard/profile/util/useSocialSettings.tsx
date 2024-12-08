@@ -616,7 +616,7 @@ const platforms = [
     // "valorant",
     // "osu!",
     "last.fm",
-    "myanimelist",
+    // "myanimelist",
     // "deezer",
     "pinterest",
     "xbox",
