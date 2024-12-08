@@ -430,10 +430,21 @@ export default function UserProfile() {
   return (
     <>
       <style jsx global>{`
+        html {
+          overflow-x: hidden;
+        }
+
         body {
           font-family: var(--font-${profileFont}) !important;
           font-weight: 500;
           ${fetchedCursorUrl ? `cursor: url(${fetchedCursorUrl}), auto;` : ''}
+        }
+
+        @media (max-width: 768px) {
+          #userCard {
+            transform: scale(0.9) !important; /* Scale down to 90% */
+            margin: 0 auto; /* Center it */
+          }
         }
       `}</style>
       
@@ -664,7 +675,7 @@ export default function UserProfile() {
                 wrapper="p"
                 speed={25}
                 repeat={999}
-                style={{ color: `rgb(${textColor})` }}
+                style={{ color: `rgb(${textColor})`, textAlign: 'center' }}
               />
             ) : (
               <p style={{ color: `rgb(${textColor})` }}>{description}</p>
@@ -729,7 +740,7 @@ export default function UserProfile() {
 
             {/* Custom Links Section */}
             {customLinks.length > 0 && (
-              <div className="w-full grid grid-cols-2 gap-2 items-center">
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
                 {customLinks.map((link, index) => (
                   <a
                     key={link.id}
@@ -833,13 +844,13 @@ export default function UserProfile() {
             )}
             {/* User Audio Controls & Display */}
             {fetchedAudioUrl && (
-              <div className="w-full rounded-xl border border-[3px] p-2 w-full gap-2 items-center transition-all duration-300"
-              style={{
+                <div className="w-full rounded-xl border border-[3px] p-2 w-full gap-2 items-center transition-all duration-300"
+                style={{
                 borderColor: `rgb(${accentColor})`,
                 borderRadius,
                 backgroundColor: `rgba(${secondaryColor}, ${cardOpacity})`,
-              }}>
-                <h3 className='text-center text-lg mt-2 mb-[-8px]'>{audioTitle}</h3>
+                }}>
+                <h3 className='text-center text-base sm:text-lg md:mt-2 m-2 md:mb-[-8px]'>{audioTitle}</h3>
                 <AudioPlayer
                   ref={audioRef}
                   src={fetchedAudioUrl}
@@ -847,7 +858,7 @@ export default function UserProfile() {
                   onVolumeChange={onVolumeChange}
                   loop
                 />
-              </div>
+                </div>
             )}
           </div>
       </div>
