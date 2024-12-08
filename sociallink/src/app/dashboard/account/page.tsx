@@ -222,7 +222,7 @@ export default function Dashboard() {
                     <span className='font-bold'>email: </span>{userData?.email}<br />
                     <span className='font-bold'>username: </span>{userData?.username}<br />
                     <span className='font-bold'>rank: </span>{userData?.role}<br />
-                    <span className='font-bold'>invite by: </span>{accountInfo.length > 0 ? accountInfo[0].created_by : 'N/A'}<br />
+                    <span className='font-bold'>invited by: </span>{accountInfo.length > 0 ? accountInfo[0].created_by : 'N/A'}<br />
                     <span className='font-bold'>join date: </span>{userData ? new Date(userData.created_at).toLocaleDateString('en-GB') : ''}<span className='text-sm'> (dd-mm-yy)</span><br />
                     </p>
                 </div>
