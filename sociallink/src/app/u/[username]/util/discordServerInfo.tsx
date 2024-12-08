@@ -93,7 +93,7 @@ export default function DiscordServerInfo() {
           </div>
         </div>
       </div>
-      <div className="flex items-center cursor-pointer"
+      <div className="flex items-center cursor-pointer hidden sm:flex"
       onClick={() => window.open(discordInv[0].discord_link, '_blank')}>
         <div className='flex discord-join transition-all border border-[2px] p-2 items-center'
         style={{
